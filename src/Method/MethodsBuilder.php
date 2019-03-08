@@ -55,6 +55,7 @@ class MethodsBuilder implements BuilderInterface
     {
         $constructor = new ConstructorBuilder();
         $this->addMethod($constructor);
+
         return $constructor;
     }
 }

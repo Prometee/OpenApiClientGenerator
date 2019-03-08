@@ -17,10 +17,10 @@ class UsesBuilder implements BuilderInterface
     public function build(string $indent = null): ?string
     {
         $content = '';
-        foreach ($this->uses as $class=>$alias) {
-            $content .= 'use '.$class;
-            $content .= !empty($alias) ? ' as '.$alias : '';
-            $content .= ';'."\n";
+        foreach ($this->uses as $class => $alias) {
+            $content .= 'use ' . $class;
+            $content .= !empty($alias) ? ' as ' . $alias : '';
+            $content .= ';' . "\n";
         }
 
         if (!empty($content)) {
@@ -43,6 +43,7 @@ class UsesBuilder implements BuilderInterface
 
     /**
      * @param string $class
+     *
      * @return bool
      */
     protected function hasUse(string $class)
@@ -61,6 +62,7 @@ class UsesBuilder implements BuilderInterface
 
     /**
      * @param string $class
+     *
      * @return string|null
      */
     public function getUseAlias(string $class): ?string
@@ -90,6 +92,7 @@ class UsesBuilder implements BuilderInterface
 
     /**
      * @param string $class
+     *
      * @return string
      */
     public function getInternalClassName(string $class): ?string

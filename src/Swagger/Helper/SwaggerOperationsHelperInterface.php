@@ -8,6 +8,7 @@ interface SwaggerOperationsHelperInterface extends HelperInterface
 {
     /**
      * @param string $path
+     *
      * @return string
      */
     public static function getClassPathFromPath(string $path): string;
@@ -16,12 +17,14 @@ interface SwaggerOperationsHelperInterface extends HelperInterface
      * @param string $path
      * @param string $operation
      * @param array $operationConfiguration
+     *
      * @return string
      */
     public static function getOperationMethodName(string $path, string $operation, array $operationConfiguration): string;
 
     /**
      * @param array $responseConfiguration
+     *
      * @return string|null
      */
     public static function getReturnType(array $responseConfiguration): ?string;

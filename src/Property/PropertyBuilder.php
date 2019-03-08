@@ -56,9 +56,9 @@ class PropertyBuilder implements PropertyBuilderInterface
         $this->configurePhpDocBuilder();
         $content .= $this->phpDocBuilder->build($indent);
 
-        $content .= $indent.$this->scope.' ';
+        $content .= $indent . $this->scope . ' ';
         $content .= $this->getPhpName();
-        $content .= ($this->value !== null) ? '='.$this->value : '';
+        $content .= ($this->value !== null) ? '=' . $this->value : '';
         $content .= ';';
 
         $content .= "\n";
@@ -84,7 +84,7 @@ class PropertyBuilder implements PropertyBuilderInterface
      */
     public function getPhpName(): string
     {
-        return '$'.$this->name;
+        return '$' . $this->name;
     }
 
     /**
@@ -115,9 +115,12 @@ class PropertyBuilder implements PropertyBuilderInterface
         foreach ($this->getTypes() as $type) {
             if (preg_match('#\[\]$#', $type)) {
                 $phpType .= 'array';
+
                 break;
-            } elseif ($type !== 'null') {
+            }
+            if ($type !== 'null') {
                 $phpType .= $type;
+
                 break;
             }
         }

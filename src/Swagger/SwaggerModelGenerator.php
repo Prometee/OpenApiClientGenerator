@@ -31,7 +31,7 @@ class SwaggerModelGenerator
      * @param string $namespace
      * @param string $indent
      */
-    public function __construct(string $folder, string $namespace, string $indent = "    ")
+    public function __construct(string $folder, string $namespace, string $indent = '    ')
     {
         $this->folder = $folder;
         $this->namespace = $namespace;
@@ -42,15 +42,21 @@ class SwaggerModelGenerator
 
     /**
      * @param bool $overwrite
+     *
      * @return bool
      */
     public function generate(bool $overwrite = false): bool
     {
-        foreach ($this->definitions as $definitionName=>$definition) {
-            if (!isset($definition['type'])) return false;
-            if (!isset($definition['properties'])) continue;
-            if ($definition['type'] !== 'object') continue;
-
+        foreach ($this->definitions as $definitionName => $definition) {
+            if (!isset($definition['type'])) {
+                return false;
+            }
+            if (!isset($definition['properties'])) {
+                continue;
+            }
+            if ($definition['type'] !== 'object') {
+                continue;
+            }
             $this->generateClass($definitionName, $definition, $overwrite);
         }
 
@@ -61,20 +67,22 @@ class SwaggerModelGenerator
      * @param string $definitionName
      * @param array $definition
      * @param bool $overwrite
+     *
      * @return bool|int
      */
     public function generateClass(string $definitionName, array $definition, bool $overwrite = false)
     {
         $filePath = $this->getFilePathFromDefinitionName($definitionName);
-        if (!$overwrite && is_file($filePath)) return false;
-
-        list($namespace, $className) = $this->getClassNameAndNamespaceFromDefinitionName($definitionName);
+        if (!$overwrite && is_file($filePath)) {
+            return false;
+        }
+        [$namespace, $className] = $this->getClassNameAndNamespaceFromDefinitionName($definitionName);
 
         $classBuilder = new ClassBuilder($namespace, $className);
         $constructorBuilder = new ConstructorBuilder();
         $classBuilder->getMethodsBuilder()->addMethod($constructorBuilder);
 
-        foreach ($definition['properties'] as $property=>$config) {
+        foreach ($definition['properties'] as $property => $config) {
             $this->processProperty(
                 $classBuilder,
                 $constructorBuilder,
@@ -113,8 +121,7 @@ class SwaggerModelGenerator
         string $property,
         array $configuration,
         bool $overwrite = false
-    ): void
-    {
+    ): void {
         $cleanPropertyName = $this->helper::cleanPropertyName($property);
 
         $type = $this->generateSubClass($definitionName, $cleanPropertyName, $configuration, $overwrite);
@@ -149,18 +156,23 @@ class SwaggerModelGenerator
         switch ($propertyBuilder->getPhpType()) {
             case 'array':
                 $constructorBuilder->addLine(sprintf('$this->%s = [];', $cleanPropertyName));
+
                 break;
             case 'string':
                 $constructorBuilder->addLine(sprintf('$this->%s = \'\';', $cleanPropertyName));
+
                 break;
             case 'bool':
                 $constructorBuilder->addLine(sprintf('$this->%s = true;', $cleanPropertyName));
+
                 break;
             case 'int':
                 $constructorBuilder->addLine(sprintf('$this->%s = 0;', $cleanPropertyName));
+
                 break;
             case 'float':
                 $constructorBuilder->addLine(sprintf('$this->%s = .0;', $cleanPropertyName));
+
                 break;
         }
 
@@ -172,6 +184,7 @@ class SwaggerModelGenerator
      * @param string $currentProperty
      * @param array $currentConfig
      * @param bool $overwrite
+     *
      * @return string|null
      */
     public function generateSubClass(string $currentDefinitionName, string $currentProperty, array $currentConfig, bool $overwrite = false): ?string
@@ -182,12 +195,12 @@ class SwaggerModelGenerator
             $subConfig = [];
             if (isset($currentConfig['properties'])) {
                 $subConfig = $currentConfig;
-            } else if (isset($currentConfig['items']) && isset($currentConfig['items']['properties'])) {
+            } elseif (isset($currentConfig['items'], $currentConfig['items']['properties'])) {
                 $subConfig = $currentConfig['items'];
             }
             if (!empty($subConfig)) {
                 $this->generateClass($subDefinitionName, $subConfig, $overwrite);
-                list($subNamespace, $subClassName) = $this->getClassNameAndNamespaceFromDefinitionName($subDefinitionName);
+                [$subNamespace, $subClassName] = $this->getClassNameAndNamespaceFromDefinitionName($subDefinitionName);
                 $type = '\\' . $subNamespace . '\\' . $subClassName;
                 $type .= $currentConfig['type'] === 'array' ? '[]' : '';
             }
@@ -219,27 +232,29 @@ class SwaggerModelGenerator
      * @param string $definitionName
      * @param string $classPrefix
      * @param string $classSuffix
+     *
      * @return array
      */
     public function getClassNameAndNamespaceFromDefinitionName(string $definitionName, string $classPrefix = '', string $classSuffix = ''): array
     {
         $className = $this->helper::getClassPathFromDefinitionName($definitionName);
-        $namespace = $this->namespace.'\\'.preg_replace('#/#', '\\', $className);
+        $namespace = $this->namespace . '\\' . preg_replace('#/#', '\\', $className);
         $className = basename($className);
         $namespace = preg_replace(
-            '#\\\\'.$className.'$#',
+            '#\\\\' . $className . '$#',
             '',
             $namespace
         );
 
         return [
             $namespace,
-            $classPrefix.$className.$classSuffix,
+            $classPrefix . $className . $classSuffix,
         ];
     }
 
     /**
      * @param string $definitionName
+     *
      * @return string
      */
     protected function getFilePathFromDefinitionName(string $definitionName): string
@@ -250,26 +265,29 @@ class SwaggerModelGenerator
     /**
      * @param array $config
      * @param ClassBuilder $classBuilder
+     *
      * @return string
      */
     public function getPhpTypeFromPropertyConfig(array $config, ClassBuilder $classBuilder)
     {
         $type = $this->helper::getPhpTypeFromSwaggerConfiguration($config);
-        $currentNamespace= $classBuilder->getNamespace();
+        $currentNamespace = $classBuilder->getNamespace();
         if ($this->hasDefinition($type)) {
             if (preg_match('#^\\\\#', $type) === 0) {
-                list($propertyNamespace, $propertyClassName) = $this->getClassNameAndNamespaceFromDefinitionName(trim($type, '[]'));
+                [$propertyNamespace, $propertyClassName] = $this->getClassNameAndNamespaceFromDefinitionName(trim($type, '[]'));
                 if ($currentNamespace !== $propertyNamespace) {
                     $classBuilder->getUsesBuilder()->addUse($propertyNamespace . '\\' . $propertyClassName);
                 }
                 $type = $propertyClassName;
             }
         }
+
         return $type;
     }
 
     /**
      * @param string $definitionName
+     *
      * @return bool
      */
     public function hasDefinition(string $definitionName): bool

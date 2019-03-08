@@ -16,10 +16,10 @@ class ClassTraitsBuilder implements BuilderInterface
 
     public function build(string $indent = null): ?string
     {
-        $content = (!empty($this->traits)) ? ' use '.implode(",\n".$indent, $this->traits) : '';
+        $content = (!empty($this->traits)) ? ' use ' . implode(",\n" . $indent, $this->traits) : '';
 
         if (!empty($content)) {
-            $content = "\n".$content.';'."\n";
+            $content = "\n" . $content . ';' . "\n";
         }
 
         return $content;

@@ -66,19 +66,19 @@ class ClassBuilder implements BuilderInterface
     {
         $content = '';
 
-        $content .= '<?php'."\n";
+        $content .= '<?php' . "\n";
         $content .= "\n";
-        $content .= 'declare(strict_types=1);'."\n";
+        $content .= 'declare(strict_types=1);' . "\n";
         $content .= "\n";
-        $content .= 'namespace '.$this->namespace.';'."\n";
+        $content .= 'namespace ' . $this->namespace . ';' . "\n";
         $content .= "\n";
         $content .= $this->usesBuilder->build($indent);
-        $content .= $this->buildClassSignature()."\n";
+        $content .= $this->buildClassSignature() . "\n";
         $content .= '{';
         $content .= $this->classTraitsBuilder->build($indent);
         $content .= $this->propertiesBuilder->build($indent);
         $content .= $this->methodsBuilder->build($indent);
-        $content .= '}'."\n";
+        $content .= '}' . "\n";
 
         return $content;
     }
@@ -88,9 +88,10 @@ class ClassBuilder implements BuilderInterface
      */
     public function buildClassSignature(): string
     {
-        $extends = ($this->extendClassName !== null) ? ' extends '.$this->extendClassName : '';
-        $implements = (!empty($this->implements)) ? ' implements '.implode(', ', $this->implements) : '';
-        return $this->builderType . ' ' . $this->className.$extends.$implements;
+        $extends = ($this->extendClassName !== null) ? ' extends ' . $this->extendClassName : '';
+        $implements = (!empty($this->implements)) ? ' implements ' . implode(', ', $this->implements) : '';
+
+        return $this->builderType . ' ' . $this->className . $extends . $implements;
     }
 
     /**

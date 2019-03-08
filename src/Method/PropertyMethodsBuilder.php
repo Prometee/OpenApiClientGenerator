@@ -31,6 +31,7 @@ class PropertyMethodsBuilder
 
     /**
      * @param string|null $indent
+     *
      * @return MethodBuilderInterface[]
      */
     public function getMethods(string $indent = null): array
@@ -39,9 +40,12 @@ class PropertyMethodsBuilder
         foreach ($this->propertyBuilder->getTypes() as $type) {
             if ($type === 'bool') {
                 $propertyMethodsBuilder = new IsserSetterBuilder($this->propertyBuilder, $this->readOnly, $this->writeOnly);
+
                 break;
-            } elseif (preg_match('#\[\]$#', $type)) {
+            }
+            if (preg_match('#\[\]$#', $type)) {
                 $propertyMethodsBuilder = new ArrayGetterSetterBuilder($this->propertyBuilder, $this->readOnly, $this->writeOnly);
+
                 break;
             }
         }

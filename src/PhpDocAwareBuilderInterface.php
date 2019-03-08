@@ -16,8 +16,5 @@ interface PhpDocAwareBuilderInterface
      */
     public function setPhpDocBuilder(PhpDocBuilderInterface $phpDocBuilder): void;
 
-    /**
-     * {@inheritdoc}
-     */
     public function resetPhpDocBuilder(): void;
 }

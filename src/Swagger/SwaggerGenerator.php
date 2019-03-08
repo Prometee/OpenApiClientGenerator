@@ -33,38 +33,43 @@ class SwaggerGenerator
      * @param string $namespace
      * @param string $indent
      */
-    public function __construct(string $swaggerUri, string $folder, string $namespace, string $indent = "    ")
+    public function __construct(string $swaggerUri, string $folder, string $namespace, string $indent = '    ')
     {
         $this->swaggerUri = $swaggerUri;
         $this->folder = $folder;
         $this->namespace = $namespace;
         $this->indent = $indent;
         $this->modelGenerator = new SwaggerModelGenerator(
-            $folder.'/'.static::TYPE_MODEL,
-            $namespace.'\\'.static::TYPE_MODEL,
+            $folder . '/' . static::TYPE_MODEL,
+            $namespace . '\\' . static::TYPE_MODEL,
             $indent
         );
         $this->operationsGenerator = new SwaggerOperationsGenerator(
-            $folder.'/'.static::TYPE_OPERATIONS,
-            $namespace.'\\'.static::TYPE_OPERATIONS,
-            $namespace.'\\'.static::TYPE_MODEL,
+            $folder . '/' . static::TYPE_OPERATIONS,
+            $namespace . '\\' . static::TYPE_OPERATIONS,
+            $namespace . '\\' . static::TYPE_MODEL,
             $indent
         );
     }
 
     /**
      * @param bool $overwrite
+     *
      * @return bool
      */
     public function generate(bool $overwrite = false): bool
     {
         $content = file_get_contents($this->swaggerUri);
-        if ($content === false) return false;
-        if (empty($content)) return false;
-
+        if ($content === false) {
+            return false;
+        }
+        if (empty($content)) {
+            return false;
+        }
         $json = json_decode($content, true);
-        if ($json === null) return false;
-
+        if ($json === null) {
+            return false;
+        }
         $this->processDefinitions($json, $overwrite);
 
         $this->processPaths($json, $overwrite);
@@ -75,20 +80,26 @@ class SwaggerGenerator
     /**
      * @param array $json
      * @param bool $overwrite
+     *
      * @return bool
      */
     public function processDefinitions(array $json, bool $overwrite = false): bool
     {
-        if (!isset($json['definitions'])) return false;
+        if (!isset($json['definitions'])) {
+            return false;
+        }
         $this->modelGenerator->setDefinitions($json['definitions']);
-        return $this->modelGenerator->generate($overwrite);
 
+        return $this->modelGenerator->generate($overwrite);
     }
 
     public function processPaths(array $json, bool $overwrite = false): bool
     {
-        if (!isset($json['paths'])) return false;
+        if (!isset($json['paths'])) {
+            return false;
+        }
         $this->operationsGenerator->setPaths($json['paths']);
+
         return $this->operationsGenerator->generate($overwrite);
     }
 

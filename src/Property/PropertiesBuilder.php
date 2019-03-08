@@ -57,6 +57,7 @@ class PropertiesBuilder implements BuilderInterface
 
     /**
      * @param string $propertyName
+     *
      * @return PropertyBuilderInterface|null
      */
     public function getPropertyByName(string $propertyName): ?PropertyBuilderInterface

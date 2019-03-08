@@ -8,5 +8,4 @@ use Prometee\SwaggerClientBuilder\BuilderInterface;
 
 interface MethodsBuilderInterface extends BuilderInterface
 {
-
 }

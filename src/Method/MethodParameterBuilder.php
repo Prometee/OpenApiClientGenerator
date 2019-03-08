@@ -43,10 +43,10 @@ class MethodParameterBuilder implements BuilderInterface
     {
         $content = '';
 
-        $content .= ($this->type !== null) ? $this->getPhpType().' ' : '';
+        $content .= ($this->type !== null) ? $this->getPhpType() . ' ' : '';
         $content .= $this->byReference ? '&' : '';
         $content .= $this->getPhpName();
-        $content .= ($this->value !== null) ? ' = '.$this->value : '';
+        $content .= ($this->value !== null) ? ' = ' . $this->value : '';
 
         return $content;
     }
@@ -56,7 +56,7 @@ class MethodParameterBuilder implements BuilderInterface
      */
     public function getPhpName(): string
     {
-        return '$'.$this->getName();
+        return '$' . $this->getName();
     }
 
     /**
@@ -87,9 +87,12 @@ class MethodParameterBuilder implements BuilderInterface
         foreach ($this->getTypes() as $type) {
             if (preg_match('#\[\]$#', $type)) {
                 $phpType .= 'array';
+
                 break;
-            } elseif ($type !== 'null') {
+            }
+            if ($type !== 'null') {
                 $phpType .= $type;
+
                 break;
             }
         }

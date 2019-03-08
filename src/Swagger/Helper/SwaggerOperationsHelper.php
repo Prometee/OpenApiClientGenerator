@@ -22,6 +22,7 @@ class SwaggerOperationsHelper extends AbstractHelper implements SwaggerOperation
 
         // replace all {path_parameter} by /
         $classPath = preg_replace('#\{[^\{]+\}#i', '/', $classPath);
+
         return $classPath;
     }
 
@@ -36,7 +37,7 @@ class SwaggerOperationsHelper extends AbstractHelper implements SwaggerOperation
 
         $hasPathParameters = preg_match('#\{[^\{]+\}#', $path);
 
-        return strtolower($operation).($hasPathParameters ? 'Item' : 'Collection');
+        return strtolower($operation) . ($hasPathParameters ? 'Item' : 'Collection');
     }
 
     /**
@@ -45,8 +46,13 @@ class SwaggerOperationsHelper extends AbstractHelper implements SwaggerOperation
     public static function getReturnType(array $responseConfiguration): ?string
     {
         foreach ([200, 201, 203, 204] as $httpCode) {
-            if (!isset($responseConfiguration[$httpCode])) continue;
-            if (!isset($responseConfiguration[$httpCode]['schema'])) continue;
+            if (!isset($responseConfiguration[$httpCode])) {
+                continue;
+            }
+            if (!isset($responseConfiguration[$httpCode]['schema'])) {
+                continue;
+            }
+
             return static::getPhpTypeFromSwaggerConfiguration($responseConfiguration[$httpCode]['schema']);
         }
 

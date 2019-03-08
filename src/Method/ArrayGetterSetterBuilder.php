@@ -67,7 +67,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
 
         $format = '';
         if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
-            $format .= 'if ($this->%2$s === null) return false;'."\n";
+            $format .= 'if ($this->%2$s === null) return false;' . "\n";
         }
         $format .= 'return in_array($%1$s, $this->%2$s, %3$s);';
 
@@ -95,11 +95,11 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
         );
         $this->addSetterMethod->addParameter($methodParameterBuilder);
 
-        $format  = 'if(!$this->%1$s(%2$s)) {'."\n";
-            if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
-                $format .= '%3$sif ($this->%4$s === null) $this->%4$s = [];'."\n";
-            }
-            $format .= '%3$s$this->%4$s[] = %2$s;'."\n";
+        $format = 'if(!$this->%1$s(%2$s)) {' . "\n";
+        if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
+            $format .= '%3$sif ($this->%4$s === null) $this->%4$s = [];' . "\n";
+        }
+        $format .= '%3$s$this->%4$s[] = %2$s;' . "\n";
         $format .= '}';
 
         $this->addSetterMethod->addLine(
@@ -127,9 +127,9 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
 
         $this->removeSetterMethod->addParameter($methodParameterBuilder);
 
-        $format  = 'if($this->%1$s(%2$s)) {'."\n";
-            $format .= '%3$s$index = array_search(%2$s, $this->%4$s);'."\n";
-            $format .= '%3$sunset($this->%4$s[$index]);'."\n";
+        $format = 'if($this->%1$s(%2$s)) {' . "\n";
+        $format .= '%3$s$index = array_search(%2$s, $this->%4$s);' . "\n";
+        $format .= '%3$sunset($this->%4$s[$index]);' . "\n";
         $format .= '}';
 
         $this->removeSetterMethod->addLine(
@@ -146,6 +146,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
     /**
      * @param string|null $prefix
      * @param string|null $suffix
+     *
      * @return string
      */
     public function getSingleMethodName(?string $prefix = null, ?string $suffix = null): string
@@ -169,9 +170,12 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
         foreach ($this->propertyBuilder->getTypes() as $type) {
             if (preg_match('#\[\]$#', $type)) {
                 $phpType .= rtrim($type, '[]');
+
                 break;
-            } elseif ($type !== 'null') {
+            }
+            if ($type !== 'null') {
                 $phpType .= $type;
+
                 break;
             }
         }

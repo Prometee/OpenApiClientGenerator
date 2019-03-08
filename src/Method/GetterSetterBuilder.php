@@ -40,6 +40,7 @@ class GetterSetterBuilder
 
     /**
      * @param string|null $indent
+     *
      * @return MethodBuilderInterface[]
      */
     public function getMethods(string $indent = null): array
@@ -56,6 +57,7 @@ class GetterSetterBuilder
     /**
      * @param string|null $prefix
      * @param string|null $suffix
+     *
      * @return string
      */
     public function getMethodName(?string $prefix = null, ?string $suffix = null): string
@@ -67,7 +69,8 @@ class GetterSetterBuilder
         foreach ($words as $word) {
             $name .= empty($word) ? '_' : $word;
         }
-        return $prefix.$name.$suffix;
+
+        return $prefix . $name . $suffix;
     }
 
     public function configureGetter(string $indent = null): void

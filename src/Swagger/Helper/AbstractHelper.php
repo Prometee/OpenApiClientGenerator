@@ -13,8 +13,8 @@ abstract class AbstractHelper implements HelperInterface
     {
         if (isset($config['type'])) {
             $type = $config['type'];
-            $items = isset($config['items']) ? $config['items'] : null;
-            $format = isset($config['format']) ? $config['format'] : null;
+            $items = $config['items'] ?? null;
+            $format = $config['format'] ?? null;
             switch ($type) {
                 case 'boolean':
                     return 'bool';
@@ -23,15 +23,15 @@ abstract class AbstractHelper implements HelperInterface
                 case 'number':
                     return 'float';
                 case 'array':
-                    return static::getPhpTypeFromSwaggerArrayType($items).'[]';
+                    return static::getPhpTypeFromSwaggerArrayType($items) . '[]';
                 case 'object':
                     return '\\stdClass';
                 case 'string':
                     return static::getPhpTypeFromSwaggerStringType($format);
             }
-        } else if (isset($config['$ref'])) {
+        } elseif (isset($config['$ref'])) {
             return static::getPhpTypeFromSwaggerDefinitionName($config['$ref']);
-        } else if ($config['schema'] && isset($config['schema']['$ref'])) {
+        } elseif ($config['schema'] && isset($config['schema']['$ref'])) {
             return static::getPhpTypeFromSwaggerDefinitionName($config['schema']['$ref']);
         }
 

@@ -8,6 +8,7 @@ interface PhpDocBuilderInterface extends BuilderInterface
 {
     /**
      * @param array|null $types
+     *
      * @return string
      */
     public static function getPossibleTypesFromTypeName(?array $types): string;
@@ -15,6 +16,7 @@ interface PhpDocBuilderInterface extends BuilderInterface
     /**
      * @param string $line
      * @param int $wrapOn
+     *
      * @return array
      */
     public static function wrapLines(string $line, int $wrapOn = 110): array;

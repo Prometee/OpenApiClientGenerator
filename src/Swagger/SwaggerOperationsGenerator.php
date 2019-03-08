@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger;
 
-use Prometee\SwaggerClientBuilder\Swagger\Builder\OperationMethodBuilder;
 use Prometee\SwaggerClientBuilder\ClassBuilder;
-use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelper;
 use Prometee\SwaggerClientBuilder\Method\MethodBuilderInterface;
 use Prometee\SwaggerClientBuilder\Method\MethodParameterBuilder;
+use Prometee\SwaggerClientBuilder\Swagger\Builder\OperationMethodBuilder;
+use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelper;
 
 class SwaggerOperationsGenerator
 {
@@ -44,7 +44,7 @@ class SwaggerOperationsGenerator
      * @param string $modelNamespace
      * @param string $indent
      */
-    public function __construct(string $folder, string $namespace, string $modelNamespace, string $indent = "    ")
+    public function __construct(string $folder, string $namespace, string $modelNamespace, string $indent = '    ')
     {
         $this->folder = $folder;
         $this->namespace = $namespace;
@@ -58,6 +58,7 @@ class SwaggerOperationsGenerator
 
     /**
      * @param bool $overwrite
+     *
      * @return bool
      */
     public function generate(bool $overwrite = false): bool
@@ -71,7 +72,9 @@ class SwaggerOperationsGenerator
 
     public function processPaths(array $json, bool $overwrite = false): bool
     {
-        if (!isset($json['paths'])) return false;
+        if (!isset($json['paths'])) {
+            return false;
+        }
         foreach ($this->paths as $path => $operationConfigurations) {
             $this->generateClass($path, $operationConfigurations, $overwrite);
         }
@@ -83,6 +86,7 @@ class SwaggerOperationsGenerator
      * @param string $path
      * @param array $operationConfigurations
      * @param bool $overwrite
+     *
      * @return bool|int
      */
     public function generateClass(string $path, array $operationConfigurations, bool $overwrite = false)
@@ -93,7 +97,7 @@ class SwaggerOperationsGenerator
             static::CLASS_SUFFIX
         );
 
-        list($namespace, $className) = $this->getClassNameAndNamespaceFromPath(
+        [$namespace, $className] = $this->getClassNameAndNamespaceFromPath(
             $path,
             '',
             static::CLASS_SUFFIX
@@ -101,9 +105,11 @@ class SwaggerOperationsGenerator
 
         $classBuilder = $this->getOrCreateClassBuilder($filePath, $namespace, $className);
 
-        foreach ($operationConfigurations as $operation=>$operationConfiguration) {
+        foreach ($operationConfigurations as $operation => $operationConfiguration) {
             $operation = strtolower($operation);
-            if (!in_array($operation, ['get', 'post', 'put', 'delete'])) continue;
+            if (!in_array($operation, ['get', 'post', 'put', 'delete'])) {
+                continue;
+            }
             $this->processOperation($classBuilder, $path, $operation, $operationConfiguration);
         }
 
@@ -119,6 +125,7 @@ class SwaggerOperationsGenerator
      * @param string $filePath
      * @param string $namespace
      * @param string $className
+     *
      * @return ClassBuilder
      */
     protected function getOrCreateClassBuilder(string $filePath, string $namespace, string $className): ClassBuilder
@@ -143,6 +150,7 @@ class SwaggerOperationsGenerator
 
     /**
      * @param string $filePath
+     *
      * @return bool
      */
     protected function hasClassBuilder(string $filePath): bool
@@ -155,8 +163,7 @@ class SwaggerOperationsGenerator
         string $path,
         string $operation,
         array $operationConfiguration
-    )
-    {
+    ) {
         $returnType = null;
         if (isset($operationConfiguration['responses'])) {
             $returnType = $this->helper::getReturnType($operationConfiguration['responses']);
@@ -186,7 +193,7 @@ class SwaggerOperationsGenerator
             $this->processOperationParameters($classBuilder, $operationMethodBuilder, $operationParameters);
         }
 
-        foreach ($this->throwsClasses as $throwsClass=>$className) {
+        foreach ($this->throwsClasses as $throwsClass => $className) {
             $classBuilder->getUsesBuilder()->addUse($throwsClass);
             $operationMethodBuilder->getPhpDocBuilder()->addThrowsLine($className);
         }
@@ -205,15 +212,18 @@ class SwaggerOperationsGenerator
     {
         foreach ($operationParameters as $parameterConfiguration) {
             $methodParameterBuilder = $this->createAnOperationParameter($classBuilder, $parameterConfiguration);
-            if ($methodParameterBuilder === null) continue;
+            if ($methodParameterBuilder === null) {
+                continue;
+            }
             $methodBuilder->addParameter($methodParameterBuilder);
         }
     }
 
     public function createAnOperationParameter(ClassBuilder $classBuilder, array $parameterConfiguration): ?MethodParameterBuilder
     {
-        if (!isset($parameterConfiguration['name'])) return null;
-
+        if (!isset($parameterConfiguration['name'])) {
+            return null;
+        }
         $type = $this->helper::getPhpTypeFromSwaggerConfiguration($parameterConfiguration);
         if ($type !== null) {
             $type = $this->minifyClassToUses($classBuilder, $type);
@@ -225,7 +235,7 @@ class SwaggerOperationsGenerator
         if (isset($parameterConfiguration['default'])) {
             $value = (string) $parameterConfiguration['default'];
             if ($type === 'string') {
-                $value = "'".addslashes($value)."'";
+                $value = "'" . addslashes($value) . "'";
             }
         }
 
@@ -238,7 +248,7 @@ class SwaggerOperationsGenerator
                 $value = null;
                 $description .= ' (required)';
             } else {
-                $type = '?'.$type;
+                $type = '?' . $type;
                 $value = $value !== null ? $value : 'null';
                 $description .= ' (optional)';
             }
@@ -257,35 +267,37 @@ class SwaggerOperationsGenerator
      * @param string $path
      * @param string $classPrefix
      * @param string $classSuffix
+     *
      * @return array
      */
     public function getClassNameAndNamespaceFromPath(string $path, string $classPrefix = '', string $classSuffix = ''): array
     {
         $className = $this->helper::getClassPathFromPath($path);
-        $namespace = $this->namespace.'\\'.preg_replace('#/#', '\\', $className);
+        $namespace = $this->namespace . '\\' . preg_replace('#/#', '\\', $className);
         $className = basename($className);
         $namespace = preg_replace(
-            '#\\\\'.$className.'$#',
+            '#\\\\' . $className . '$#',
             '',
             $namespace
         );
 
         return [
             $namespace,
-            $classPrefix.$className.$classSuffix,
+            $classPrefix . $className . $classSuffix,
         ];
     }
 
     /**
      * @param ClassBuilder $classBuilder
      * @param string $type
+     *
      * @return string
      */
     public function minifyClassToUses(ClassBuilder $classBuilder, string $type): string
     {
         if (preg_match('$^#/definitions/$', $type)) {
             $type = preg_replace('$#/definitions/$', '', $type);
-            $type = '\\'.$this->modelNamespace.'\\'.ucfirst($type);
+            $type = '\\' . $this->modelNamespace . '\\' . ucfirst($type);
         }
 
         if (preg_match('#^\\\\#', $type)) {
@@ -301,12 +313,14 @@ class SwaggerOperationsGenerator
      * @param string $path
      * @param string $classPrefix
      * @param string $classSuffix
+     *
      * @return string
      */
     protected function getFilePathFromPath(string $path, string $classPrefix = '', string $classSuffix = ''): string
     {
         $filePath = sprintf('%s/%s%s%s.php', $this->folder, $classPrefix, $this->helper::getClassPathFromPath($path), $classSuffix);
-        return preg_replace('#/'.$classPrefix.$classSuffix.'\.php$#', $classPrefix.$classSuffix.'.php', $filePath);
+
+        return preg_replace('#/' . $classPrefix . $classSuffix . '\.php$#', $classPrefix . $classSuffix . '.php', $filePath);
     }
 
     /**

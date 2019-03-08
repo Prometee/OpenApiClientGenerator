@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger\Builder;
 
-use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelper;
 use Prometee\SwaggerClientBuilder\Method\MethodBuilder;
 use Prometee\SwaggerClientBuilder\Method\MethodBuilderInterface;
+use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelper;
 
 class OperationMethodBuilder extends MethodBuilder
 {
@@ -35,7 +35,7 @@ class OperationMethodBuilder extends MethodBuilder
             $suffix = '.\'[]\'';
         }
 
-        return rtrim($this->returnType, '[]').'::class'.$suffix;
+        return rtrim($this->returnType, '[]') . '::class' . $suffix;
     }
 
     /**
@@ -49,15 +49,19 @@ class OperationMethodBuilder extends MethodBuilder
         switch ($operation) {
             case 'get':
                 $this->addGetOperationLines($path, $operationParameters, $indent);
+
                 break;
             case 'post':
                 $this->addPostOperationLines($path, $operationParameters, $indent);
+
                 break;
             case 'put':
                 $this->addPutOperationLines($path, $operationParameters, $indent);
+
                 break;
             case 'delete':
                 $this->addDeleteOperationLines($path, $operationParameters, $indent);
+
                 break;
         }
     }
@@ -69,17 +73,16 @@ class OperationMethodBuilder extends MethodBuilder
      */
     public function addGetOperationLines(string $path, array $operationParameters, string $indent = null): void
     {
-        list($pathParams, $queryParams) = $this->buildPathAndQueryParams($operationParameters);
+        [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
         $format =
-            'return $this->execGetOperation('."\n"
-                .'%1$s\'%2$s\','."\n"
-                .'%1$s%3$s,'."\n"
-                .'%1$s['.$pathParams.'],'."\n"
-                .'%1$s['.$queryParams.']'."\n"
-            .');'."\n"
+            'return $this->execGetOperation(' . "\n"
+                . '%1$s\'%2$s\',' . "\n"
+                . '%1$s%3$s,' . "\n"
+                . '%1$s[' . $pathParams . '],' . "\n"
+                . '%1$s[' . $queryParams . ']' . "\n"
+            . ');' . "\n"
         ;
-
 
         $this->addLine(sprintf(
             $format,
@@ -98,16 +101,16 @@ class OperationMethodBuilder extends MethodBuilder
      */
     public function addPostOperationLines(string $path, array $operationParameters, string $indent = null): void
     {
-        list($pathParams, $queryParams) = $this->buildPathAndQueryParams($operationParameters);
+        [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
         $format =
-            'return $this->execPostOperation('."\n"
-            .'%1$s\'%2$s\','."\n"
-            .'%1$s%3$s,'."\n"
-            .'%1$s%4$s,'."\n"
-            .'%1$s['.$pathParams.'],'."\n"
-            .'%1$s['.$queryParams.']'."\n"
-            .');'."\n"
+            'return $this->execPostOperation(' . "\n"
+            . '%1$s\'%2$s\',' . "\n"
+            . '%1$s%3$s,' . "\n"
+            . '%1$s%4$s,' . "\n"
+            . '%1$s[' . $pathParams . '],' . "\n"
+            . '%1$s[' . $queryParams . ']' . "\n"
+            . ');' . "\n"
         ;
 
         $bodyParam = $this->buildQueryParam($operationParameters);
@@ -128,16 +131,16 @@ class OperationMethodBuilder extends MethodBuilder
      */
     public function addPutOperationLines(string $path, array $operationParameters, string $indent = null): void
     {
-        list($pathParams, $queryParams) = $this->buildPathAndQueryParams($operationParameters);
+        [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
         $format =
-            'return $this->execPutOperation('."\n"
-            .'%1$s\'%2$s\','."\n"
-            .'%1$s%3$s,'."\n"
-            .'%1$s%4$s,'."\n"
-            .'%1$s['.$pathParams.'],'."\n"
-            .'%1$s['.$queryParams.']'."\n"
-            .');'."\n"
+            'return $this->execPutOperation(' . "\n"
+            . '%1$s\'%2$s\',' . "\n"
+            . '%1$s%3$s,' . "\n"
+            . '%1$s%4$s,' . "\n"
+            . '%1$s[' . $pathParams . '],' . "\n"
+            . '%1$s[' . $queryParams . ']' . "\n"
+            . ');' . "\n"
         ;
 
         $bodyParam = $this->buildQueryParam($operationParameters);
@@ -158,15 +161,15 @@ class OperationMethodBuilder extends MethodBuilder
      */
     public function addDeleteOperationLines(string $path, array $operationParameters, string $indent = null): void
     {
-        list($pathParams, $queryParams) = $this->buildPathAndQueryParams($operationParameters);
+        [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
         $format =
-            'return $this->execDeleteOperation('."\n"
-            .'%1$s\'%2$s\','."\n"
-            .'%1$s%3$s,'."\n"
-            .'%1$s['.$pathParams.'],'."\n"
-            .'%1$s['.$queryParams.']'."\n"
-            .');'."\n"
+            'return $this->execDeleteOperation(' . "\n"
+            . '%1$s\'%2$s\',' . "\n"
+            . '%1$s%3$s,' . "\n"
+            . '%1$s[' . $pathParams . '],' . "\n"
+            . '%1$s[' . $queryParams . ']' . "\n"
+            . ');' . "\n"
         ;
 
         $this->addLine(sprintf(
@@ -179,6 +182,7 @@ class OperationMethodBuilder extends MethodBuilder
 
     /**
      * @param array $operationParameters
+     *
      * @return array
      */
     protected function buildPathAndQueryParams(array $operationParameters): array
@@ -186,42 +190,56 @@ class OperationMethodBuilder extends MethodBuilder
         $pathParams = '';
         $queryParams = '';
         foreach ($operationParameters as $operationParameter) {
-            if (!isset($operationParameter['in'])) continue;
-            if (!isset($operationParameter['name'])) continue;
+            if (!isset($operationParameter['in'])) {
+                continue;
+            }
+            if (!isset($operationParameter['name'])) {
+                continue;
+            }
             $parameterName = lcfirst(SwaggerOperationsHelper::cleanPropertyName($operationParameter['name']));
             switch ($operationParameter['in']) {
                 case 'query':
                     $queryParams .= "\n" . '%1$s%1$s\'' . $parameterName . '\' => $' . $parameterName . ',';
+
                     break;
                 case 'path':
                     $pathParams .= "\n" . '%1$s%1$s\'' . $parameterName . '\' => $' . $parameterName . ',';
+
                     break;
             }
         }
         if (!empty($pathParams)) {
-            $pathParams .= "\n".'%1$s';
+            $pathParams .= "\n" . '%1$s';
         }
         if (!empty($queryParams)) {
-            $queryParams .= "\n".'%1$s';
+            $queryParams .= "\n" . '%1$s';
         }
-        return array($pathParams, $queryParams);
+
+        return [$pathParams, $queryParams];
     }
 
     /**
      * @param array $operationParameters
+     *
      * @return string
      */
     protected function buildQueryParam(array $operationParameters): string
     {
         $bodyParam = 'null';
         foreach ($operationParameters as $operationParameter) {
-            if (!isset($operationParameter['in'])) continue;
-            if ($operationParameter['in'] !== 'body') continue;
-            if (!isset($operationParameter['name'])) continue;
-
+            if (!isset($operationParameter['in'])) {
+                continue;
+            }
+            if ($operationParameter['in'] !== 'body') {
+                continue;
+            }
+            if (!isset($operationParameter['name'])) {
+                continue;
+            }
             $parameterName = lcfirst(SwaggerOperationsHelper::cleanPropertyName($operationParameter['name']));
             $bodyParam = '$' . $parameterName;
         }
+
         return $bodyParam;
     }
 }

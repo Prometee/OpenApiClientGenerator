@@ -9,7 +9,7 @@ class ConstantBuilder extends PropertyBuilder
     public function __construct(string $name)
     {
         parent::__construct($name);
-        $this->setScope(static::SCOPE_PUBLIC.' const');
+        $this->setScope(static::SCOPE_PUBLIC . ' const');
     }
 
     public function getPhpName(): string

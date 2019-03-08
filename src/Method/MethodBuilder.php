@@ -15,7 +15,7 @@ class MethodBuilder implements MethodBuilderInterface
     /** @var string */
     protected $name;
 
-    /** @var null|string */
+    /** @var string|null */
     protected $returnType;
 
     /** @var bool */
@@ -70,13 +70,13 @@ class MethodBuilder implements MethodBuilderInterface
             $static = ($this->static) ? ' static ' : '';
             $content .= $indent . $this->scope . $static . ' function ' . $this->name . '(';
 
-            $additionalIndentation = count($this->parameters) > 4 ? "\n".$indent.$indent : '';
+            $additionalIndentation = count($this->parameters) > 4 ? "\n" . $indent . $indent : '';
             $parameters = [];
             foreach ($this->parameters as $methodParameterBuilder) {
-                $parameters[] = $additionalIndentation.$methodParameterBuilder->build($indent);
+                $parameters[] = $additionalIndentation . $methodParameterBuilder->build($indent);
             }
             $content .= implode(', ', $parameters);
-            $content .= (count($this->parameters) > 4 ? "\n".$indent : '').')';
+            $content .= (count($this->parameters) > 4 ? "\n" . $indent : '') . ')';
             if ($this->returnType !== null && $this->returnType !== 'mixed') {
                 $content .= ': ' . $this->getPhpReturnType();
             }
@@ -100,7 +100,6 @@ class MethodBuilder implements MethodBuilderInterface
     public function configurePhpDocBuilder(): void
     {
         if (!$this->hasAlreadyBeenGenerated) {
-
             if (!empty($this->getDescription())) {
                 $this->phpDocBuilder->addDescriptionLine($this->getDescription());
             }
@@ -145,9 +144,12 @@ class MethodBuilder implements MethodBuilderInterface
         foreach ($this->getReturnTypes() as $type) {
             if (preg_match('#\[\]$#', $type)) {
                 $phpReturnType .= 'array';
+
                 break;
-            } elseif ($type !== 'null') {
+            }
+            if ($type !== 'null') {
                 $phpReturnType .= $type;
+
                 break;
             }
         }

@@ -61,7 +61,7 @@ class PhpDocBuilder implements PhpDocBuilderInterface
     public function addParamLine(string $name, string $type = '', string $description = '')
     {
         $this->addLine(
-            (empty($type) ? '' : $type.' ').$name.(empty($description) ? '' : ' '.$description),
+            (empty($type) ? '' : $type . ' ') . $name . (empty($description) ? '' : ' ' . $description),
             static::TYPE_PARAM
         );
     }
@@ -93,17 +93,17 @@ class PhpDocBuilder implements PhpDocBuilderInterface
         $phpdocLines = [];
         $previousType = null;
         $this->orderLines();
-        foreach ($this->lines as $type=>$lines) {
+        foreach ($this->lines as $type => $lines) {
             if ($previousType !== $type) {
-                if($previousType !== null) {
+                if ($previousType !== null) {
                     $phpdocLines[] = '';
                 }
                 $previousType = $type;
             }
             foreach ($lines as $line) {
-                $lineSuffix = ($type === static::TYPE_DESCRIPTION ? '' : '@'.$type.' ');
-                foreach (static::wrapLines($lineSuffix.$line, $this->wrapOn) as $i=> $line) {
-                    $phpdocLines[] = ($i > 0 ? str_repeat(' ', strlen($lineSuffix)) : '').$line;
+                $lineSuffix = ($type === static::TYPE_DESCRIPTION ? '' : '@' . $type . ' ');
+                foreach (static::wrapLines($lineSuffix . $line, $this->wrapOn) as $i => $line) {
+                    $phpdocLines[] = ($i > 0 ? str_repeat(' ', strlen($lineSuffix)) : '') . $line;
                 }
             }
         }
@@ -129,6 +129,7 @@ class PhpDocBuilder implements PhpDocBuilderInterface
     /**
      * @param string $line
      * @param int $wrapOn
+     *
      * @return array
      */
     public static function wrapLines(string $line, int $wrapOn = 100): array
@@ -136,11 +137,11 @@ class PhpDocBuilder implements PhpDocBuilderInterface
         $lines = [];
         $currentLine = '';
         foreach (explode(' ', $line) as $word) {
-            if (iconv_strlen($currentLine.' '.$word) > $wrapOn) {
+            if (iconv_strlen($currentLine . ' ' . $word) > $wrapOn) {
                 $lines[] = $currentLine;
                 $currentLine = $word;
             } else {
-                $currentLine .= (!empty($currentLine) ? ' ' : '').$word;
+                $currentLine .= (!empty($currentLine) ? ' ' : '') . $word;
             }
         }
         $lines[] = $currentLine;
@@ -150,15 +151,20 @@ class PhpDocBuilder implements PhpDocBuilderInterface
 
     /**
      * @param array|null $types
+     *
      * @return string
      */
     public static function getPossibleTypesFromTypeName(?array $types): string
     {
-        if ($types === null) return '';
+        if ($types === null) {
+            return '';
+        }
         $typesFound = [];
 
         foreach ($types as $type) {
-            if ($type === null) continue;
+            if ($type === null) {
+                continue;
+            }
             if (preg_match('#^\?#', $type)) {
                 $typesFound[] = 'null';
             }
@@ -195,11 +201,11 @@ class PhpDocBuilder implements PhpDocBuilderInterface
             static::TYPE_RETURN,
             static::TYPE_THROWS,
         ];
-        uksort($this->lines, function($k1, $k2) use ($lineTypeOrder) {
+        uksort($this->lines, function ($k1, $k2) use ($lineTypeOrder) {
             $o1 = array_search($k1, $lineTypeOrder);
             $o2 = array_search($k2, $lineTypeOrder);
 
-            return $o1-$o2;
+            return $o1 - $o2;
         });
     }
 }

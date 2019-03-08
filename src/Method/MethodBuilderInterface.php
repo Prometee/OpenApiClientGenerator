@@ -83,9 +83,6 @@ interface MethodBuilderInterface extends BuilderInterface, PhpDocAwareBuilderInt
      */
     public function setParameter(MethodParameterBuilder $methodParameterBuilder): void;
 
-    /**
-     * @return void
-     */
     public function configurePhpDocBuilder(): void;
 
     /**
