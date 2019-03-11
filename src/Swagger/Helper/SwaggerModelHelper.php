@@ -23,17 +23,4 @@ class SwaggerModelHelper extends AbstractHelper implements SwaggerModelHelperInt
             ?? true
             ;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getClassPathFromDefinitionName(string $definitionName): string
-    {
-        $classPath = trim($definitionName, '_');
-        $words = explode('_', $classPath);
-        $words = array_map('ucfirst', $words);
-        $classPath = implode('', $words);
-
-        return $classPath;
-    }
 }

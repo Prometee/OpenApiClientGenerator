@@ -48,4 +48,11 @@ interface HelperInterface
      * @return string
      */
     public static function getPhpTypeFromSwaggerTypeAndFormat(string $type, ?array $items): string;
+
+    /**
+     * @param string $definitionName
+     *
+     * @return string
+     */
+    public static function getClassNameFromDefinitionName(string $definitionName): string;
 }

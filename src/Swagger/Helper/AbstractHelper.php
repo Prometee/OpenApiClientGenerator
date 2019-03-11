@@ -99,4 +99,18 @@ abstract class AbstractHelper implements HelperInterface
     {
         return preg_replace('#[^a-z_0-9]#i', '_', $property);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getClassNameFromDefinitionName(string $definitionName): string
+    {
+        $className = preg_replace('#-#', '_', $definitionName);
+        $className = trim($className, '_');
+        $words = explode('_', $className);
+        $words = array_map('ucfirst', $words);
+        $className = implode('', $words);
+
+        return $className;
+    }
 }

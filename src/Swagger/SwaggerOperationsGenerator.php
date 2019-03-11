@@ -296,8 +296,9 @@ class SwaggerOperationsGenerator
     public function minifyClassToUses(ClassBuilder $classBuilder, string $type): string
     {
         if (preg_match('$^#/definitions/$', $type)) {
-            $type = preg_replace('$#/definitions/$', '', $type);
-            $type = '\\' . $this->modelNamespace . '\\' . ucfirst($type);
+            $className = preg_replace('$#/definitions/$', '', $type);
+            $className = $this->helper::getClassNameFromDefinitionName($className);
+            $type = '\\' . $this->modelNamespace . '\\' . $className;
         }
 
         if (preg_match('#^\\\\#', $type)) {

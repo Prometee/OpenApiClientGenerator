@@ -23,7 +23,7 @@ class SwaggerModelGenerator
     /** @var array */
     protected $definitions;
 
-    /** @var string */
+    /** @var callable|SwaggerModelHelper */
     protected $helper;
 
     /**
@@ -237,7 +237,7 @@ class SwaggerModelGenerator
      */
     public function getClassNameAndNamespaceFromDefinitionName(string $definitionName, string $classPrefix = '', string $classSuffix = ''): array
     {
-        $className = $this->helper::getClassPathFromDefinitionName($definitionName);
+        $className = $this->helper::getClassNameFromDefinitionName($definitionName);
         $namespace = $this->namespace . '\\' . preg_replace('#/#', '\\', $className);
         $className = basename($className);
         $namespace = preg_replace(
@@ -259,7 +259,7 @@ class SwaggerModelGenerator
      */
     protected function getFilePathFromDefinitionName(string $definitionName): string
     {
-        return sprintf('%s/%s.php', $this->folder, $this->helper::getClassPathFromDefinitionName($definitionName));
+        return sprintf('%s/%s.php', $this->folder, $this->helper::getClassNameFromDefinitionName($definitionName));
     }
 
     /**

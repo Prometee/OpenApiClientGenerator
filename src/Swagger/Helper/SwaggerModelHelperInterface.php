@@ -13,11 +13,4 @@ interface SwaggerModelHelperInterface extends HelperInterface
      * @return bool
      */
     public static function isNullableBySwaggerConfiguration(string $targetedProperty, array $definition): bool;
-
-    /**
-     * @param string $definitionName
-     *
-     * @return string
-     */
-    public static function getClassPathFromDefinitionName(string $definitionName): string;
 }
