@@ -71,7 +71,6 @@ class PropertyBuilder implements PropertyBuilderInterface
         if (!$this->hasAlreadyBeenGenerated) {
             if (!empty($this->description)) {
                 $this->phpDocBuilder->addDescriptionLine($this->description);
-                $this->phpDocBuilder->addEmptyLine();
             }
             $this->phpDocBuilder->addVarLine($this->type);
 

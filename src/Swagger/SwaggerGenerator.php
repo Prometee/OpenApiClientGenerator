@@ -192,10 +192,26 @@ class SwaggerGenerator
     }
 
     /**
+     * @param SwaggerModelGenerator $modelGenerator
+     */
+    public function setModelGenerator(SwaggerModelGenerator $modelGenerator): void
+    {
+        $this->modelGenerator = $modelGenerator;
+    }
+
+    /**
      * @return SwaggerOperationsGenerator
      */
     public function getOperationsGenerator(): SwaggerOperationsGenerator
     {
         return $this->operationsGenerator;
+    }
+
+    /**
+     * @param SwaggerOperationsGenerator $operationsGenerator
+     */
+    public function setOperationsGenerator(SwaggerOperationsGenerator $operationsGenerator): void
+    {
+        $this->operationsGenerator = $operationsGenerator;
     }
 }
