@@ -79,8 +79,9 @@ class OperationMethodBuilder extends MethodBuilder
     {
         [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
-        $format =
-            'return $this->execGetOperation(' . "\n"
+        $format  = $this->returnType === 'void' ? '' : 'return ';
+        $format .=
+            '$this->execGetOperation(' . "\n"
                 . '%1$s\'%2$s\',' . "\n"
                 . '%1$s%3$s,' . "\n"
                 . '%1$s[' . $pathParams . '],' . "\n"
@@ -107,8 +108,9 @@ class OperationMethodBuilder extends MethodBuilder
     {
         [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
-        $format =
-            'return $this->execPostOperation(' . "\n"
+        $format  = $this->returnType === 'void' ? '' : 'return ';
+        $format .=
+            '$this->execPostOperation(' . "\n"
             . '%1$s\'%2$s\',' . "\n"
             . '%1$s%3$s,' . "\n"
             . '%1$s%4$s,' . "\n"
@@ -137,8 +139,9 @@ class OperationMethodBuilder extends MethodBuilder
     {
         [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
-        $format =
-            'return $this->execPutOperation(' . "\n"
+        $format  = $this->returnType === 'void' ? '' : 'return ';
+        $format .=
+            '$this->execPutOperation(' . "\n"
             . '%1$s\'%2$s\',' . "\n"
             . '%1$s%3$s,' . "\n"
             . '%1$s%4$s,' . "\n"
@@ -167,8 +170,9 @@ class OperationMethodBuilder extends MethodBuilder
     {
         [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
-        $format =
-            'return $this->execDeleteOperation(' . "\n"
+        $format  = $this->returnType === 'void' ? '' : 'return ';
+        $format .=
+            '$this->execDeleteOperation(' . "\n"
             . '%1$s\'%2$s\',' . "\n"
             . '%1$s%3$s,' . "\n"
             . '%1$s[' . $pathParams . '],' . "\n"
