@@ -178,7 +178,9 @@ class SwaggerOperationsGenerator
         );
 
         if (isset($operationConfiguration['description'])) {
-            $operationMethodBuilder->getPhpDocBuilder()->addDescriptionLine($operationConfiguration['description']);
+            foreach (explode("\n", $operationConfiguration['description']) as $line) {
+                $operationMethodBuilder->getPhpDocBuilder()->addDescriptionLine($line);
+            }
         }
         $operationMethodBuilder->getPhpDocBuilder()->addDescriptionLine(
             sprintf('path: %s', $path)
