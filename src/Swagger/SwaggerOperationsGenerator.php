@@ -170,6 +170,8 @@ class SwaggerOperationsGenerator
         }
         if ($returnType !== null) {
             $returnType = $this->minifyClassToUses($classBuilder, $returnType);
+        } else {
+            $returnType = 'void';
         }
 
         $operationMethodBuilder = new OperationMethodBuilder(
