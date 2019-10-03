@@ -22,6 +22,10 @@ class OperationMethodBuilder extends MethodBuilder
 
     public function getMinifiedReturnType()
     {
+        if ($this->returnType === null) {
+            return 'null';
+        }
+
         if ($this->returnType === 'array') {
             return '\'array\'';
         }
