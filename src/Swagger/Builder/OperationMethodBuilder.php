@@ -22,7 +22,7 @@ class OperationMethodBuilder extends MethodBuilder
 
     public function getMinifiedReturnType()
     {
-        if ($this->returnType === null) {
+        if ($this->returnType === 'void') {
             return 'null';
         }
 
