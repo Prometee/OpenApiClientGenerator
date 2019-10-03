@@ -106,7 +106,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
             $format .= '%3$s$this->%4$s = [];' . "\n";
             $format .= '}' . "\n\n";
         }
-        $format .= '%3$s$this->%4$s[] = %2$s;';
+        $format .= '$this->%4$s[] = %2$s;';
 
         $this->addSetterMethod->addLine(
             sprintf(
