@@ -68,7 +68,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
         $format = '';
         if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
             $format .= 'if (null === $this->%2$s) {' . "\n";
-            $format .= '%5$sreturn false;' . "\n";
+            $format .= '%4$sreturn false;' . "\n";
             $format .= '}' . "\n\n";
         }
         $format .= 'return in_array($%1$s, $this->%2$s, %3$s);';
