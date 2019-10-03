@@ -26,6 +26,10 @@ class OperationMethodBuilder extends MethodBuilder
             return 'null';
         }
 
+        if ($this->returnType === null) {
+            return 'null';
+        }
+
         if ($this->returnType === 'array') {
             return '\'array\'';
         }
