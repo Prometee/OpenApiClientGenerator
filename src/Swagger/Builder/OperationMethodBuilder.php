@@ -17,10 +17,6 @@ class OperationMethodBuilder extends MethodBuilder
      */
     public function __construct(string $name, ?string $returnType = null, string $description = '')
     {
-        if ($returnType === null) {
-            $returnType = 'array';
-        }
-
         parent::__construct(MethodBuilderInterface::SCOPE_PUBLIC, $name, $returnType, false, $description);
     }
 
