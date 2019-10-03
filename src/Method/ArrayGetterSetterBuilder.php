@@ -67,7 +67,9 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
 
         $format = '';
         if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
-            $format .= 'if ($this->%2$s === null) return false;' . "\n";
+            $format .= 'if (null === $this->%2$s) {' . "\n";
+            $format .= '%5$sreturn false;' . "\n";
+            $format .= '}' . "\n\n";
         }
         $format .= 'return in_array($%1$s, $this->%2$s, %3$s);';
 
@@ -76,7 +78,8 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
                 $format,
                 $this->getSingleName(),
                 $this->propertyBuilder->getName(),
-                $methodParameterBuilder2->getPhpName()
+                $methodParameterBuilder2->getPhpName(),
+                $indent
             )
         );
     }
@@ -95,12 +98,15 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
         );
         $this->addSetterMethod->addParameter($methodParameterBuilder);
 
-        $format = 'if (!$this->%1$s(%2$s)) {' . "\n";
+        $format  = 'if ($this->%1$s(%2$s)) {' . "\n";
+        $format .= '%3$sreturn;' . "\n";
+        $format .= '}' . "\n\n";
         if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
-            $format .= '%3$sif (null === $this->%4$s) $this->%4$s = [];' . "\n";
+            $format .= 'if (null === $this->%4$s) {' . "\n";
+            $format .= '%3$s$this->%4$s = [];' . "\n";
+            $format .= '}' . "\n\n";
         }
-        $format .= '%3$s$this->%4$s[] = %2$s;' . "\n";
-        $format .= '}';
+        $format .= '%3$s$this->%4$s[] = %2$s;';
 
         $this->addSetterMethod->addLine(
             sprintf(
