@@ -97,7 +97,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
 
         $format = 'if (!$this->%1$s(%2$s)) {' . "\n";
         if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
-            $format .= '%3$sif ($this->%4$s === null) $this->%4$s = [];' . "\n";
+            $format .= '%3$sif (null === $this->%4$s) $this->%4$s = [];' . "\n";
         }
         $format .= '%3$s$this->%4$s[] = %2$s;' . "\n";
         $format .= '}';
