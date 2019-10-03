@@ -95,7 +95,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
         );
         $this->addSetterMethod->addParameter($methodParameterBuilder);
 
-        $format = 'if(!$this->%1$s(%2$s)) {' . "\n";
+        $format = 'if (!$this->%1$s(%2$s)) {' . "\n";
         if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
             $format .= '%3$sif ($this->%4$s === null) $this->%4$s = [];' . "\n";
         }
@@ -127,7 +127,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder
 
         $this->removeSetterMethod->addParameter($methodParameterBuilder);
 
-        $format = 'if($this->%1$s(%2$s)) {' . "\n";
+        $format = 'if ($this->%1$s(%2$s)) {' . "\n";
         $format .= '%3$s$index = array_search(%2$s, $this->%4$s);' . "\n";
         $format .= '%3$sunset($this->%4$s[$index]);' . "\n";
         $format .= '}';
