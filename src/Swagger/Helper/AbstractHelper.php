@@ -44,9 +44,8 @@ abstract class AbstractHelper implements HelperInterface
     public static function getPhpTypeFromSwaggerStringType(?string $format): string
     {
         switch ($format) {
-            case 'date':
-                return '\\DateTimeInterface';
             case 'date-time':
+            case 'date':
                 return '\\DateTimeInterface';
         }
 

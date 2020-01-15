@@ -4,46 +4,59 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger;
 
-use Prometee\SwaggerClientBuilder\ClassBuilder;
-use Prometee\SwaggerClientBuilder\Method\ConstructorBuilder;
-use Prometee\SwaggerClientBuilder\Method\MethodParameterBuilder;
-use Prometee\SwaggerClientBuilder\Method\PropertyMethodsBuilder;
-use Prometee\SwaggerClientBuilder\Property\PropertyBuilder;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\ConstructorBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
 use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerModelHelper;
 
-class SwaggerModelGenerator
+class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
 {
+    /** @var ClassFactoryInterface */
+    protected $classFactory;
+    /** @var MethodFactoryInterface */
+    protected $methodFactory;
+    /** @var callable|SwaggerModelHelper */
+    protected $helper;
+
     /** @var string */
     protected $folder;
     /** @var string */
     protected $namespace;
     /** @var string */
     protected $indent;
-
     /** @var array */
-    protected $definitions;
+    protected $definitions = [];
 
-    /** @var callable|SwaggerModelHelper */
-    protected $helper;
+    /**
+     * @param ClassFactoryInterface $classFactory
+     * @param MethodFactoryInterface $methodFactory
+     */
+    public function __construct(
+        ClassFactoryInterface $classFactory,
+        MethodFactoryInterface $methodFactory
+    )
+    {
+        $this->classFactory = $classFactory;
+        $this->methodFactory = $methodFactory;
+        $this->helper = SwaggerModelHelper::class;
+    }
 
     /**
      * @param string $folder
      * @param string $namespace
      * @param string $indent
      */
-    public function __construct(string $folder, string $namespace, string $indent = '    ')
+    public function configure(string $folder, string $namespace, string $indent = '    ')
     {
         $this->folder = $folder;
         $this->namespace = $namespace;
         $this->indent = $indent;
         $this->definitions = [];
-        $this->helper = SwaggerModelHelper::class;
     }
 
     /**
-     * @param bool $overwrite
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function generate(bool $overwrite = false): bool
     {
@@ -64,11 +77,7 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @param string $definitionName
-     * @param array $definition
-     * @param bool $overwrite
-     *
-     * @return bool|int
+     * {@inheritDoc}
      */
     public function generateClass(string $definitionName, array $definition, bool $overwrite = false)
     {
@@ -78,8 +87,11 @@ class SwaggerModelGenerator
         }
         [$namespace, $className] = $this->getClassNameAndNamespaceFromDefinitionName($definitionName);
 
-        $classBuilder = new ClassBuilder($namespace, $className);
-        $constructorBuilder = new ConstructorBuilder();
+        $classBuilder = $this->classFactory->createClassBuilder();
+        $classBuilder->configure($namespace, $className);
+        $constructorBuilder = $this->methodFactory->createConstructorBuilder(
+            $classBuilder->getUsesBuilder()
+        );
         $classBuilder->getMethodsBuilder()->addMethod($constructorBuilder);
 
         foreach ($definition['properties'] as $property => $config) {
@@ -105,17 +117,11 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @param ClassBuilder $classBuilder
-     * @param ConstructorBuilder $constructorBuilder
-     * @param string $definitionName
-     * @param array $definition
-     * @param string $property
-     * @param array $configuration
-     * @param bool $overwrite
+     * {@inheritDoc}
      */
     public function processProperty(
-        ClassBuilder $classBuilder,
-        ConstructorBuilder $constructorBuilder,
+        ClassBuilderInterface $classBuilder,
+        ConstructorBuilderInterface $constructorBuilder,
         string $definitionName,
         array $definition,
         string $property,
@@ -139,13 +145,19 @@ class SwaggerModelGenerator
             $type .= '|null';
         }
 
-        $propertyBuilder = new PropertyBuilder($cleanPropertyName, $type);
+        $propertyBuilder = $this->classFactory->createPropertyBuilder(
+            $classBuilder->getUsesBuilder()
+        );
+        $propertyBuilder->configure($cleanPropertyName, $type);
         if (isset($configuration['description'])) {
             $propertyBuilder->setDescription($configuration['description']);
         }
         $classBuilder->getPropertiesBuilder()->addProperty($propertyBuilder);
 
-        $getterSetterBuilder = new PropertyMethodsBuilder($propertyBuilder);
+        $getterSetterBuilder = $this->methodFactory->createPropertyMethodsBuilder(
+            $classBuilder->getUsesBuilder()
+        );
+        $getterSetterBuilder->configure($propertyBuilder);
         if (isset($definition['readOnly']) && $definition['readOnly'] === 'true') {
             $getterSetterBuilder->setReadOnly(true);
         }
@@ -180,12 +192,7 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @param string $currentDefinitionName
-     * @param string $currentProperty
-     * @param array $currentConfig
-     * @param bool $overwrite
-     *
-     * @return string|null
+     * {@inheritDoc}
      */
     public function generateSubClass(string $currentDefinitionName, string $currentProperty, array $currentConfig, bool $overwrite = false): ?string
     {
@@ -210,11 +217,9 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @param ClassBuilder $classBuilder
-     * @param ConstructorBuilder $constructorBuilder
-     * @param array $definition
+     * {@inheritDoc}
      */
-    public function processRequiredProperties(ClassBuilder $classBuilder, ConstructorBuilder $constructorBuilder, array $definition): void
+    public function processRequiredProperties(ClassBuilderInterface $classBuilder, ConstructorBuilderInterface $constructorBuilder, array $definition): void
     {
         if (isset($definition['required'])) {
             foreach ($definition['required'] as $property) {
@@ -222,18 +227,18 @@ class SwaggerModelGenerator
                 $propertyBuilder = $classBuilder->getPropertiesBuilder()->getPropertyByName($property);
                 $type = ($propertyBuilder !== null) ? $propertyBuilder->getType() : '';
                 $description = $propertyBuilder->getDescription();
-                $constructorBuilder->addParameter(new MethodParameterBuilder($type, $property, null, false, $description));
+                $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
+                    $classBuilder->getUsesBuilder()
+                );
+                $methodParameterBuilder->configure($type, $property, null, false, $description);
+                $constructorBuilder->addParameter($methodParameterBuilder);
                 $constructorBuilder->addLine(sprintf('$this->%1$s = $%1$s;', $property));
             }
         }
     }
 
     /**
-     * @param string $definitionName
-     * @param string $classPrefix
-     * @param string $classSuffix
-     *
-     * @return array
+     * {@inheritDoc}
      */
     public function getClassNameAndNamespaceFromDefinitionName(string $definitionName, string $classPrefix = '', string $classSuffix = ''): array
     {
@@ -253,9 +258,7 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @param string $definitionName
-     *
-     * @return string
+     * {@inheritDoc}
      */
     protected function getFilePathFromDefinitionName(string $definitionName): string
     {
@@ -263,12 +266,9 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @param array $config
-     * @param ClassBuilder $classBuilder
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    public function getPhpTypeFromPropertyConfig(array $config, ClassBuilder $classBuilder)
+    public function getPhpTypeFromPropertyConfig(array $config, ClassBuilderInterface $classBuilder)
     {
         $type = $this->helper::getPhpTypeFromSwaggerConfiguration($config);
         $currentNamespace = $classBuilder->getNamespace();
@@ -286,9 +286,7 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @param string $definitionName
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function hasDefinition(string $definitionName): bool
     {
@@ -296,7 +294,7 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     public function getDefinitions(): array
     {
@@ -304,7 +302,7 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @param array $definitions
+     * {@inheritDoc}
      */
     public function setDefinitions(array $definitions): void
     {
@@ -312,7 +310,7 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
     public function getHelper(): string
     {
@@ -320,7 +318,7 @@ class SwaggerModelGenerator
     }
 
     /**
-     * @param string $helper
+     * {@inheritDoc}
      */
     public function setHelper(string $helper): void
     {

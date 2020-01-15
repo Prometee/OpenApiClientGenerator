@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger;
 
-class SwaggerGenerator
+class SwaggerGenerator implements SwaggerGeneratorInterface
 {
-    public const TYPE_MODEL = 'Model';
-    const TYPE_OPERATIONS = 'Operations';
+    /** @var SwaggerModelGeneratorInterface */
+    protected $modelGenerator;
+    /** @var SwaggerOperationsGeneratorInterface */
+    protected $operationsGenerator;
 
     /** @var string */
     protected $swaggerUri;
@@ -22,29 +24,36 @@ class SwaggerGenerator
     /** @var string */
     protected $indent;
 
-    /** @var SwaggerModelGenerator */
-    protected $modelGenerator;
-    /** @var SwaggerOperationsGenerator */
-    protected $operationsGenerator;
+    /**
+     * @param SwaggerModelGeneratorInterface $modelGenerator
+     * @param SwaggerOperationsGeneratorInterface $operationsGenerator
+     */
+    public function __construct(
+        SwaggerModelGeneratorInterface $modelGenerator,
+        SwaggerOperationsGeneratorInterface $operationsGenerator
+    )
+    {
+        $this->modelGenerator = $modelGenerator;
+        $this->operationsGenerator = $operationsGenerator;
+    }
 
     /**
-     * @param string $swaggerUri
-     * @param string $folder
-     * @param string $namespace
-     * @param string $indent
+     * {@inheritDoc}
      */
-    public function __construct(string $swaggerUri, string $folder, string $namespace, string $indent = '    ')
+    public function configure(string $swaggerUri, string $folder, string $namespace, string $indent = '    ')
     {
         $this->swaggerUri = $swaggerUri;
         $this->folder = $folder;
         $this->namespace = $namespace;
         $this->indent = $indent;
-        $this->modelGenerator = new SwaggerModelGenerator(
+
+        $this->modelGenerator->configure(
             $folder . '/' . static::TYPE_MODEL,
             $namespace . '\\' . static::TYPE_MODEL,
             $indent
         );
-        $this->operationsGenerator = new SwaggerOperationsGenerator(
+
+        $this->operationsGenerator->configure(
             $folder . '/' . static::TYPE_OPERATIONS,
             $namespace . '\\' . static::TYPE_OPERATIONS,
             $namespace . '\\' . static::TYPE_MODEL,
@@ -53,9 +62,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @param bool $overwrite
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function generate(bool $overwrite = false): bool
     {
@@ -70,6 +77,7 @@ class SwaggerGenerator
         if ($json === null) {
             return false;
         }
+
         $this->processDefinitions($json, $overwrite);
 
         $this->processPaths($json, $overwrite);
@@ -78,33 +86,35 @@ class SwaggerGenerator
     }
 
     /**
-     * @param array $json
-     * @param bool $overwrite
-     *
-     * @return bool
+     * {@inheritDoc}
      */
     public function processDefinitions(array $json, bool $overwrite = false): bool
     {
         if (!isset($json['definitions'])) {
             return false;
         }
+
         $this->modelGenerator->setDefinitions($json['definitions']);
 
         return $this->modelGenerator->generate($overwrite);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function processPaths(array $json, bool $overwrite = false): bool
     {
         if (!isset($json['paths'])) {
             return false;
         }
+
         $this->operationsGenerator->setPaths($json['paths']);
 
         return $this->operationsGenerator->generate($overwrite);
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
     public function getSwaggerUri(): string
     {
@@ -112,7 +122,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @param string $swaggerUri
+     * {@inheritDoc}
      */
     public function setSwaggerUri(string $swaggerUri): void
     {
@@ -120,7 +130,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
     public function getFolder(): string
     {
@@ -128,7 +138,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @param string $folder
+     * {@inheritDoc}
      */
     public function setFolder(string $folder): void
     {
@@ -136,7 +146,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
     public function getNamespace(): string
     {
@@ -144,7 +154,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @param string $namespace
+     * {@inheritDoc}
      */
     public function setNamespace(string $namespace): void
     {
@@ -152,7 +162,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     public function getDefinitions(): array
     {
@@ -160,7 +170,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @param array $definitions
+     * {@inheritDoc}
      */
     public function setDefinitions(array $definitions): void
     {
@@ -168,7 +178,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @return string
+     * {@inheritDoc}
      */
     public function getIndent(): string
     {
@@ -176,7 +186,7 @@ class SwaggerGenerator
     }
 
     /**
-     * @param string $indent
+     * {@inheritDoc}
      */
     public function setIndent(string $indent): void
     {
@@ -184,33 +194,33 @@ class SwaggerGenerator
     }
 
     /**
-     * @return SwaggerModelGenerator
+     * {@inheritDoc}
      */
-    public function getModelGenerator(): SwaggerModelGenerator
+    public function getModelGenerator(): SwaggerModelGeneratorInterface
     {
         return $this->modelGenerator;
     }
 
     /**
-     * @param SwaggerModelGenerator $modelGenerator
+     * {@inheritDoc}
      */
-    public function setModelGenerator(SwaggerModelGenerator $modelGenerator): void
+    public function setModelGenerator(SwaggerModelGeneratorInterface $modelGenerator): void
     {
         $this->modelGenerator = $modelGenerator;
     }
 
     /**
-     * @return SwaggerOperationsGenerator
+     * {@inheritDoc}
      */
-    public function getOperationsGenerator(): SwaggerOperationsGenerator
+    public function getOperationsGenerator(): SwaggerOperationsGeneratorInterface
     {
         return $this->operationsGenerator;
     }
 
     /**
-     * @param SwaggerOperationsGenerator $operationsGenerator
+     * {@inheritDoc}
      */
-    public function setOperationsGenerator(SwaggerOperationsGenerator $operationsGenerator): void
+    public function setOperationsGenerator(SwaggerOperationsGeneratorInterface $operationsGenerator): void
     {
         $this->operationsGenerator = $operationsGenerator;
     }

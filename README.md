@@ -18,14 +18,19 @@ $ composer require prometee/swagger-client-builder
 ## Usage
 
 ```php
+
 $loader = require_once( __DIR__.'/vendor/autoload.php');
 
-use Prometee\SwaggerClientBuilder\SwaggerGenerator;
-
+use Prometee\SwaggerClientBuilder\Swagger\Builder\SwaggerGeneratorBuilder;
 $baseUri = 'https://github.com/OAI/OpenAPI-Specification/raw/master/examples/v2.0/json/petstore-expanded.json';
 $folder = __DIR__ . '/Build';
-$namespace = 'Tests\\Prometee\\SwaggerClientBuilder\\Build';
+$namespace = 'Tests\\Prometee\\SwaggerClientBuilder\\PhpBuilder\\Classes\\Build';
 $overwrite = true;
+
+$swaggerGeneratorBuilder = new SwaggerGeneratorBuilder();
+$swaggerGenerator = $swaggerGeneratorBuilder->build();
+$swaggerGenerator->configure($baseUri, $folder, $namespace);
+
 /*
 $abstractOperationClass = \MyVendor\MyApi\AbstractOperations::class;
 $throwClasses = [
@@ -33,14 +38,11 @@ $throwClasses = [
     '\\Http\\Client\\Exception'=>'HttpClientException',
     '\\Symfony\\Component\\Serializer\\Exception\\ExceptionInterface'=>'SerializerExceptionInterface',
 ];
-*/
-
-$swaggerGenerator = new SwaggerGenerator($baseUri, $folder, $namespace);
-/*
 $operationsGenerator = $swaggerGenerator->getOperationsGenerator();
 $operationsGenerator->setAbstractOperationClass($abstractOperationClass);
 $operationsGenerator->setThrowsClasses($throwClasses);
 */
+
 $result = $swaggerGenerator->generate($overwrite);
 
 ```
