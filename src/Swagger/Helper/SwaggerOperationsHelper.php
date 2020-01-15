@@ -32,12 +32,26 @@ class SwaggerOperationsHelper extends AbstractHelper implements SwaggerOperation
     public static function getOperationMethodName(string $path, string $operation, array $operationConfiguration): string
     {
         if (isset($operationConfiguration['operationId'])) {
-            return $operationConfiguration['operationId'];
+            return self::cleanOperationName($operationConfiguration['operationId']);
         }
 
         $hasPathParameters = preg_match('#\{[^\{]+\}#', $path);
 
         return strtolower($operation) . ($hasPathParameters ? 'Item' : 'Collection');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function cleanOperationName(string $definitionName): string
+    {
+        $className = preg_replace('#[^a-z]#i', '_', $definitionName);
+        $className = trim($className, '_');
+        $words = explode('_', $className);
+        $words = array_map('ucfirst', $words);
+        $className = implode('', $words);
+
+        return lcfirst($className);
     }
 
     /**

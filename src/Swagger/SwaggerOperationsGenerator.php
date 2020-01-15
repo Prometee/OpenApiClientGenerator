@@ -193,10 +193,9 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         $operationMethodBuilder = $this->swaggerMethodFactory->createOperationMethodBuilder(
             $classBuilder->getUsesBuilder()
         );
-        $operationMethodBuilder->configure(
-            $this->helper::getOperationMethodName($path, $operation, $operationConfiguration),
-            $returnType
-        );
+        $operationMethodName = $this->helper::getOperationMethodName($path, $operation, $operationConfiguration);
+        $operationMethodBuilder->setName($operationMethodName);
+        $operationMethodBuilder->setReturnType($returnType);
 
         if (isset($operationConfiguration['description'])) {
             foreach (explode("\n", $operationConfiguration['description']) as $line) {

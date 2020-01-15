@@ -93,6 +93,7 @@ class GetterSetterBuilder implements GetterSetterBuilderInterface
     {
         if (!$this->isWriteOnly()) {
             $this->getterMethodBuilder->configure(
+                MethodBuilderInterface::SCOPE_PUBLIC,
                 $this->getMethodName(static::GETTER_PREFIX),
                 $this->propertyBuilder->getType()
             );

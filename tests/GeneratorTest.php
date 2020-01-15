@@ -13,7 +13,7 @@ class GeneratorTest extends TestCase
     public function generate()
     {
         $baseUri = 'https://github.com/OAI/OpenAPI-Specification/raw/master/examples/v2.0/json/petstore-expanded.json';
-        $folder = __DIR__ . '/Build';
+        $folder = __DIR__ . '/../etc/build';
         $namespace = 'Tests\\Prometee\\SwaggerClientBuilder\\PhpBuilder\\Classes\\Build';
         $overwrite = true;
 

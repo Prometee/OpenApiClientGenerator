@@ -9,6 +9,9 @@ use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelper;
 
 class OperationMethodBuilder extends MethodBuilder implements OperationMethodBuilderInterface
 {
+    /** @var {@inheritDoc} */
+    protected $scope = self::SCOPE_PUBLIC;
+
     /**
      * {@inheritDoc}
      */
@@ -20,7 +23,7 @@ class OperationMethodBuilder extends MethodBuilder implements OperationMethodBui
         string $description = ''
     )
     {
-        parent::configure(static::SCOPE_PUBLIC, $name, $returnType, false, $description);
+        parent::configure(self::SCOPE_PUBLIC, $name, $returnType, false, $description);
     }
 
     public function getMinifiedReturnType()
