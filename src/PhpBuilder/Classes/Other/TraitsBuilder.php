@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilderInterface;
-
 class TraitsBuilder implements TraitsBuilderInterface
 {
     /** @var UsesBuilderInterface */

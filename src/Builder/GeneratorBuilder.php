@@ -17,7 +17,7 @@ use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other\MethodsBuilder;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other\PropertiesBuilder;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other\TraitsBuilder;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other\UsesBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Property\PropertyBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Property\PropertyBuilder;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactory;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactory;
@@ -48,7 +48,7 @@ abstract class GeneratorBuilder implements GeneratorBuilderInterface
             TraitsBuilder::class,
             PropertiesBuilder::class,
             MethodsBuilder::class,
-            PropertyBuilderInterface::class
+            PropertyBuilder::class
         );
 
         $this->methodFactory = new MethodFactory(

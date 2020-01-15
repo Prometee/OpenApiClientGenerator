@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Property\PropertyBuilderInterface;
 
 class PropertiesBuilder implements PropertiesBuilderInterface

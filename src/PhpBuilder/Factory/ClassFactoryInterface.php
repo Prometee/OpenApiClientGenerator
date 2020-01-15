@@ -10,7 +10,6 @@ use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other\PropertiesBuilderInte
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other\TraitsBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other\UsesBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Property\PropertyBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\PhpDoc\PhpDocBuilderInterface;
 
 interface ClassFactoryInterface
 {

@@ -44,6 +44,7 @@ class PropertyMethodsBuilder implements PropertyMethodsBuilderInterface
         bool $writeOnly = false
     ): void
     {
+        $this->propertyBuilder = $propertyBuilder;
         $this->readOnly = $readOnly;
         $this->writeOnly = $writeOnly;
     }
@@ -54,14 +55,16 @@ class PropertyMethodsBuilder implements PropertyMethodsBuilderInterface
     public function getMethods(string $indent = null): array
     {
         $propertyMethodsBuilder = null;
-        foreach ($this->propertyBuilder->getTypes() as $type) {
-            if ('bool' === $type) {
-                $propertyMethodsBuilder = $this->methodFactory->createIsserSetterBuilderBuilder($this->usesBuilder);
-                break;
-            }
-            if (preg_match('#\[\]$#', $type)) {
-                $propertyMethodsBuilder = $this->methodFactory->createArrayGetterSetterBuilder($this->usesBuilder);
-                break;
+        if (null !== $this->propertyBuilder->getTypes()) {
+            foreach ($this->propertyBuilder->getTypes() as $type) {
+                if ('bool' === $type) {
+                    $propertyMethodsBuilder = $this->methodFactory->createIsserSetterBuilderBuilder($this->usesBuilder);
+                    break;
+                }
+                if (preg_match('#\[\]$#', $type)) {
+                    $propertyMethodsBuilder = $this->methodFactory->createArrayGetterSetterBuilder($this->usesBuilder);
+                    break;
+                }
             }
         }
 

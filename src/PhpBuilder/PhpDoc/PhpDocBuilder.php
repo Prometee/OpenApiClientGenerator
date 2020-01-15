@@ -7,10 +7,9 @@ namespace Prometee\SwaggerClientBuilder\PhpBuilder\PhpDoc;
 class PhpDocBuilder implements PhpDocBuilderInterface
 {
     /** @var string[] */
-    protected $lines;
-
+    protected $lines = [];
     /** @var int */
-    protected $wrapOn;
+    protected $wrapOn = 100;
 
     /**
      * @param string[] $lines
