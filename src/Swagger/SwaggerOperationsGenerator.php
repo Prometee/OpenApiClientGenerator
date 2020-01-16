@@ -11,7 +11,7 @@ use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodParameterBuild
 use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
 use Prometee\SwaggerClientBuilder\Swagger\Factory\MethodFactoryInterface as SwaggerMethodFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelper;
+use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelperInterface;
 
 class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
 {
@@ -34,7 +34,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /** @var array */
     protected $paths = [];
 
-    /** @var callable|SwaggerOperationsHelper */
+    /** @var SwaggerOperationsHelperInterface */
     protected $helper;
 
     /** @var ClassBuilder[] */
@@ -50,17 +50,19 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
      * @param ClassFactoryInterface $classFactory
      * @param MethodFactoryInterface $methodFactory
      * @param SwaggerMethodFactoryInterface $swaggerMethodFactory
+     * @param SwaggerOperationsHelperInterface $helper
      */
     public function __construct(
         ClassFactoryInterface $classFactory,
         MethodFactoryInterface $methodFactory,
-        SwaggerMethodFactoryInterface $swaggerMethodFactory
+        SwaggerMethodFactoryInterface $swaggerMethodFactory,
+        SwaggerOperationsHelperInterface $helper
     )
     {
         $this->classFactory = $classFactory;
         $this->methodFactory = $methodFactory;
         $this->swaggerMethodFactory = $swaggerMethodFactory;
-        $this->helper = SwaggerOperationsHelper::class;
+        $this->helper = $helper;
     }
 
     /**
@@ -154,7 +156,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         if ($this->abstractOperationClass !== null) {
             $useBuilder = $classBuilder->getUsesBuilder();
             $useBuilder->addUse($this->abstractOperationClass);
-            $extendClassName = $useBuilder->getInternalClassName($this->abstractOperationClass);
+            $extendClassName = $useBuilder->getInternalUseClassName($this->abstractOperationClass);
             $classBuilder->setExtendClassName($extendClassName);
         }
 
@@ -185,7 +187,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             $returnType = $this->helper::getReturnType($operationConfiguration['responses']);
         }
         if ($returnType !== null) {
-            $returnType = $this->minifyClassToUses($classBuilder, $returnType);
+            $returnType = $this->getPhpNameFromType($returnType);
         } else {
             $returnType = 'void';
         }
@@ -254,9 +256,9 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         }
         $type = $this->helper::getPhpTypeFromSwaggerConfiguration($parameterConfiguration);
         if ($type !== null) {
-            $type = $this->minifyClassToUses($classBuilder, $type);
+            $type = $this->getPhpNameFromType($type);
         }
-        $name = lcfirst($this->helper::cleanPropertyName($parameterConfiguration['name']));
+        $name = lcfirst($this->helper::cleanStr($parameterConfiguration['name']));
         $value = null;
         $description = '';
 
@@ -286,7 +288,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             $classBuilder->getUsesBuilder()
         );
         $methodParameterBuilder->configure(
-            $type,
+            (array) $type,
             $name,
             $value,
             false,
@@ -319,18 +321,12 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function minifyClassToUses(ClassBuilderInterface $classBuilder, string $type): string
+    public function getPhpNameFromType(string $type): string
     {
         if (preg_match('$^#/definitions/$', $type)) {
             $className = preg_replace('$#/definitions/$', '', $type);
-            $className = $this->helper::getClassNameFromDefinitionName($className);
-            $type = '\\' . $this->modelNamespace . '\\' . $className;
-        }
-
-        if (preg_match('#^\\\\#', $type)) {
-            $classBuilder->getUsesBuilder()->addUse(trim($type, '\\[]'));
-            $types = explode('\\', trim($type, '\\'));
-            $type = end($types);
+            $className = $this->helper::camelize($className);
+            return '\\' . $this->modelNamespace . '\\' . $className;
         }
 
         return $type;
@@ -365,7 +361,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getHelper(): string
+    public function getHelper(): SwaggerOperationsHelperInterface
     {
         return $this->helper;
     }
@@ -373,7 +369,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function setHelper(string $helper): void
+    public function setHelper(SwaggerOperationsHelperInterface $helper): void
     {
         $this->helper = $helper;
     }

@@ -7,6 +7,7 @@ namespace Prometee\SwaggerClientBuilder\Swagger;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodParameterBuilderInterface;
+use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelperInterface;
 
 interface SwaggerOperationsGeneratorInterface
 {
@@ -21,9 +22,9 @@ interface SwaggerOperationsGeneratorInterface
     public function configure(string $folder, string $namespace, string $modelNamespace, string $indent = '    ');
 
     /**
-     * @param string $helper
+     * @param SwaggerOperationsHelperInterface $helper
      */
-    public function setHelper(string $helper): void;
+    public function setHelper(SwaggerOperationsHelperInterface $helper): void;
 
     /**
      * @param bool $overwrite
@@ -65,9 +66,9 @@ interface SwaggerOperationsGeneratorInterface
     public function getClassNameAndNamespaceFromPath(string $path, string $classPrefix = '', string $classSuffix = ''): array;
 
     /**
-     * @return string
+     * @return SwaggerOperationsHelperInterface
      */
-    public function getHelper(): string;
+    public function getHelper(): SwaggerOperationsHelperInterface;
 
     /**
      * @param ClassBuilderInterface $classBuilder
@@ -97,12 +98,11 @@ interface SwaggerOperationsGeneratorInterface
     public function getPaths(): array;
 
     /**
-     * @param ClassBuilderInterface $classBuilder
      * @param string $type
      *
      * @return string
      */
-    public function minifyClassToUses(ClassBuilderInterface $classBuilder, string $type): string;
+    public function getPhpNameFromType(string $type): string;
 
     /**
      * @param string[] $throwsClasses

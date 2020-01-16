@@ -6,6 +6,7 @@ namespace Prometee\SwaggerClientBuilder\Swagger;
 
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\ConstructorBuilderInterface;
+use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerModelHelperInterface;
 
 interface SwaggerModelGeneratorInterface
 {
@@ -14,19 +15,23 @@ interface SwaggerModelGeneratorInterface
      * @param string $namespace
      * @param string $indent
      */
-    public function configure(string $folder, string $namespace, string $indent = '    ');
+    public function configure(string $folder, string $namespace, string $indent = '    '): void;
 
     /**
      * @param ClassBuilderInterface $classBuilder
      * @param ConstructorBuilderInterface $constructorBuilder
      * @param array $definition
      */
-    public function processRequiredProperties(ClassBuilderInterface $classBuilder, ConstructorBuilderInterface $constructorBuilder, array $definition): void;
+    public function processRequiredProperties(
+        ClassBuilderInterface $classBuilder,
+        ConstructorBuilderInterface $constructorBuilder,
+        array $definition
+    ): void;
 
     /**
-     * @param string $helper
+     * @param SwaggerModelHelperInterface $helper
      */
-    public function setHelper(string $helper): void;
+    public function setHelper(SwaggerModelHelperInterface $helper): void;
 
     /**
      * @param string $currentDefinitionName
@@ -44,7 +49,7 @@ interface SwaggerModelGeneratorInterface
      *
      * @return string
      */
-    public function getPhpTypeFromPropertyConfig(array $config, ClassBuilderInterface $classBuilder);
+    public function getPhpTypeFromPropertyConfig(array $config, ClassBuilderInterface $classBuilder): string;
 
     /**
      * @param array $definitions
@@ -64,9 +69,9 @@ interface SwaggerModelGeneratorInterface
     public function getDefinitions(): array;
 
     /**
-     * @return string
+     * @return SwaggerModelHelperInterface
      */
-    public function getHelper(): string;
+    public function getHelper(): SwaggerModelHelperInterface;
 
     /**
      * @param string $definitionName
@@ -75,7 +80,11 @@ interface SwaggerModelGeneratorInterface
      *
      * @return array
      */
-    public function getClassNameAndNamespaceFromDefinitionName(string $definitionName, string $classPrefix = '', string $classSuffix = ''): array;
+    public function getClassNameAndNamespaceFromDefinitionName(
+        string $definitionName,
+        string $classPrefix = '',
+        string $classSuffix = ''
+    ): array;
 
     /**
      * @param ClassBuilderInterface $classBuilder
@@ -86,7 +95,15 @@ interface SwaggerModelGeneratorInterface
      * @param array $configuration
      * @param bool $overwrite
      */
-    public function processProperty(ClassBuilderInterface $classBuilder, ConstructorBuilderInterface $constructorBuilder, string $definitionName, array $definition, string $property, array $configuration, bool $overwrite = false): void;
+    public function processProperty(
+        ClassBuilderInterface $classBuilder,
+        ConstructorBuilderInterface $constructorBuilder,
+        string $definitionName,
+        array $definition,
+        string $property,
+        array $configuration,
+        bool $overwrite = false
+    ): void;
 
     /**
      * @param string $definitionName

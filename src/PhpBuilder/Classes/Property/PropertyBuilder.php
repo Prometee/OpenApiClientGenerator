@@ -19,13 +19,13 @@ class PropertyBuilder implements PropertyBuilderInterface
     /** @var string */
     protected $name;
     /** @var string|null */
-    protected $type;
-    /** @var string|null */
     protected $value;
     /** @var string */
     protected $description = '';
     /** @var bool */
     protected $hasAlreadyBeenGenerated = false;
+    /** @var string[] */
+    protected $types;
 
     /**
      * @param UsesBuilderInterface $usesBuilder
@@ -41,22 +41,19 @@ class PropertyBuilder implements PropertyBuilderInterface
     }
 
     /**
-     * @param string $name
-     * @param string|null $type
-     * @param string|null $value
-     * @param string $description
+     * {@inheritdoc}
      */
     public function configure(
         string $name,
-        ?string $type = null,
+        array $types = [],
         ?string $value = null,
         string $description = ''
     )
     {
-        $this->type = $type;
-        $this->name = $name;
-        $this->value = $value;
-        $this->description = $description;
+        $this->setName($name);
+        $this->setTypes($types);
+        $this->setValue($value);
+        $this->setDescription($description);
 
         $this->phpDocBuilder->configure();
         $this->hasAlreadyBeenGenerated = false;
@@ -88,7 +85,7 @@ class PropertyBuilder implements PropertyBuilderInterface
             if (!empty($this->description)) {
                 $this->phpDocBuilder->addDescriptionLine($this->description);
             }
-            $this->phpDocBuilder->addVarLine($this->type);
+            $this->phpDocBuilder->addVarLine($this->getType());
 
             $this->hasAlreadyBeenGenerated = true;
         }
@@ -105,13 +102,36 @@ class PropertyBuilder implements PropertyBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getTypes(): ?array
+    public function getTypes(): array
     {
-        if ($this->type !== null) {
-            return explode('|', $this->type);
-        }
+        return $this->types;
+    }
 
-        return null;
+    /**
+     * {@inheritdoc}
+     */
+    public function setTypes(array $types): void
+    {
+        foreach ($types as &$type) {
+            if (true === $this->usesBuilder->isAClass($type)) {
+                $isArray = 1 === preg_match('#\[\]$#', $type);
+                $class = rtrim($type, '\\[]');
+                $this->usesBuilder->guessUse($class);
+                $type = $this->usesBuilder->getInternalUseClassName($class) . ($isArray ? '[]' : '');
+            }
+        }
+        $this->types = $types;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType(): ?string
+    {
+        if (empty($this->types)) {
+            return null;
+        }
+        return implode('|', $this->types);
     }
 
     /**
@@ -119,15 +139,15 @@ class PropertyBuilder implements PropertyBuilderInterface
      */
     public function getPhpType(): ?string
     {
-        if ($this->type === null) {
+        if (empty($this->types)) {
             return null;
         }
 
         $phpType = '';
-        if (in_array('null', $this->getTypes())) {
+        if (in_array('null', $this->types)) {
             $phpType = '?';
         }
-        foreach ($this->getTypes() as $type) {
+        foreach ($this->types as $type) {
             if (preg_match('#\[\]$#', $type)) {
                 $phpType .= 'array';
 
@@ -157,22 +177,6 @@ class PropertyBuilder implements PropertyBuilderInterface
     public function setScope(string $scope): void
     {
         $this->scope = $scope;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setType(?string $type): void
-    {
-        $this->type = $type;
     }
 
     /**

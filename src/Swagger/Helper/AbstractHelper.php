@@ -94,22 +94,22 @@ abstract class AbstractHelper implements HelperInterface
     /**
      * {@inheritdoc}
      */
-    public static function cleanPropertyName(string $property): string
+    public static function cleanStr(string $str): string
     {
-        return preg_replace('#[^a-z_0-9]#i', '_', $property);
+        return preg_replace('#[^a-z_0-9]#i', '_', $str);
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getClassNameFromDefinitionName(string $definitionName): string
+    public static function camelize(string $str): string
     {
-        $className = preg_replace('#-#', '_', $definitionName);
-        $className = trim($className, '_');
-        $words = explode('_', $className);
+        $underscored = preg_replace('#-#', '_', $str);
+        $underscored = self::cleanStr($underscored);
+        $underscored = trim($underscored, '_');
+        $words = explode('_', $underscored);
         $words = array_map('ucfirst', $words);
-        $className = implode('', $words);
 
-        return $className;
+        return implode('', $words);
     }
 }

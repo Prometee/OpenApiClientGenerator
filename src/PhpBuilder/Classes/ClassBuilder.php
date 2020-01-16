@@ -73,7 +73,7 @@ class ClassBuilder implements ClassBuilderInterface
         $this->extendClassName = $extendClassName;
         $this->implements = $implements;
 
-        $this->usesBuilder->configure();
+        $this->usesBuilder->configure($this->namespace);
         $this->traitsBuilder->configure($this->usesBuilder);
         $this->propertiesBuilder->configure($this->usesBuilder);
         $this->methodsBuilder->configure($this->usesBuilder);
@@ -199,9 +199,10 @@ class ClassBuilder implements ClassBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function setExtendClassName(?string $extendClassName): void
+    public function setExtendClassName(?string $extendClass): void
     {
-        $this->extendClassName = $extendClassName;
+        $this->usesBuilder->guessUse($extendClass);
+        $this->extendClassName = $this->usesBuilder->getInternalUseClassName($extendClass);
     }
 
     /**
@@ -217,7 +218,12 @@ class ClassBuilder implements ClassBuilderInterface
      */
     public function setImplements(array $implements): void
     {
-        $this->implements = $implements;
+        $internalImplements = [];
+        foreach ($implements as $implement) {
+            $this->usesBuilder->guessUse($implement);
+            $internalImplements[] = $this->usesBuilder->getInternalUseClassName($implement);
+        }
+        $this->implements = $internalImplements;
     }
 
     /**

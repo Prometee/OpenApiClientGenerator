@@ -4,17 +4,59 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other;
 
+use Exception;
+
 class UsesBuilder implements UsesBuilderInterface
 {
     /** @var string[] */
     protected $uses = [];
+    /** @var string[] */
+    protected $internalUses = [];
+    /** @var string */
+    protected $namespace = '';
 
     /**
      * {@inheritDoc}
      */
-    public function configure(array $uses = []): void
+    public function configure(string $namespace, array $uses = [], array $internalUses = []): void
     {
+        $this->namespace = $namespace;
         $this->uses = $uses;
+        $this->internalUses = $internalUses;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isAClass(string $str): bool
+    {
+        return 1 === preg_match('#\\\\#', $str);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessUse(string $class, string $alias = ''): void
+    {
+        if (true === $this->hasUse($class)) {
+            return;
+        }
+
+        $classParts = explode('\\', $class);
+        $className = end($classParts);
+        array_pop($classParts);
+        $namespace = implode('\\', $classParts);
+
+        if ($this->getInternalUseClass($className) === $namespace) {
+            return;
+        }
+
+        if ($namespace === $this->namespace) {
+            $this->processInternalUseClassName($class, $alias);
+            return;
+        }
+
+        $this->addUse($class, $alias);
     }
 
     /**
@@ -59,7 +101,9 @@ class UsesBuilder implements UsesBuilderInterface
      */
     public function setUse(string $class, string $alias = '')
     {
-        $this->uses[trim($class, '\\')] = $alias;
+        $class = trim($class, '\\');
+        $this->uses[$class] = $alias;
+        $this->processInternalUseClassName($class, $alias);
     }
 
     /**
@@ -93,20 +137,66 @@ class UsesBuilder implements UsesBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function getInternalClassName(string $class): ?string
+    public function hasInternalUse(string $internalClassName): bool
     {
-        if ($this->hasUse($class)) {
-            $alias = $this->getUseAlias($class);
-            if ($alias !== null) {
-                if (empty($alias)) {
-                    $class_parts = explode('\\', $class);
-                    $alias = end($class_parts);
-                }
+        return isset($this->internalUses[$internalClassName]);
+    }
 
-                return $alias;
-            }
+    /**
+     * {@inheritDoc}
+     */
+    public function getInternalUseClass(string $internalClassName): ?string
+    {
+        if ($this->hasInternalUse($internalClassName)) {
+            return $this->internalUses[$internalClassName];
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getInternalUseClassName(string $class): ?string
+    {
+        $internalClassName = array_search($class, $this->internalUses);
+
+        if (false === $internalClassName) {
+            return null;
+        }
+
+        return $internalClassName;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function processInternalUseClassName(string $class, string $internalClassName = ''): void
+    {
+        $existingInternalClassName = $this->getInternalUseClassName($class);
+        if (null !== $existingInternalClassName) {
+            return;
+        }
+
+        if (empty($internalClassName)) {
+            $classParts = explode('\\', $class);
+            $internalClassName = end($classParts);
+        }
+
+        $uniqInternalClassName = $internalClassName;
+        if ($this->hasInternalUse($uniqInternalClassName)) {
+            $uniqInternalClassName .= 'Alias';
+        }
+
+        $i = 1;
+        while ($this->hasInternalUse($uniqInternalClassName)) {
+            $uniqInternalClassName = $internalClassName . ++$i;
+        }
+
+        if ($uniqInternalClassName !== $internalClassName) {
+            $this->uses[$class] = $uniqInternalClassName;
+        }
+
+        $this->internalUses[$uniqInternalClassName] = $class;
     }
 }

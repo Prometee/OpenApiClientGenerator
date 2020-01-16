@@ -15,21 +15,21 @@ interface TraitsBuilderInterface extends BuilderInterface
     public function configure(UsesBuilderInterface $usesBuilder, array $traits = []): void;
 
     /**
-     * @param string $name
-     * @param string|null $alias
+     * @param string $class
+     * @param string $alias
      */
-    public function setTrait(string $name, ?string $alias = null): void;
+    public function setTrait(string $class, string $alias = ''): void;
 
     /**
      * @param string $name
-     * @param string|null $alias
+     * @param string $alias
      */
-    public function addTrait(string $name, ?string $alias = null): void;
+    public function addTrait(string $name, string $alias = ''): void;
 
     /**
-     * @param string $name
+     * @param string $class
      *
      * @return bool
      */
-    public function hasTrait(string $name): bool;
+    public function hasTrait(string $class): bool;
 }

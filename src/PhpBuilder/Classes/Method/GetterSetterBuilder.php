@@ -119,7 +119,7 @@ class GetterSetterBuilder implements GetterSetterBuilderInterface
                 $this->usesBuilder
             );
             $methodParameterBuilder->configure(
-                $this->propertyBuilder->getType(),
+                (array) $this->propertyBuilder->getType(),
                 $this->propertyBuilder->getName()
             );
 

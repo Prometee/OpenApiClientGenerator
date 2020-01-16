@@ -55,13 +55,13 @@ class MethodBuilder implements MethodBuilderInterface
         string $description = ''
     )
     {
-        $this->scope = $scope;
-        $this->name = $name;
-        $this->returnType = $returnType;
-        $this->static = $static;
-        $this->description = $description;
-        $this->parameters = [];
-        $this->lines = [];
+        $this->setScope($scope);
+        $this->setName($name);
+        $this->setReturnType($returnType);
+        $this->setStatic($static);
+        $this->setDescription($description);
+        $this->setParameters([]);
+        $this->setLines([]);
 
         $this->phpDocBuilder->configure();
         $this->hasAlreadyBeenGenerated = false;
@@ -296,6 +296,12 @@ class MethodBuilder implements MethodBuilderInterface
      */
     public function setReturnType(?string $returnType): void
     {
+        if (true === $this->usesBuilder->isAClass($returnType)) {
+            $isArray = 1 === preg_match('#\[\]$#', $returnType);
+            $class = trim($returnType, '\\[]');
+            $this->usesBuilder->guessUse($class);
+            $returnType = $this->usesBuilder->getInternalUseClassName($class) . ($isArray ? '[]' : '');
+        }
         $this->returnType = $returnType;
     }
 

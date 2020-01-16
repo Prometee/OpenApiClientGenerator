@@ -106,9 +106,9 @@ interface ClassBuilderInterface extends BuilderInterface
     public function getPropertiesBuilder(): PropertiesBuilderInterface;
 
     /**
-     * @param string|null $extendClassName
+     * @param string|null $extendClass
      */
-    public function setExtendClassName(?string $extendClassName): void;
+    public function setExtendClassName(?string $extendClass): void;
 
     /**
      * @param string $className

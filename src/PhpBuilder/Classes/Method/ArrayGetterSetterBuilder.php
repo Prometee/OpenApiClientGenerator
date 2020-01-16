@@ -86,7 +86,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGette
             $this->usesBuilder
         );
         $methodParameterBuilder->configure(
-            $this->getSingleTypeName(),
+            (array) $this->getSingleTypeName(),
             $this->getSingleName()
         );
         $this->hasGetterMethod->addParameter($methodParameterBuilder);
@@ -95,7 +95,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGette
             $this->usesBuilder
         );
         $methodParameterBuilder2->configure(
-            'bool',
+            (array) 'bool',
             'strict',
             'true'
         );
@@ -135,7 +135,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGette
             $this->usesBuilder
         );
         $methodParameterBuilder->configure(
-            $this->getSingleTypeName(),
+            (array) $this->getSingleTypeName(),
             $this->getSingleName()
         );
         $this->addSetterMethod->addParameter($methodParameterBuilder);
@@ -175,7 +175,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGette
             $this->usesBuilder
         );
         $methodParameterBuilder->configure(
-            $this->getSingleTypeName(),
+            (array) $this->getSingleTypeName(),
             $this->getSingleName()
         );
 
@@ -210,7 +210,7 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGette
      */
     public function getSingleTypeName(): ?string
     {
-        if ($this->propertyBuilder->getType() === null) {
+        if (empty($this->propertyBuilder->getTypes())) {
             return null;
         }
 

@@ -9,19 +9,19 @@ use Prometee\SwaggerClientBuilder\PhpBuilder\BuilderInterface;
 interface MethodParameterBuilderInterface extends BuilderInterface
 {
     /**
-     * @param string|null $type
+     * @param string[] $types
      * @param string $name
      * @param string|null $value
      * @param bool $byReference
      * @param string|null $description
      */
     public function configure(
-        ?string $type,
+        array $types,
         string $name,
         ?string $value = null,
         bool $byReference = false,
         string $description = ''
-    ):void;
+    ): void;
 
     /**
      * @return string
@@ -34,9 +34,14 @@ interface MethodParameterBuilderInterface extends BuilderInterface
     public function isByReference(): bool;
 
     /**
-     * @return array|null
+     * @return array
      */
-    public function getTypes(): ?array;
+    public function getTypes(): array;
+
+    /**
+     * @param array $types
+     */
+    public function setTypes(array $types): void;
 
     /**
      * @return string
@@ -74,11 +79,6 @@ interface MethodParameterBuilderInterface extends BuilderInterface
      * @param string $description
      */
     public function setDescription(string $description): void;
-
-    /**
-     * @param string|null $type
-     */
-    public function setType(?string $type): void;
 
     /**
      * @return string|null

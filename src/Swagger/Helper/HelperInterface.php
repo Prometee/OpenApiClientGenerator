@@ -21,11 +21,11 @@ interface HelperInterface
     public static function getPhpTypeFromSwaggerStringType(?string $format): string;
 
     /**
-     * @param string $property
+     * @param string $str
      *
      * @return string
      */
-    public static function cleanPropertyName(string $property): string;
+    public static function cleanStr(string $str): string;
 
     /**
      * @param array $config
@@ -50,9 +50,9 @@ interface HelperInterface
     public static function getPhpTypeFromSwaggerTypeAndFormat(string $type, ?array $items): string;
 
     /**
-     * @param string $definitionName
+     * @param string $str
      *
      * @return string
      */
-    public static function getClassNameFromDefinitionName(string $definitionName): string;
+    public static function camelize(string $str): string;
 }

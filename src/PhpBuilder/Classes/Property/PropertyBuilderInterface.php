@@ -11,13 +11,13 @@ interface PropertyBuilderInterface extends BuilderInterface, PhpDocAwareBuilderI
 {
     /**
      * @param string $name
-     * @param string|null $type
+     * @param array $types
      * @param string|null $value
      * @param string $description
      */
     public function configure(
         string $name,
-        ?string $type = null,
+        array $types = [],
         ?string $value = null,
         string $description = ''
     );
@@ -60,16 +60,6 @@ interface PropertyBuilderInterface extends BuilderInterface, PhpDocAwareBuilderI
     /**
      * @return string|null
      */
-    public function getType(): ?string;
-
-    /**
-     * @param string|null $type
-     */
-    public function setType(?string $type): void;
-
-    /**
-     * @return string|null
-     */
     public function getPhpType(): ?string;
 
     /**
@@ -83,7 +73,17 @@ interface PropertyBuilderInterface extends BuilderInterface, PhpDocAwareBuilderI
     public function setDescription(string $description): void;
 
     /**
-     * @return string[]|null
+     * @return string[]
      */
-    public function getTypes(): ?array;
+    public function getTypes(): array;
+
+    /**
+     * @param string[] $types
+     */
+    public function setTypes(array $types): void;
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string;
 }

@@ -11,8 +11,8 @@ class MethodParameterBuilder implements MethodParameterBuilderInterface
     /** @var UsesBuilderInterface */
     protected $usesBuilder;
 
-    /** @var string|null */
-    protected $type;
+    /** @var string[] */
+    protected $types = [];
     /** @var string */
     protected $name;
     /** @var string|null */
@@ -34,18 +34,18 @@ class MethodParameterBuilder implements MethodParameterBuilderInterface
      * @inheritDoc
      */
     public function configure(
-        ?string $type,
+        array $types,
         string $name,
         ?string $value = null,
         bool $byReference = false,
         string $description = ''
-    ):void
+    ): void
     {
-        $this->type = $type;
-        $this->name = $name;
-        $this->value = $value;
-        $this->byReference = $byReference;
-        $this->description = $description;
+        $this->setTypes($types);
+        $this->setName($name);
+        $this->setValue($value);
+        $this->setByReference($byReference);
+        $this->setDescription($description);
     }
 
     /**
@@ -55,7 +55,7 @@ class MethodParameterBuilder implements MethodParameterBuilderInterface
     {
         $content = '';
 
-        $content .= ($this->type !== null) ? $this->getPhpType() . ' ' : '';
+        $content .= null === $this->getType() ? $this->getPhpType() . ' ' : '';
         $content .= $this->byReference ? '&' : '';
         $content .= $this->getPhpName();
         $content .= ($this->value !== null) ? ' = ' . $this->value : '';
@@ -74,13 +74,26 @@ class MethodParameterBuilder implements MethodParameterBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function getTypes(): ?array
+    public function getTypes(): array
     {
-        if ($this->type !== null) {
-            return explode('|', $this->type);
+        return $this->types;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setTypes(array $types): void
+    {
+        foreach ($types as &$type) {
+            if (true === $this->usesBuilder->isAClass($type)) {
+                $isArray = 1 === preg_match('#\[\]$#', $type);
+                $class = rtrim($type, '\\[]');
+                $this->usesBuilder->guessUse($class);
+                $type = $this->usesBuilder->getInternalUseClassName($class) . ($isArray ? '[]' : '');
+            }
         }
 
-        return null;
+        $this->types = $types;
     }
 
     /**
@@ -88,12 +101,12 @@ class MethodParameterBuilder implements MethodParameterBuilderInterface
      */
     public function getPhpType(): ?string
     {
-        if ($this->type === null) {
+        if (empty($this->types)) {
             return null;
         }
 
         $phpType = '';
-        if (in_array('null', $this->getTypes())) {
+        if (in_array('null', $this->types)) {
             $phpType = '?';
         }
         foreach ($this->getTypes() as $type) {
@@ -149,15 +162,11 @@ class MethodParameterBuilder implements MethodParameterBuilderInterface
      */
     public function getType(): ?string
     {
-        return $this->type;
-    }
+        if (empty($this->types)) {
+            return null;
+        }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setType(?string $type): void
-    {
-        $this->type = $type;
+        return implode('|', $this->types);
     }
 
     /**

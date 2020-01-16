@@ -40,7 +40,7 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function configure(string $swaggerUri, string $folder, string $namespace, string $indent = '    ')
+    public function configure(string $swaggerUri, string $folder, string $namespace, string $indent = '    '): void
     {
         $this->swaggerUri = $swaggerUri;
         $this->folder = $folder;

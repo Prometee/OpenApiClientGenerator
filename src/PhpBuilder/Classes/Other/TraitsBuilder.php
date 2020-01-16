@@ -37,7 +37,7 @@ class TraitsBuilder implements TraitsBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function addTrait(string $name, ?string $alias = null): void
+    public function addTrait(string $name, string $alias = ''): void
     {
         if (!$this->hasTrait($name)) {
             $this->setTrait($name, $alias);
@@ -47,16 +47,17 @@ class TraitsBuilder implements TraitsBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function hasTrait(string $name): bool
+    public function hasTrait(string $class): bool
     {
-        return isset($this->traits[$name]);
+        return isset($this->traits[$class]);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setTrait(string $name, ?string $alias = null): void
+    public function setTrait(string $class, string $alias = ''): void
     {
-        $this->traits[$name] = $alias;
+        $this->usesBuilder->guessUse($class, $alias);
+        $this->traits[$class] = $this->usesBuilder->getInternalUseClassName($class);
     }
 }

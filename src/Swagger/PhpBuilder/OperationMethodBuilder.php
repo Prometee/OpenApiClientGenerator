@@ -210,7 +210,7 @@ class OperationMethodBuilder extends MethodBuilder implements OperationMethodBui
             if (!isset($operationParameter['name'])) {
                 continue;
             }
-            $parameterName = lcfirst(SwaggerOperationsHelper::cleanPropertyName($operationParameter['name']));
+            $parameterName = lcfirst(SwaggerOperationsHelper::cleanStr($operationParameter['name']));
             switch ($operationParameter['in']) {
                 case 'query':
                     $queryParams .= "\n" . '%1$s%1$s\'' . $parameterName . '\' => $' . $parameterName . ',';
@@ -250,7 +250,7 @@ class OperationMethodBuilder extends MethodBuilder implements OperationMethodBui
             if (!isset($operationParameter['name'])) {
                 continue;
             }
-            $parameterName = lcfirst(SwaggerOperationsHelper::cleanPropertyName($operationParameter['name']));
+            $parameterName = lcfirst(SwaggerOperationsHelper::cleanStr($operationParameter['name']));
             $bodyParam = '$' . $parameterName;
         }
 
