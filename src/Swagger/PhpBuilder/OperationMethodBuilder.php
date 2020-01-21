@@ -18,25 +18,25 @@ class OperationMethodBuilder extends MethodBuilder implements OperationMethodBui
     public function configure(
         string $scope,
         string $name,
-        ?string $returnType = null,
+        array $returnTypes = [],
         bool $static = false,
         string $description = ''
     )
     {
-        parent::configure(self::SCOPE_PUBLIC, $name, $returnType, false, $description);
+        parent::configure(self::SCOPE_PUBLIC, $name, $returnTypes, false, $description);
     }
 
-    public function getMinifiedReturnType()
+    public function getMinifiedReturnType(): string
     {
-        if ($this->returnType === 'void') {
+        if (empty($this->returnTypes)) {
             return 'null';
         }
 
-        if ($this->returnType === null) {
+        if ($this->returnTypes === ['void']) {
             return 'null';
         }
 
-        if ($this->returnType === 'array') {
+        if ($this->returnTypes === ['array']) {
             return '\'array\'';
         }
 
@@ -45,7 +45,7 @@ class OperationMethodBuilder extends MethodBuilder implements OperationMethodBui
             $suffix = '.\'[]\'';
         }
 
-        return rtrim($this->returnType, '[]') . '::class' . $suffix;
+        return rtrim($this->returnTypes[0], '[]') . '::class' . $suffix;
     }
 
     /**
@@ -85,7 +85,7 @@ class OperationMethodBuilder extends MethodBuilder implements OperationMethodBui
     {
         [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
-        $format  = $this->returnType === 'void' ? '' : 'return ';
+        $format  = $this->returnTypes === ['void'] ? '' : 'return ';
         $format .=
             '$this->execGetOperation(' . "\n"
                 . '%1$s\'%2$s\',' . "\n"
@@ -114,7 +114,7 @@ class OperationMethodBuilder extends MethodBuilder implements OperationMethodBui
     {
         [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
-        $format  = $this->returnType === 'void' ? '' : 'return ';
+        $format  = $this->returnTypes === ['void'] ? '' : 'return ';
         $format .=
             '$this->execPostOperation(' . "\n"
             . '%1$s\'%2$s\',' . "\n"
@@ -145,7 +145,7 @@ class OperationMethodBuilder extends MethodBuilder implements OperationMethodBui
     {
         [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
-        $format  = $this->returnType === 'void' ? '' : 'return ';
+        $format  = $this->returnTypes === ['void'] ? '' : 'return ';
         $format .=
             '$this->execPutOperation(' . "\n"
             . '%1$s\'%2$s\',' . "\n"
@@ -176,7 +176,7 @@ class OperationMethodBuilder extends MethodBuilder implements OperationMethodBui
     {
         [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
 
-        $format  = $this->returnType === 'void' ? '' : 'return ';
+        $format  = $this->returnTypes === ['void'] ? '' : 'return ';
         $format .=
             '$this->execDeleteOperation(' . "\n"
             . '%1$s\'%2$s\',' . "\n"

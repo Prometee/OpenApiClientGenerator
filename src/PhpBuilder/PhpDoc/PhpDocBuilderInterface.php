@@ -23,17 +23,19 @@ interface PhpDocBuilderInterface extends BuilderInterface
     ];
 
     /**
-     * @param string[] $lines
+     * @param array $lines
      * @param int $wrapOn
+     *
+     * @return mixed
      */
     public function configure(array $lines = [], int $wrapOn = 100);
 
     /**
-     * @param string[]|null $types
+     * @param string[] $types
      *
      * @return string
      */
-    public static function getPossibleTypesFromTypeName(?array $types): string;
+    public static function getPossibleTypesFromTypeNames(array $types = []): string;
 
     /**
      * @param string $line

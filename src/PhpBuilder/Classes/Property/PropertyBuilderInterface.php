@@ -83,6 +83,18 @@ interface PropertyBuilderInterface extends BuilderInterface, PhpDocAwareBuilderI
     public function setTypes(array $types): void;
 
     /**
+     * @param string $type
+     */
+    public function addType(string $type): void;
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function hasType(string $type): bool;
+
+    /**
      * @return string|null
      */
     public function getType(): ?string;

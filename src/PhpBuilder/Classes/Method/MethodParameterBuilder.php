@@ -84,16 +84,29 @@ class MethodParameterBuilder implements MethodParameterBuilderInterface
      */
     public function setTypes(array $types): void
     {
-        foreach ($types as &$type) {
-            if (true === $this->usesBuilder->isAClass($type)) {
-                $isArray = 1 === preg_match('#\[\]$#', $type);
-                $class = rtrim($type, '\\[]');
-                $this->usesBuilder->guessUse($class);
-                $type = $this->usesBuilder->getInternalUseClassName($class) . ($isArray ? '[]' : '');
-            }
+        $this->types = [];
+        foreach ($types as $type) {
+            $this->addType($type);
         }
+    }
 
-        $this->types = $types;
+    /**
+     * {@inheritDoc}
+     */
+    public function addType(string $type): void
+    {
+        $type = $this->usesBuilder->guessUseOrReturnType($type);
+        if (false === $this->hasType($type)) {
+            $this->types[] = $type;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasType(string $type): bool
+    {
+        return false !== array_search($type, $this->types);
     }
 
     /**

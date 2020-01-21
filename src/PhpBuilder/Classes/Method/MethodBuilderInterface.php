@@ -16,14 +16,14 @@ interface MethodBuilderInterface extends BuilderInterface, PhpDocAwareBuilderInt
     /**
      * @param string $scope
      * @param string $name
-     * @param string|null $returnType
+     * @param string[] $returnTypes
      * @param bool $static
      * @param string $description
      */
     public function configure(
         string $scope,
         string $name,
-        ?string $returnType = null,
+        array $returnTypes = [],
         bool $static = false,
         string $description = ''
     );
@@ -34,9 +34,9 @@ interface MethodBuilderInterface extends BuilderInterface, PhpDocAwareBuilderInt
     public function getDescription(): string;
 
     /**
-     * @return array|null
+     * @return array
      */
-    public function getReturnTypes(): ?array;
+    public function getReturnTypes(): array;
 
     /**
      * @return string
@@ -89,9 +89,21 @@ interface MethodBuilderInterface extends BuilderInterface, PhpDocAwareBuilderInt
     public function setName(string $name): void;
 
     /**
-     * @param string|null $returnType
+     * @param string[] $returnTypes
      */
-    public function setReturnType(?string $returnType): void;
+    public function setReturnTypes(array $returnTypes): void;
+
+    /**
+     * @param string $returnType
+     */
+    public function addReturnType(string $returnType): void;
+
+    /**
+     * @param string $returnType
+     *
+     * @return bool
+     */
+    public function hasReturnType(string $returnType): bool;
 
     /**
      * {@inheritdoc}
@@ -109,11 +121,6 @@ interface MethodBuilderInterface extends BuilderInterface, PhpDocAwareBuilderInt
      * @param string $description
      */
     public function setDescription(string $description): void;
-
-    /**
-     * @return string|null
-     */
-    public function getReturnType(): ?string;
 
     /**
      * @return string

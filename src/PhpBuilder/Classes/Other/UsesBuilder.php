@@ -28,7 +28,7 @@ class UsesBuilder implements UsesBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function isAClass(string $str): bool
+    public function isUsable(string $str): bool
     {
         return 1 === preg_match('#\\\\#', $str);
     }
@@ -36,27 +36,52 @@ class UsesBuilder implements UsesBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function guessUse(string $class, string $alias = ''): void
+    public function cleanUse(string $use): string
     {
-        if (true === $this->hasUse($class)) {
+        $cleanedUse = rtrim($use, '][');
+        $cleanedUse = trim($cleanedUse, '\\');
+        return $cleanedUse;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessUseOrReturnType(string $use): string
+    {
+        if (false === $this->isUsable($use)) {
+            return $use;
+        }
+
+        $isArray = 1 === preg_match('#\[\]$#', $use);
+        $this->guessUse($use);
+        return $this->getInternalUseName($use) . ($isArray ? '[]' : '');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessUse(string $use, string $alias = ''): void
+    {
+        if (false === $this->isUsable($use)) {
             return;
         }
 
-        $classParts = explode('\\', $class);
-        $className = end($classParts);
-        array_pop($classParts);
-        $namespace = implode('\\', $classParts);
+        $use = $this->cleanUse($use);
 
-        if ($this->getInternalUseClass($className) === $namespace) {
+        if (true === $this->hasUse($use)) {
             return;
         }
+
+        $useParts = explode('\\', $use);
+        array_pop($useParts);
+        $namespace = implode('\\', $useParts);
 
         if ($namespace === $this->namespace) {
-            $this->processInternalUseClassName($class, $alias);
+            $this->processInternalUseName($use, $alias);
             return;
         }
 
-        $this->addUse($class, $alias);
+        $this->addUse($use, $alias);
     }
 
     /**
@@ -65,8 +90,8 @@ class UsesBuilder implements UsesBuilderInterface
     public function build(string $indent = null): ?string
     {
         $content = '';
-        foreach ($this->uses as $class => $alias) {
-            $content .= 'use ' . $class;
+        foreach ($this->uses as $use => $alias) {
+            $content .= 'use ' . $use;
             $content .= !empty($alias) ? ' as ' . $alias : '';
             $content .= ';' . "\n";
         }
@@ -81,38 +106,39 @@ class UsesBuilder implements UsesBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function addUse(string $class, string $alias = '')
+    public function addUse(string $use, string $alias = '')
     {
-        if (!$this->hasUse($class)) {
-            $this->setUse($class, $alias);
+        if (!$this->hasUse($use)) {
+            $this->setUse($use, $alias);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public function hasUse(string $class): bool
+    public function hasUse(string $use): bool
     {
-        return isset($this->uses[$class]);
+        return isset($this->uses[$use]);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setUse(string $class, string $alias = '')
+    public function setUse(string $use, string $alias = '')
     {
-        $class = trim($class, '\\');
-        $this->uses[$class] = $alias;
-        $this->processInternalUseClassName($class, $alias);
+        $use = $this->cleanUse($use);
+        $this->uses[$use] = $alias;
+        $this->processInternalUseName($use, $alias);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getUseAlias(string $class): ?string
+    public function getUseAlias(string $use): ?string
     {
-        if ($this->hasUse($class)) {
-            return $this->uses[$class];
+        $use = $this->cleanUse($use);
+        if ($this->hasUse($use)) {
+            return $this->uses[$use];
         }
 
         return null;
@@ -137,18 +163,19 @@ class UsesBuilder implements UsesBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function hasInternalUse(string $internalClassName): bool
+    public function hasInternalUse(string $internalUseName): bool
     {
-        return isset($this->internalUses[$internalClassName]);
+        return isset($this->internalUses[$internalUseName]);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getInternalUseClass(string $internalClassName): ?string
+    public function getInternalUse(string $internalUseName): ?string
     {
-        if ($this->hasInternalUse($internalClassName)) {
-            return $this->internalUses[$internalClassName];
+        $internalUseName = $this->cleanUse($internalUseName);
+        if ($this->hasInternalUse($internalUseName)) {
+            return $this->internalUses[$internalUseName];
         }
 
         return null;
@@ -157,46 +184,48 @@ class UsesBuilder implements UsesBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function getInternalUseClassName(string $class): ?string
+    public function getInternalUseName(string $use): ?string
     {
-        $internalClassName = array_search($class, $this->internalUses);
+        $use = $this->cleanUse($use);
+        $internalUseName = array_search($use, $this->internalUses);
 
-        if (false === $internalClassName) {
+        if (false === $internalUseName) {
             return null;
         }
 
-        return $internalClassName;
+        return $internalUseName;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function processInternalUseClassName(string $class, string $internalClassName = ''): void
+    public function processInternalUseName(string $use, string $internalUseName = ''): void
     {
-        $existingInternalClassName = $this->getInternalUseClassName($class);
-        if (null !== $existingInternalClassName) {
+        $use = $this->cleanUse($use);
+        $existingInternalUseName = $this->getInternalUseName($use);
+        if (null !== $existingInternalUseName) {
             return;
         }
 
-        if (empty($internalClassName)) {
-            $classParts = explode('\\', $class);
-            $internalClassName = end($classParts);
+        if (empty($internalUseName)) {
+            $useParts = explode('\\', $use);
+            $internalUseName = end($useParts);
         }
 
-        $uniqInternalClassName = $internalClassName;
-        if ($this->hasInternalUse($uniqInternalClassName)) {
-            $uniqInternalClassName .= 'Alias';
+        $uniqInternalUseName = $internalUseName;
+        if ($this->hasInternalUse($uniqInternalUseName)) {
+            $uniqInternalUseName .= 'Alias';
         }
 
         $i = 1;
-        while ($this->hasInternalUse($uniqInternalClassName)) {
-            $uniqInternalClassName = $internalClassName . ++$i;
+        while ($this->hasInternalUse($uniqInternalUseName)) {
+            $uniqInternalUseName = $internalUseName . ++$i;
         }
 
-        if ($uniqInternalClassName !== $internalClassName) {
-            $this->uses[$class] = $uniqInternalClassName;
+        if ($uniqInternalUseName !== $internalUseName) {
+            $this->uses[$use] = $uniqInternalUseName;
         }
 
-        $this->internalUses[$uniqInternalClassName] = $class;
+        $this->internalUses[$uniqInternalUseName] = $use;
     }
 }

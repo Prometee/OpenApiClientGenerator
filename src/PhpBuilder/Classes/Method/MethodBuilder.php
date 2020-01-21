@@ -18,8 +18,8 @@ class MethodBuilder implements MethodBuilderInterface
     protected $scope = '';
     /** @var string */
     protected $name = '';
-    /** @var string|null */
-    protected $returnType;
+    /** @var string[] */
+    protected $returnTypes = [];
     /** @var bool */
     protected $static = false;
     /** @var string */
@@ -50,14 +50,14 @@ class MethodBuilder implements MethodBuilderInterface
     public function configure(
         string $scope,
         string $name,
-        ?string $returnType = null,
+        array $returnTypes = [],
         bool $static = false,
         string $description = ''
     )
     {
         $this->setScope($scope);
         $this->setName($name);
-        $this->setReturnType($returnType);
+        $this->setReturnTypes($returnTypes);
         $this->setStatic($static);
         $this->setDescription($description);
         $this->setParameters([]);
@@ -89,7 +89,7 @@ class MethodBuilder implements MethodBuilderInterface
             }
             $content .= implode(', ', $parameters);
             $content .= (count($this->parameters) > 4 ? "\n" . $indent : '') . ')';
-            if ($this->returnType !== null && $this->returnType !== 'mixed') {
+            if (!empty($this->returnTypes) && !in_array('mixed', $this->returnTypes)) {
                 $content .= ': ' . $this->getPhpReturnType();
             }
             $content .= "\n";
@@ -116,11 +116,11 @@ class MethodBuilder implements MethodBuilderInterface
                 $this->phpDocBuilder->addDescriptionLine($this->getDescription());
             }
             foreach ($this->parameters as $parameter) {
-                $type = $this->phpDocBuilder::getPossibleTypesFromTypeName([$parameter->getType(), $parameter->getValueType()]);
+                $type = $this->phpDocBuilder::getPossibleTypesFromTypeNames([$parameter->getType(), $parameter->getValueType()]);
                 $this->phpDocBuilder->addParamLine($parameter->getPhpName(), $type, $parameter->getDescription());
             }
-            if ($this->returnType !== null && $this->returnType !== 'void') {
-                $type = $this->phpDocBuilder::getPossibleTypesFromTypeName([$this->returnType]);
+            if (!empty($this->returnTypes) && !in_array('void', $this->returnTypes)) {
+                $type = $this->phpDocBuilder::getPossibleTypesFromTypeNames($this->returnTypes);
                 $this->phpDocBuilder->addReturnLine($type);
             }
 
@@ -131,13 +131,9 @@ class MethodBuilder implements MethodBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getReturnTypes(): ?array
+    public function getReturnTypes(): array
     {
-        if ($this->returnType !== null) {
-            return explode('|', $this->returnType);
-        }
-
-        return null;
+        return $this->returnTypes;
     }
 
     /**
@@ -145,15 +141,15 @@ class MethodBuilder implements MethodBuilderInterface
      */
     public function getPhpReturnType(): ?string
     {
-        if ($this->returnType === null) {
+        if (empty($this->returnTypes)) {
             return null;
         }
 
         $phpReturnType = '';
-        if (in_array('null', $this->getReturnTypes())) {
+        if (in_array('null', $this->returnTypes)) {
             $phpReturnType = '?';
         }
-        foreach ($this->getReturnTypes() as $type) {
+        foreach ($this->returnTypes as $type) {
             if (preg_match('#\[\]$#', $type)) {
                 $phpReturnType .= 'array';
 
@@ -167,6 +163,36 @@ class MethodBuilder implements MethodBuilderInterface
         }
 
         return $phpReturnType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setReturnTypes(array $returnTypes): void
+    {
+        $this->returnTypes = [];
+        foreach ($returnTypes as $returnType) {
+            $this->addReturnType($returnType);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addReturnType(string $returnType): void
+    {
+        $returnType = $this->usesBuilder->guessUseOrReturnType($returnType);
+        if (false === $this->hasReturnType($returnType)) {
+            $this->returnTypes[] = $returnType;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function hasReturnType(string $returnType): bool
+    {
+        return false !== array_search($returnType, $this->returnTypes);
     }
 
     /**
@@ -281,28 +307,6 @@ class MethodBuilder implements MethodBuilderInterface
     public function setParameters(array $parameters): void
     {
         $this->parameters = $parameters;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getReturnType(): ?string
-    {
-        return $this->returnType;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setReturnType(?string $returnType): void
-    {
-        if (true === $this->usesBuilder->isAClass($returnType)) {
-            $isArray = 1 === preg_match('#\[\]$#', $returnType);
-            $class = trim($returnType, '\\[]');
-            $this->usesBuilder->guessUse($class);
-            $returnType = $this->usesBuilder->getInternalUseClassName($class) . ($isArray ? '[]' : '');
-        }
-        $this->returnType = $returnType;
     }
 
     /**

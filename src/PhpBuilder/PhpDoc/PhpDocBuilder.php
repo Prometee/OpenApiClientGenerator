@@ -6,14 +6,13 @@ namespace Prometee\SwaggerClientBuilder\PhpBuilder\PhpDoc;
 
 class PhpDocBuilder implements PhpDocBuilderInterface
 {
-    /** @var string[] */
+    /** @var array */
     protected $lines = [];
     /** @var int */
     protected $wrapOn = 100;
 
     /**
-     * @param string[] $lines
-     * @param int $wrapOn
+     * {@inheritDoc}
      */
     public function configure(array $lines = [], int $wrapOn = 100)
     {
@@ -159,9 +158,9 @@ class PhpDocBuilder implements PhpDocBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public static function getPossibleTypesFromTypeName(?array $types): string
+    public static function getPossibleTypesFromTypeNames(array $types = []): string
     {
-        if ($types === null) {
+        if (empty($types)) {
             return '';
         }
         $typesFound = [];

@@ -20,66 +20,80 @@ interface UsesBuilderInterface extends BuilderInterface
      *
      * @return bool
      */
-    public function isAClass(string $str): bool;
+    public function isUsable(string $str): bool;
 
     /**
-     * @param string $class
+     * @param string $use
+     *
+     * @return string
+     */
+    public function guessUseOrReturnType(string $use): string;
+
+    /**
+     * @param string $use
      * @param string $alias
      */
-    public function guessUse(string $class, string $alias = ''): void;
+    public function guessUse(string $use, string $alias = ''): void;
 
     /**
-     * @param string $internalClassName
+     * @param string $internalUseName
      *
      * @return bool
      */
-    public function hasInternalUse(string $internalClassName): bool;
+    public function hasInternalUse(string $internalUseName): bool;
 
     /**
-     * @param string $internalClassName
+     * @param string $internalUseName
      *
      * @return string|null
      */
-    public function getInternalUseClass(string $internalClassName): ?string;
+    public function getInternalUse(string $internalUseName): ?string;
 
     /**
-     * @param string $class
+     * @param string $use
      *
      * @return string|null
      */
-    public function getInternalUseClassName(string $class): ?string;
+    public function getInternalUseName(string $use): ?string;
 
     /**
-     * @param string $class
-     * @param string $internalClassName
+     * @param string $use
+     * @param string $internalUseName
      */
-    public function processInternalUseClassName(string $class, string $internalClassName = '');
+    public function processInternalUseName(string $use, string $internalUseName = '');
 
     /**
-     * @param string $class
+     * @param string $use
+     *
+     * @return string
+     */
+    public function cleanUse(string $use): string;
+
+    /**
+     * @param string $use
      *
      * @return string|null
      */
-    public function getUseAlias(string $class): ?string;
+    public function getUseAlias(string $use): ?string;
 
     /**
-     * @param string $class
+     * @param string $use
      * @param string $alias
      */
-    public function setUse(string $class, string $alias = '');
+    public function setUse(string $use, string $alias = '');
 
     /**
-     * @param string $class
+     * @param string $use
      * @param string $alias
      */
-    public function addUse(string $class, string $alias = '');
+    public function addUse(string $use, string $alias = '');
 
     /**
-     * @param string $class
+     * @param string $use
      *
      * @return bool
      */
-    public function hasUse(string $class): bool;
+    public function hasUse(string $use): bool;
 
     /**
      * @return string[]

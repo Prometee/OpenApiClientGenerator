@@ -17,11 +17,11 @@ class ConstructorBuilder extends MethodBuilder implements ConstructorBuilderInte
     public function configure(
         string $scope,
         string $name,
-        ?string $returnType = null,
+        array $returnTypes = [],
         bool $static = false,
         string $description = ''
     )
     {
-        parent::configure(self::SCOPE_PUBLIC, '__construct', $returnType, $static, $description);
+        parent::configure(self::SCOPE_PUBLIC, '__construct', $returnTypes, $static, $description);
     }
 }

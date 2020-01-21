@@ -95,7 +95,7 @@ class GetterSetterBuilder implements GetterSetterBuilderInterface
             $this->getterMethodBuilder->configure(
                 MethodBuilderInterface::SCOPE_PUBLIC,
                 $this->getMethodName(static::GETTER_PREFIX),
-                $this->propertyBuilder->getType()
+                $this->propertyBuilder->getTypes()
             );
 
             $this->getterMethodBuilder->addLine(
@@ -113,7 +113,7 @@ class GetterSetterBuilder implements GetterSetterBuilderInterface
             $this->setterMethodBuilder->configure(
                 MethodBuilderInterface::SCOPE_PUBLIC,
                 $this->getMethodName(static::SETTER_PREFIX),
-                'void'
+                ['void']
             );
             $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
                 $this->usesBuilder

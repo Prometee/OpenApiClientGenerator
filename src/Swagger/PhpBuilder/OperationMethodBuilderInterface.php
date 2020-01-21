@@ -8,4 +8,8 @@ use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodBuilderInterfa
 
 interface OperationMethodBuilderInterface extends MethodBuilderInterface
 {
+    /**
+     * @return string
+     */
+    public function getMinifiedReturnType(): string;
 }

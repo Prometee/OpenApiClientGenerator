@@ -44,6 +44,18 @@ interface MethodParameterBuilderInterface extends BuilderInterface
     public function setTypes(array $types): void;
 
     /**
+     * @param string $type
+     */
+    public function addType(string $type): void;
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function hasType(string $type): bool;
+
+    /**
      * @return string
      */
     public function getName(): string;

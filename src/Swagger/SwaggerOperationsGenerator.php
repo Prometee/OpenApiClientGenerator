@@ -156,7 +156,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         if ($this->abstractOperationClass !== null) {
             $useBuilder = $classBuilder->getUsesBuilder();
             $useBuilder->addUse($this->abstractOperationClass);
-            $extendClassName = $useBuilder->getInternalUseClassName($this->abstractOperationClass);
+            $extendClassName = $useBuilder->getInternalUseName($this->abstractOperationClass);
             $classBuilder->setExtendClassName($extendClassName);
         }
 
@@ -197,7 +197,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         );
         $operationMethodName = $this->helper::getOperationMethodName($path, $operation, $operationConfiguration);
         $operationMethodBuilder->setName($operationMethodName);
-        $operationMethodBuilder->setReturnType($returnType);
+        $operationMethodBuilder->addReturnType($returnType);
 
         if (isset($operationConfiguration['description'])) {
             foreach (explode("\n", $operationConfiguration['description']) as $line) {

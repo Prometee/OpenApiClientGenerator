@@ -58,6 +58,6 @@ class TraitsBuilder implements TraitsBuilderInterface
     public function setTrait(string $class, string $alias = ''): void
     {
         $this->usesBuilder->guessUse($class, $alias);
-        $this->traits[$class] = $this->usesBuilder->getInternalUseClassName($class);
+        $this->traits[$class] = $this->usesBuilder->getInternalUseName($class);
     }
 }
