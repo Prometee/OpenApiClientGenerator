@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger\Helper;
 
+use Exception;
+
 abstract class AbstractHelper implements HelperInterface
 {
     /**
@@ -54,14 +56,22 @@ abstract class AbstractHelper implements HelperInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws Exception
      */
     public static function getPhpTypeFromSwaggerArrayType(?array $items): string
     {
+        $phpType = 'array';
+
         if ($items !== null) {
-            return static::getPhpTypeFromSwaggerConfiguration($items);
+            $phpType = static::getPhpTypeFromSwaggerConfiguration($items);
         }
 
-        return 'array';
+        if (null === $phpType) {
+            throw new Exception(sprintf('Unable to found the corresponding php type of "%s"', print_r($items)));
+        }
+
+        return $phpType;
     }
 
     /**
