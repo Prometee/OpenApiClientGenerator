@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\ConstructorBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\ConstructorBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\MethodsBuilderInterface;
 use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerModelHelperInterface;
+use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Other\ModelPropertiesBuilderInterface;
 
 interface SwaggerModelGeneratorInterface
 {
@@ -16,17 +18,6 @@ interface SwaggerModelGeneratorInterface
      * @param string $indent
      */
     public function configure(string $folder, string $namespace, string $indent = '    '): void;
-
-    /**
-     * @param ClassBuilderInterface $classBuilder
-     * @param ConstructorBuilderInterface $constructorBuilder
-     * @param array $definition
-     */
-    public function processRequiredProperties(
-        ClassBuilderInterface $classBuilder,
-        ConstructorBuilderInterface $constructorBuilder,
-        array $definition
-    ): void;
 
     /**
      * @param SwaggerModelHelperInterface $helper
@@ -45,11 +36,10 @@ interface SwaggerModelGeneratorInterface
 
     /**
      * @param array $config
-     * @param ClassBuilderInterface $classBuilder
      *
      * @return string
      */
-    public function getPhpTypeFromPropertyConfig(array $config, ClassBuilderInterface $classBuilder): string;
+    public function getPhpTypeFromPropertyConfig(array $config): string;
 
     /**
      * @param array $definitions
@@ -87,20 +77,20 @@ interface SwaggerModelGeneratorInterface
     ): array;
 
     /**
-     * @param ClassBuilderInterface $classBuilder
-     * @param ConstructorBuilderInterface $constructorBuilder
+     * @param ModelPropertiesBuilderInterface $modelPropertiesBuilder
+     * @param MethodsBuilderInterface $methodsBuilder
      * @param string $definitionName
      * @param array $definition
-     * @param string $property
+     * @param string $propertyName
      * @param array $configuration
      * @param bool $overwrite
      */
     public function processProperty(
-        ClassBuilderInterface $classBuilder,
-        ConstructorBuilderInterface $constructorBuilder,
+        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
+        MethodsBuilderInterface $methodsBuilder,
         string $definitionName,
         array $definition,
-        string $property,
+        string $propertyName,
         array $configuration,
         bool $overwrite = false
     ): void;

@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\ConstructorBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\MethodsBuilderInterface;
 use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerModelHelperInterface;
+use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelClassFactoryInterface;
+use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelMethodFactoryInterface;
+use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Other\ModelPropertiesBuilderInterface;
 
 class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
 {
-    /** @var ClassFactoryInterface */
+    /** @var ModelClassFactoryInterface */
     protected $classFactory;
-    /** @var MethodFactoryInterface */
+    /** @var ModelMethodFactoryInterface */
     protected $methodFactory;
     /** @var SwaggerModelHelperInterface */
     protected $helper;
@@ -29,13 +29,13 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
     protected $definitions = [];
 
     /**
-     * @param ClassFactoryInterface $classFactory
-     * @param MethodFactoryInterface $methodFactory
+     * @param ModelClassFactoryInterface $classFactory
+     * @param ModelMethodFactoryInterface $methodFactory
      * @param SwaggerModelHelperInterface $helper
      */
     public function __construct(
-        ClassFactoryInterface $classFactory,
-        MethodFactoryInterface $methodFactory,
+        ModelClassFactoryInterface $classFactory,
+        ModelMethodFactoryInterface $methodFactory,
         SwaggerModelHelperInterface $helper
     )
     {
@@ -84,19 +84,40 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         if (!$overwrite && is_file($filePath)) {
             return false;
         }
-        [$namespace, $className] = $this->getClassNameAndNamespaceFromDefinitionName($definitionName);
 
+        // Class
+        if (isset($definition['properties'])) {
+            $properties = $definition['properties'];
+            $extendClass = null;
+        } else {
+            $properties = $definition['allOf'][1]['properties'];
+            $extendClass = $this->getPhpTypeFromPropertyConfig($definition['allOf'][0]);
+        }
         $classBuilder = $this->classFactory->createClassBuilder();
-        $classBuilder->configure($namespace, $className);
-        $constructorBuilder = $this->methodFactory->createConstructorBuilder(
-            $classBuilder->getUsesBuilder()
-        );
+        [$namespace, $className] = $this->getClassNameAndNamespaceFromDefinitionName($definitionName);
+        $classBuilder->configure($namespace, $className, $extendClass);
+
+        // Properties
+        /** @var ModelPropertiesBuilderInterface $modelPropertiesBuilder */
+        $modelPropertiesBuilder = $classBuilder->getPropertiesBuilder();
+        foreach ($properties as $propertyName => $configuration) {
+            $this->processProperty(
+                $modelPropertiesBuilder,
+                $classBuilder->getMethodsBuilder(),
+                $definitionName,
+                $definition,
+                $propertyName,
+                $configuration,
+                $overwrite
+            );
+        }
+
+        // Constructor
+        $constructorBuilder = $this->methodFactory->createModelConstructorBuilder($classBuilder->getUsesBuilder());
+        $constructorBuilder->configureFromPropertiesBuilder($modelPropertiesBuilder);
         $classBuilder->getMethodsBuilder()->addMethod($constructorBuilder);
 
-        $this->processProperties($definitionName, $definition, $classBuilder, $constructorBuilder, $overwrite);
-
-        $this->processRequiredProperties($classBuilder, $constructorBuilder, $definition);
-
+        // File creation
         $directory = dirname($filePath);
         if (!is_dir($directory)) {
             mkdir($directory, 0777, true);
@@ -106,109 +127,45 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
     }
 
     /**
-     * @param string $definitionName
-     * @param array $definition
-     * @param ClassBuilderInterface $classBuilder
-     * @param ConstructorBuilderInterface $constructorBuilder
-     * @param bool $overwrite
-     */
-    public function processProperties(
-        string $definitionName,
-        array $definition,
-        ClassBuilderInterface $classBuilder,
-        ConstructorBuilderInterface $constructorBuilder,
-        bool $overwrite = false
-    ): void
-    {
-        if (isset($definition['properties'])) {
-            $properties = $definition['properties'];
-        } else {
-            $properties = $definition['allOf'][1]['properties'];
-            $type = $this->getPhpTypeFromPropertyConfig($definition['allOf'][0], $classBuilder);
-            $classBuilder->setExtendClassName($type);
-        }
-
-        foreach ($properties as $property => $config) {
-            $this->processProperty(
-                $classBuilder,
-                $constructorBuilder,
-                $definitionName,
-                $definition,
-                $property,
-                $config,
-                $overwrite
-            );
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function processProperty(
-        ClassBuilderInterface $classBuilder,
-        ConstructorBuilderInterface $constructorBuilder,
+        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
+        MethodsBuilderInterface $methodsBuilder,
         string $definitionName,
         array $definition,
-        string $property,
+        string $propertyName,
         array $configuration,
         bool $overwrite = false
     ): void {
-        $cleanPropertyName = $this->helper::cleanStr($property);
+        $cleanPropertyName = $this->helper::cleanStr($propertyName);
 
         $type = $this->generateSubClass($definitionName, $cleanPropertyName, $configuration, $overwrite);
         $type = $type === null ?
-            $this->getPhpTypeFromPropertyConfig($configuration, $classBuilder)
+            $this->getPhpTypeFromPropertyConfig($configuration)
             : $type;
 
         $types = (array) $type;
-        if ($this->helper::isNullableBySwaggerConfiguration($property, $definition)) {
+        if ($this->helper::isNullableBySwaggerConfiguration($propertyName, $definition)) {
             $types[] = 'null';
         }
 
-        $propertyBuilder = $this->classFactory->createPropertyBuilder(
-            $classBuilder->getUsesBuilder()
+        $description = isset($configuration['description']) ? $configuration['description'] : null;
+        $propertyBuilder = $modelPropertiesBuilder->configurePropertyFromSwaggerPropertyDefinition(
+            $cleanPropertyName,
+            $types,
+            $description
         );
-        $propertyBuilder->configure($cleanPropertyName, $types);
-        if (isset($configuration['description'])) {
-            $propertyBuilder->setDescription($configuration['description']);
-        }
-        $classBuilder->getPropertiesBuilder()->addProperty($propertyBuilder);
 
         $getterSetterBuilder = $this->methodFactory->createPropertyMethodsBuilder(
-            $classBuilder->getUsesBuilder()
+            $methodsBuilder->getUsesBuilder()
         );
-        $getterSetterBuilder->configure($propertyBuilder);
-        if (isset($definition['readOnly']) && $definition['readOnly'] === 'true') {
-            $getterSetterBuilder->setReadOnly(true);
-        }
-        if (isset($definition['writeOnly']) && $definition['writeOnly'] === 'true') {
-            $getterSetterBuilder->setWriteOnly(true);
-        }
+        $readOnly = isset($definition['readOnly']) && $definition['readOnly'] === 'true';
+        $writeOnly = isset($definition['writeOnly']) && $definition['writeOnly'] === 'true';
+        $getterSetterBuilder->configure($propertyBuilder, $readOnly, $writeOnly);
 
-        switch ($propertyBuilder->getPhpType()) {
-            case 'array':
-                $constructorBuilder->addLine(sprintf('$this->%s = [];', $cleanPropertyName));
-
-                break;
-            case 'string':
-                $constructorBuilder->addLine(sprintf('$this->%s = \'\';', $cleanPropertyName));
-
-                break;
-            case 'bool':
-                $constructorBuilder->addLine(sprintf('$this->%s = true;', $cleanPropertyName));
-
-                break;
-            case 'int':
-                $constructorBuilder->addLine(sprintf('$this->%s = 0;', $cleanPropertyName));
-
-                break;
-            case 'float':
-                $constructorBuilder->addLine(sprintf('$this->%s = .0;', $cleanPropertyName));
-
-                break;
-        }
-
-        $classBuilder->getMethodsBuilder()->addMultipleMethod($getterSetterBuilder->getMethods($this->indent));
+        $methodBuilders = $getterSetterBuilder->getMethods($this->indent);
+        $methodsBuilder->addMultipleMethod($methodBuilders);
     }
 
     /**
@@ -239,43 +196,13 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function processRequiredProperties(ClassBuilderInterface $classBuilder, ConstructorBuilderInterface $constructorBuilder, array $definition): void
-    {
-        if (isset($definition['required'])) {
-            foreach ($definition['required'] as $property) {
-                $property = $this->helper::cleanStr($property);
-                $propertyBuilder = $classBuilder->getPropertiesBuilder()->getPropertyByName($property);
-                $type = ($propertyBuilder !== null) ? $propertyBuilder->getType() : '';
-                $description = $propertyBuilder->getDescription();
-                $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
-                    $classBuilder->getUsesBuilder()
-                );
-                $methodParameterBuilder->configure(
-                    (array) $type,
-                    $property,
-                    null,
-                    false,
-                    $description
-                );
-                $constructorBuilder->addParameter($methodParameterBuilder);
-                $constructorBuilder->addLine(sprintf('$this->%1$s = $%1$s;', $property));
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getClassNameAndNamespaceFromDefinitionName(string $definitionName, string $classPrefix = '', string $classSuffix = ''): array
     {
-        $className = $this->helper::camelize($definitionName);
-        $namespace = $this->namespace . '\\' . preg_replace('#/#', '\\', $className);
-        $className = basename($className);
-        $namespace = preg_replace(
-            '#\\\\' . $className . '$#',
-            '',
-            $namespace
-        );
+        $classPath = $this->helper::camelize($definitionName);
+        $classParts = explode('/', $classPath);
+        $className = array_pop($classParts);
+        $namespace = implode('\\', $classParts);
+        $namespace = $this->namespace . ($namespace === '' ? '' : $namespace);
 
         return [
             $namespace,
@@ -294,7 +221,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getPhpTypeFromPropertyConfig(array $config, ClassBuilderInterface $classBuilder): string
+    public function getPhpTypeFromPropertyConfig(array $config): string
     {
         $type = $this->helper::getPhpTypeFromSwaggerConfiguration($config);
 
@@ -306,7 +233,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
             return $type;
         }
 
-        $singleType = trim($type, '[]');
+        $singleType = rtrim($type, '[]');
         [$propertyNamespace, $propertyClassName] = $this->getClassNameAndNamespaceFromDefinitionName($singleType);
         return $propertyNamespace . '\\' . $propertyClassName;
     }

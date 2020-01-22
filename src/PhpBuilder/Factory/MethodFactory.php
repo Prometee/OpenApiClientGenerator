@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Factory;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\ArrayGetterSetterBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\ConstructorBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\GetterSetterBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\IsserSetterBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodParameterBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\PropertyMethodsBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Other\UsesBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\ArrayGetterSetterBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\ConstructorBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\GetterSetterBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\IsserSetterBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodParameterBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\PropertyMethodsBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\UsesBuilderInterface;
 
 class MethodFactory implements MethodFactoryInterface
 {
@@ -69,7 +69,7 @@ class MethodFactory implements MethodFactoryInterface
     public function createMethodBuilder(UsesBuilderInterface $usesBuilder): MethodBuilderInterface
     {
         $phpDocBuilder = $this->phpDocFactory->createPhpDocBuilder($usesBuilder);
-        return new $this->methodBuilderClass($usesBuilder, $phpDocBuilder);
+        return new $this->methodBuilderClass($usesBuilder, $phpDocBuilder, $this);
     }
 
     /**
@@ -78,7 +78,7 @@ class MethodFactory implements MethodFactoryInterface
     public function createConstructorBuilder(UsesBuilderInterface $usesBuilder): ConstructorBuilderInterface
     {
         $phpDocBuilder = $this->phpDocFactory->createPhpDocBuilder($usesBuilder);
-        return new $this->constructorBuilderClass($usesBuilder, $phpDocBuilder);
+        return new $this->constructorBuilderClass($usesBuilder, $phpDocBuilder, $this);
     }
 
     /**
@@ -119,5 +119,133 @@ class MethodFactory implements MethodFactoryInterface
     public function createArrayGetterSetterBuilder(UsesBuilderInterface $usesBuilder): ArrayGetterSetterBuilderInterface
     {
         return new $this->arrayGetterSetterBuilderClass($usesBuilder, $this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPhpDocFactory(): PhpDocFactoryInterface
+    {
+        return $this->phpDocFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setPhpDocFactory(PhpDocFactoryInterface $phpDocFactory): void
+    {
+        $this->phpDocFactory = $phpDocFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMethodBuilderClass(): string
+    {
+        return $this->methodBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setMethodBuilderClass(string $methodBuilderClass): void
+    {
+        $this->methodBuilderClass = $methodBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getConstructorBuilderClass(): string
+    {
+        return $this->constructorBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setConstructorBuilderClass(string $constructorBuilderClass): void
+    {
+        $this->constructorBuilderClass = $constructorBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMethodParameterBuilderClass(): string
+    {
+        return $this->methodParameterBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setMethodParameterBuilderClass(string $methodParameterBuilderClass): void
+    {
+        $this->methodParameterBuilderClass = $methodParameterBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getGetterSetterBuilderClass(): string
+    {
+        return $this->getterSetterBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setGetterSetterBuilderClass(string $getterSetterBuilderClass): void
+    {
+        $this->getterSetterBuilderClass = $getterSetterBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getIsserSetterBuilderClass(): string
+    {
+        return $this->isserSetterBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setIsserSetterBuilderClass(string $isserSetterBuilderClass): void
+    {
+        $this->isserSetterBuilderClass = $isserSetterBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getArrayGetterSetterBuilderClass(): string
+    {
+        return $this->arrayGetterSetterBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setArrayGetterSetterBuilderClass(string $arrayGetterSetterBuilderClass): void
+    {
+        $this->arrayGetterSetterBuilderClass = $arrayGetterSetterBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPropertyMethodsBuilderClass(): string
+    {
+        return $this->propertyMethodsBuilderClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setPropertyMethodsBuilderClass(string $propertyMethodsBuilderClass): void
+    {
+        $this->propertyMethodsBuilderClass = $propertyMethodsBuilderClass;
     }
 }

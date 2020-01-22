@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodParameterBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodParameterBuilderInterface;
 use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelperInterface;
 
 interface SwaggerOperationsGeneratorInterface

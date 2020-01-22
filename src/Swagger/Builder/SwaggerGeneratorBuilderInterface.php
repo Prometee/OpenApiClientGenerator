@@ -5,28 +5,47 @@ declare(strict_types=1);
 namespace Prometee\SwaggerClientBuilder\Swagger\Builder;
 
 use Prometee\SwaggerClientBuilder\Builder\GeneratorBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\PhpDocFactoryInterface;
+use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelClassFactoryInterface;
+use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelMethodFactoryInterface;
+use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\OperationsMethodFactoryInterface;
 use Prometee\SwaggerClientBuilder\Swagger\SwaggerModelGeneratorInterface;
 use Prometee\SwaggerClientBuilder\Swagger\SwaggerOperationsGeneratorInterface;
 
 interface SwaggerGeneratorBuilderInterface extends GeneratorBuilderInterface
 {
     /**
+     * @param PhpDocFactoryInterface $phpDocFactory
+     *
      * @return SwaggerModelGeneratorInterface
      */
-    public function getSwaggerModelGenerator(): SwaggerModelGeneratorInterface;
+    public function createSwaggerModelGenerator(PhpDocFactoryInterface $phpDocFactory): SwaggerModelGeneratorInterface;
 
     /**
-     * @param SwaggerModelGeneratorInterface $swaggerModelGenerator
+     * @param PhpDocFactoryInterface $phpDocFactory
+     *
+     * @return ModelMethodFactoryInterface
      */
-    public function setSwaggerModelGenerator(SwaggerModelGeneratorInterface $swaggerModelGenerator): void;
+    public function createModelMethodFactory(PhpDocFactoryInterface $phpDocFactory): ModelMethodFactoryInterface;
 
     /**
+     * @param PhpDocFactoryInterface $phpDocFactory
+     *
      * @return SwaggerOperationsGeneratorInterface
      */
-    public function getSwaggerOperationsGenerator(): SwaggerOperationsGeneratorInterface;
+    public function createSwaggerOperationsGenerator(PhpDocFactoryInterface $phpDocFactory): SwaggerOperationsGeneratorInterface;
 
     /**
-     * @param SwaggerOperationsGeneratorInterface $swaggerOperationsGenerator
+     * @param PhpDocFactoryInterface $phpDocFactory
+     *
+     * @return OperationsMethodFactoryInterface
      */
-    public function setSwaggerOperationsGenerator(SwaggerOperationsGeneratorInterface $swaggerOperationsGenerator): void;
+    public function createOperationsMethodFactory(PhpDocFactoryInterface $phpDocFactory): OperationsMethodFactoryInterface;
+
+    /**
+     * @param PhpDocFactoryInterface $phpDocFactory
+     *
+     * @return ModelClassFactoryInterface
+     */
+    public function createModelClassFactory(PhpDocFactoryInterface $phpDocFactory): ModelClassFactoryInterface;
 }

@@ -6,6 +6,8 @@ namespace Prometee\SwaggerClientBuilder\Builder;
 
 use Prometee\SwaggerClientBuilder\GeneratorInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\PhpDocFactoryInterface;
 
 interface GeneratorBuilderInterface
 {
@@ -15,12 +17,21 @@ interface GeneratorBuilderInterface
     public function build(): GeneratorInterface;
 
     /**
-     * @return ClassFactoryInterface
+     * @return PhpDocFactoryInterface
      */
-    public function getClassFactory(): ClassFactoryInterface;
+    public function createPhpDocFactory(): PhpDocFactoryInterface;
 
     /**
-     * @param ClassFactoryInterface $classFactory
+     * @param PhpDocFactoryInterface $phpDocFactory
+     *
+     * @return ClassFactoryInterface
      */
-    public function setClassFactory(ClassFactoryInterface $classFactory): void;
+    public function createClassFactory(PhpDocFactoryInterface $phpDocFactory): ClassFactoryInterface;
+
+    /**
+     * @param PhpDocFactoryInterface $phpDocFactory
+     *
+     * @return MethodFactoryInterface
+     */
+    public function createMethodFactory(PhpDocFactoryInterface $phpDocFactory): MethodFactoryInterface;
 }

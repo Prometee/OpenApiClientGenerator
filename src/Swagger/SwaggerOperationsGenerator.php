@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\ClassBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Classes\Method\MethodParameterBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\Factory\MethodFactoryInterface as SwaggerMethodFactoryInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilder;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodParameterBuilderInterface;
 use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelperInterface;
+use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\OperationsMethodFactoryInterface;
 
 class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
 {
     /** @var ClassFactoryInterface */
     protected $classFactory;
-    /** @var MethodFactoryInterface */
+    /** @var OperationsMethodFactoryInterface */
     protected $methodFactory;
-    /** @var SwaggerMethodFactoryInterface */
-    protected $swaggerMethodFactory;
 
     /** @var string */
     protected $folder;
@@ -48,20 +45,17 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
 
     /**
      * @param ClassFactoryInterface $classFactory
-     * @param MethodFactoryInterface $methodFactory
-     * @param SwaggerMethodFactoryInterface $swaggerMethodFactory
+     * @param OperationsMethodFactoryInterface $methodFactory
      * @param SwaggerOperationsHelperInterface $helper
      */
     public function __construct(
         ClassFactoryInterface $classFactory,
-        MethodFactoryInterface $methodFactory,
-        SwaggerMethodFactoryInterface $swaggerMethodFactory,
+        OperationsMethodFactoryInterface $methodFactory,
         SwaggerOperationsHelperInterface $helper
     )
     {
         $this->classFactory = $classFactory;
         $this->methodFactory = $methodFactory;
-        $this->swaggerMethodFactory = $swaggerMethodFactory;
         $this->helper = $helper;
     }
 
@@ -192,7 +186,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             $returnType = 'void';
         }
 
-        $operationMethodBuilder = $this->swaggerMethodFactory->createOperationMethodBuilder(
+        $operationMethodBuilder = $this->methodFactory->createOperationMethodBuilder(
             $classBuilder->getUsesBuilder()
         );
         $operationMethodName = $this->helper::getOperationMethodName($path, $operation, $operationConfiguration);
