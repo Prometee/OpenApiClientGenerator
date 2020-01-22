@@ -31,6 +31,20 @@ interface MethodBuilderInterface extends BuilderInterface, PhpDocAwareBuilderInt
     );
 
     /**
+     * @param string|null $indent
+     *
+     * @return string
+     */
+    public function buildMethodBody(string $indent = null): string;
+
+    /**
+     * @param string|null $indent
+     *
+     * @return string
+     */
+    public function buildMethodSignature(string $indent = null): string;
+
+    /**
      * @return string
      */
     public function getDescription(): string;

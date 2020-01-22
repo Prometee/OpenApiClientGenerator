@@ -78,37 +78,57 @@ class MethodBuilder implements MethodBuilderInterface
      */
     public function build(string $indent = null): ?string
     {
-        $content = '';
-        if (count($this->lines) > 0) {
-            $content .= "\n";
-
-            $this->configurePhpDocBuilder();
-            $content .= $this->phpDocBuilder->build($indent);
-
-            $static = ($this->static) ? ' static ' : '';
-            $content .= $indent . $this->scope . $static . ' function ' . $this->name . '(';
-
-            $additionalIndentation = count($this->parameters) > 4 ? "\n" . $indent . $indent : '';
-            $parameters = [];
-            foreach ($this->parameters as $methodParameterBuilder) {
-                $parameters[] = $additionalIndentation . $methodParameterBuilder->build($indent);
-            }
-            $content .= implode(', ', $parameters);
-            $content .= (count($this->parameters) > 4 ? "\n" . $indent : '') . ')';
-            if (!empty($this->returnTypes) && !in_array('mixed', $this->returnTypes)) {
-                $content .= ': ' . $this->getPhpReturnType();
-            }
-            $content .= "\n";
-
-            $content .= $indent . '{' . "\n";
-            foreach ($this->lines as $line) {
-                foreach (explode("\n", $line) as $innerLine) {
-                    $content .= $indent . $indent . $innerLine . "\n";
-                }
-            }
-            $content .= $indent . '}' . "\n";
+        if (count($this->lines) === 0) {
+            return '';
         }
 
+        $content = "\n";
+
+        $this->configurePhpDocBuilder();
+        $content .= $this->phpDocBuilder->build($indent);
+
+        $content .= $this->buildMethodSignature($indent);
+        $content .= "\n";
+
+        $content .= $indent . '{' . "\n";
+        $content .= $this->buildMethodBody($indent);
+        $content .= $indent . '}' . "\n";
+
+        return $content;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildMethodBody(string $indent = null): string
+    {
+        $content = '';
+        foreach ($this->lines as $line) {
+            foreach (explode("\n", $line) as $innerLine) {
+                $content .= $indent . $indent . $innerLine . "\n";
+            }
+        }
+        return $content;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildMethodSignature(string $indent = null): string
+    {
+        $static = ($this->static) ? ' static ' : '';
+        $content = $indent . $this->scope . $static . ' function ' . $this->name . '(';
+
+        $additionalIndentation = count($this->parameters) > 4 ? "\n" . $indent . $indent : '';
+        $parameters = [];
+        foreach ($this->parameters as $methodParameterBuilder) {
+            $parameters[] = $additionalIndentation . $methodParameterBuilder->build($indent);
+        }
+        $content .= implode(', ', $parameters);
+        $content .= (count($this->parameters) > 4 ? "\n" . $indent : '') . ')';
+        if (!empty($this->returnTypes) && !in_array('mixed', $this->returnTypes)) {
+            $content .= ': ' . $this->getPhpReturnType();
+        }
         return $content;
     }
 
@@ -117,21 +137,23 @@ class MethodBuilder implements MethodBuilderInterface
      */
     public function configurePhpDocBuilder(): void
     {
-        if (!$this->hasAlreadyBeenGenerated) {
-            if (!empty($this->getDescription())) {
-                $this->phpDocBuilder->addDescriptionLine($this->getDescription());
-            }
-            foreach ($this->parameters as $parameter) {
-                $type = $this->phpDocBuilder::getPossibleTypesFromTypeNames([$parameter->getType(), $parameter->getValueType()]);
-                $this->phpDocBuilder->addParamLine($parameter->getPhpName(), $type, $parameter->getDescription());
-            }
-            if (!empty($this->returnTypes) && !in_array('void', $this->returnTypes)) {
-                $type = $this->phpDocBuilder::getPossibleTypesFromTypeNames($this->returnTypes);
-                $this->phpDocBuilder->addReturnLine($type);
-            }
-
-            $this->hasAlreadyBeenGenerated = true;
+        if ($this->hasAlreadyBeenGenerated) {
+            return;
         }
+
+        if (!empty($this->getDescription())) {
+            $this->phpDocBuilder->addDescriptionLine($this->getDescription());
+        }
+        foreach ($this->parameters as $parameter) {
+            $type = $this->phpDocBuilder::getPossibleTypesFromTypeNames([$parameter->getType(), $parameter->getValueType()]);
+            $this->phpDocBuilder->addParamLine($parameter->getPhpName(), $type, $parameter->getDescription());
+        }
+        if (!empty($this->returnTypes) && !in_array('void', $this->returnTypes)) {
+            $type = $this->phpDocBuilder::getPossibleTypesFromTypeNames($this->returnTypes);
+            $this->phpDocBuilder->addReturnLine($type);
+        }
+
+        $this->hasAlreadyBeenGenerated = true;
     }
 
     /**
@@ -158,12 +180,10 @@ class MethodBuilder implements MethodBuilderInterface
         foreach ($this->returnTypes as $type) {
             if (preg_match('#\[\]$#', $type)) {
                 $phpReturnType .= 'array';
-
                 break;
             }
             if ($type !== 'null') {
                 $phpReturnType .= $type;
-
                 break;
             }
         }
