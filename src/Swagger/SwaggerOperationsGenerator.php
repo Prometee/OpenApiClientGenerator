@@ -297,14 +297,11 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
      */
     public function getClassNameAndNamespaceFromPath(string $path, string $classPrefix = '', string $classSuffix = ''): array
     {
-        $className = $this->helper::getClassPathFromPath($path);
-        $namespace = $this->namespace . '\\' . preg_replace('#/#', '\\', $className);
-        $className = basename($className);
-        $namespace = preg_replace(
-            '#\\\\' . $className . '$#',
-            '',
-            $namespace
-        );
+        $classPath = $this->helper::getClassPathFromPath($path);
+        $classParts = explode('/', $classPath);
+        $className = array_pop($classParts);
+        $namespace = implode('\\', $classParts);
+        $namespace = $this->namespace . ($namespace === '' ? '' : $namespace);
 
         return [
             $namespace,
