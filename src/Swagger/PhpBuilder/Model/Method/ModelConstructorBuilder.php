@@ -27,32 +27,30 @@ class ModelConstructorBuilder extends ConstructorBuilder implements ModelConstru
      */
     public function configureBodyFromPropertyBuilder(ModelPropertyBuilderInterface $modelPropertyBuilder): void
     {
-        $format = null;
+        if ($modelPropertyBuilder->isRequired()) {
+            $this->addLine(sprintf('$this->%1$s = $%1$s;', $modelPropertyBuilder->getName()));
+        }
+
+        $defaultValue = null;
         switch ($modelPropertyBuilder->getPhpType()) {
             case 'array':
-                $format = '$this->%1$s = [];';
+                $defaultValue = '[]';
                 break;
             case 'string':
-                $format = '$this->%1$s = \'\';';
+                $defaultValue = '\'\'';
                 break;
             case 'bool':
-                $format = '$this->%1$s = true;';
+                $defaultValue = 'true';
                 break;
             case 'int':
-                $format = '$this->%1$s = 0;';
+                $defaultValue = '0';
                 break;
             case 'float':
-                $format = '$this->%1$s = .0;';
+                $defaultValue = '.0';
                 break;
         }
 
-        if ($modelPropertyBuilder->isRequired()) {
-            $format = '$this->%1$s = $%1$s;';
-        }
-
-        if (null !== $format) {
-            $this->addLine(sprintf($format, $modelPropertyBuilder->getName()));
-        }
+        $modelPropertyBuilder->setValue($defaultValue);
     }
 
     /**
@@ -60,16 +58,21 @@ class ModelConstructorBuilder extends ConstructorBuilder implements ModelConstru
      */
     public function configureParameterFromPropertyBuilder(ModelPropertyBuilderInterface $modelPropertyBuilder): void
     {
+        if (false === $modelPropertyBuilder->isRequired()) {
+            return;
+        }
+
         $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
             $this->getUsesBuilder()
         );
         $methodParameterBuilder->configure(
             $modelPropertyBuilder->getTypes(),
             $modelPropertyBuilder->getName(),
-            null,
+            $modelPropertyBuilder->getValue(),
             false,
             $modelPropertyBuilder->getDescription()
         );
+
         $this->addParameter($methodParameterBuilder);
     }
 }

@@ -29,6 +29,7 @@ class MethodsBuilder implements MethodsBuilderInterface
     {
         $content = '';
 
+        $this->orderMethods();
         foreach ($this->methods as $method) {
             $content .= $method->build($indent);
         }
@@ -54,6 +55,19 @@ class MethodsBuilder implements MethodsBuilderInterface
         if (!$this->hasMethod($methodBuilder->getName())) {
             $this->methods[$methodBuilder->getName()] = $methodBuilder;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function orderMethods(): void
+    {
+        uksort($this->methods, function ($k1, $k2) {
+            $o1 = preg_match('#^__#', $k1) === 0 ? 1 : 0;
+            $o2 = preg_match('#^__#', $k2) === 0 ? 1 : 0;
+
+            return $o1 - $o2;
+        });
     }
 
     /**

@@ -71,7 +71,7 @@ class PropertyBuilder implements PropertyBuilderInterface
 
         $content .= $indent . $this->scope . ' ';
         $content .= $this->getPhpName();
-        $content .= ($this->value !== null) ? '=' . $this->value : '';
+        $content .= ($this->value !== null) ? ' = ' . $this->value : '';
         $content .= ';';
 
         $content .= "\n";

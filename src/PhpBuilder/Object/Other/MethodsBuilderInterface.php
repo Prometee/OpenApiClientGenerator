@@ -26,6 +26,11 @@ interface MethodsBuilderInterface extends BuilderInterface
     public function addMethod(MethodBuilderInterface $methodBuilder): void;
 
     /**
+     * Order methods to prioritize the one starting with "__"
+     */
+    public function orderMethods(): void;
+
+    /**
      * @param string $name
      *
      * @return bool
