@@ -10,7 +10,7 @@ use Prometee\SwaggerClientBuilder\PhpBuilder\PhpDoc\PhpDocBuilderInterface;
 class PropertyBuilder implements PropertyBuilderInterface
 {
     /** @var UsesBuilderInterface  */
-    private $usesBuilder;
+    protected $usesBuilder;
     /** @var PhpDocBuilderInterface */
     protected $phpDocBuilder;
 

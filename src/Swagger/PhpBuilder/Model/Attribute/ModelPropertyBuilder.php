@@ -25,6 +25,20 @@ class ModelPropertyBuilder extends PropertyBuilder implements ModelPropertyBuild
     /**
      * {@inheritDoc}
      */
+    public function addType(string $type): void
+    {
+        if (false === $this->isInherited()) {
+            $type = $this->usesBuilder->guessUseOrReturnType($type);
+        }
+
+        if (false === $this->hasType($type)) {
+            $this->types[] = $type;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function isRequired(): bool
     {
         return $this->required;

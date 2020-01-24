@@ -21,9 +21,9 @@ class ModelPropertiesBuilder extends PropertiesBuilder implements ModelPropertie
         ?string $description = null
     ): void
     {
-        $propertyBuilder->configure($propertyName, $types);
         $propertyBuilder->setRequired($required);
         $propertyBuilder->setInherited($inherited);
+        $propertyBuilder->configure($propertyName, $types);
 
         if (null !== $description) {
             $propertyBuilder->setDescription($description);
