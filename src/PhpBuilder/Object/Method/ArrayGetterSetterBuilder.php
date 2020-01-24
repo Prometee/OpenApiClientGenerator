@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method;
 
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\UsesBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
 
 class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGetterSetterBuilderInterface
 {
@@ -18,18 +17,26 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGette
 
     /**
      * @param UsesBuilderInterface $usesBuilder
-     * @param MethodFactoryInterface $methodFactory
+     * @param MethodBuilderInterface $getterMethodBuilder
+     * @param MethodBuilderInterface $setterMethodBuilder
+     * @param MethodBuilderInterface $hasGetterMethod
+     * @param MethodBuilderInterface $addSetterMethod
+     * @param MethodBuilderInterface $removeSetterMethod
      */
     public function __construct(
         UsesBuilderInterface $usesBuilder,
-        MethodFactoryInterface $methodFactory
+        MethodBuilderInterface $getterMethodBuilder,
+        MethodBuilderInterface $setterMethodBuilder,
+        MethodBuilderInterface $hasGetterMethod,
+        MethodBuilderInterface $addSetterMethod,
+        MethodBuilderInterface $removeSetterMethod
     )
     {
-        parent::__construct($usesBuilder, $methodFactory);
+        parent::__construct($usesBuilder, $getterMethodBuilder, $setterMethodBuilder);
 
-        $this->hasGetterMethod = $this->methodFactory->createMethodBuilder($this->usesBuilder);
-        $this->addSetterMethod = $this->methodFactory->createMethodBuilder($this->usesBuilder);
-        $this->removeSetterMethod = $this->methodFactory->createMethodBuilder($this->usesBuilder);
+        $this->hasGetterMethod = $hasGetterMethod;
+        $this->addSetterMethod = $addSetterMethod;
+        $this->removeSetterMethod = $removeSetterMethod;
     }
 
     /**
@@ -79,21 +86,17 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGette
         $this->hasGetterMethod->configure(
             MethodBuilderInterface::SCOPE_PUBLIC,
             $this->getSingleMethodName(static::HAS_GETTER_PREFIX),
-            'bool'
+            ['bool']
         );
 
-        $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
-            $this->usesBuilder
-        );
+        $methodParameterBuilder = clone clone $this->hasGetterMethod->getMethodParameterBuilderSkel();
         $methodParameterBuilder->configure(
             (array) $this->getSingleTypeName(),
             $this->getSingleName()
         );
         $this->hasGetterMethod->addParameter($methodParameterBuilder);
 
-        $methodParameterBuilder2 = $this->methodFactory->createMethodParameterBuilder(
-            $this->usesBuilder
-        );
+        $methodParameterBuilder2 = clone $this->hasGetterMethod->getMethodParameterBuilderSkel();
         $methodParameterBuilder2->configure(
             (array) 'bool',
             'strict',
@@ -128,12 +131,10 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGette
         $this->addSetterMethod->configure(
             MethodBuilderInterface::SCOPE_PUBLIC,
             $this->getSingleMethodName(static::ADD_SETTER_PREFIX),
-            'void'
+            ['void']
         );
 
-        $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
-            $this->usesBuilder
-        );
+        $methodParameterBuilder = clone $this->addSetterMethod->getMethodParameterBuilderSkel();
         $methodParameterBuilder->configure(
             (array) $this->getSingleTypeName(),
             $this->getSingleName()
@@ -169,11 +170,9 @@ class ArrayGetterSetterBuilder extends GetterSetterBuilder implements ArrayGette
         $this->removeSetterMethod->configure(
             MethodBuilderInterface::SCOPE_PUBLIC,
             $this->getSingleMethodName(static::REMOVE_SETTER_PREFIX),
-            'void'
+            ['void']
         );
-        $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
-            $this->usesBuilder
-        );
+        $methodParameterBuilder = clone $this->removeSetterMethod->getMethodParameterBuilderSkel();
         $methodParameterBuilder->configure(
             (array) $this->getSingleTypeName(),
             $this->getSingleName()

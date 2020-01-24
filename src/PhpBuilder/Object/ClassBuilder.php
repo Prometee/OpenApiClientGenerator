@@ -8,51 +8,46 @@ use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\MethodsBuilderInterfac
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\PropertiesBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\TraitsBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\UsesBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
 
 class ClassBuilder implements ClassBuilderInterface
 {
-    /** @var string */
-    protected $builderType = 'class';
-
-    /** @var string */
-    protected $namespace;
-
     /** @var UsesBuilderInterface */
     protected $usesBuilder;
-
-    /** @var string */
-    protected $className;
-
-    /** @var string|null */
-    protected $extendClassName;
-
-    /** @var string[] */
-    protected $implements;
-
     /** @var PropertiesBuilderInterface */
     protected $propertiesBuilder;
-
     /** @var MethodsBuilderInterface */
     protected $methodsBuilder;
-
     /** @var TraitsBuilderInterface */
     protected $traitsBuilder;
 
-    /** @var ClassFactoryInterface */
-    protected $classFactory;
+    /** @var string */
+    protected $builderType = 'class';
+    /** @var string */
+    protected $namespace;
+    /** @var string */
+    protected $className;
+    /** @var string|null */
+    protected $extendClassName;
+    /** @var string[] */
+    protected $implements;
 
     /**
-     * @param ClassFactoryInterface $classFactory
+     * @param UsesBuilderInterface $usesBuilder
+     * @param PropertiesBuilderInterface $propertiesBuilder
+     * @param MethodsBuilderInterface $methodsBuilder
+     * @param TraitsBuilderInterface $traitsBuilder
      */
-    public function __construct(ClassFactoryInterface $classFactory)
+    public function __construct(
+        UsesBuilderInterface $usesBuilder,
+        PropertiesBuilderInterface $propertiesBuilder,
+        MethodsBuilderInterface $methodsBuilder,
+        TraitsBuilderInterface $traitsBuilder
+    )
     {
-        $this->classFactory = $classFactory;
-
-        $this->usesBuilder = $this->classFactory->createUsesBuilder();
-        $this->traitsBuilder = $this->classFactory->createTraitsBuilder();
-        $this->propertiesBuilder = $this->classFactory->createPropertiesBuilder();
-        $this->methodsBuilder = $this->classFactory->createMethodsBuilder();
+        $this->usesBuilder = $usesBuilder;
+        $this->propertiesBuilder = $propertiesBuilder;
+        $this->methodsBuilder = $methodsBuilder;
+        $this->traitsBuilder = $traitsBuilder;
     }
 
     /**

@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method;
 
+use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\UsesBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Attribute\PropertyBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
 
 class PropertyMethodsBuilder implements PropertyMethodsBuilderInterface
 {
     /** @var UsesBuilderInterface */
     protected $usesBuilder;
-    /** @var MethodFactoryInterface */
-    protected $methodFactory;
 
     /** @var PropertyBuilderInterface */
     protected $propertyBuilder;
@@ -24,15 +22,12 @@ class PropertyMethodsBuilder implements PropertyMethodsBuilderInterface
 
     /**
      * @param UsesBuilderInterface $usesBuilder
-     * @param MethodFactoryInterface $methodFactory
      */
     public function __construct(
-        UsesBuilderInterface $usesBuilder,
-        MethodFactoryInterface $methodFactory
+        UsesBuilderInterface $usesBuilder
     )
     {
         $this->usesBuilder = $usesBuilder;
-        $this->methodFactory = $methodFactory;
     }
 
     /**
@@ -52,27 +47,31 @@ class PropertyMethodsBuilder implements PropertyMethodsBuilderInterface
     /**
      * {@inheritDoc}
      */
-    public function getMethods(string $indent = null): array
+    public function getMethods(MethodFactoryInterface $methodFactory, string $indent = null): array
     {
         $propertyMethodsBuilder = null;
         if (null !== $this->propertyBuilder->getTypes()) {
             foreach ($this->propertyBuilder->getTypes() as $type) {
                 if ('bool' === $type) {
-                    $propertyMethodsBuilder = $this->methodFactory->createIsserSetterBuilderBuilder($this->usesBuilder);
+                    $propertyMethodsBuilder = $methodFactory->createIsserSetterBuilderBuilder($this->usesBuilder);
                     break;
                 }
                 if (preg_match('#\[\]$#', $type)) {
-                    $propertyMethodsBuilder = $this->methodFactory->createArrayGetterSetterBuilder($this->usesBuilder);
+                    $propertyMethodsBuilder = $methodFactory->createArrayGetterSetterBuilder($this->usesBuilder);
                     break;
                 }
             }
         }
 
         if (null === $propertyMethodsBuilder) {
-            $propertyMethodsBuilder = $this->methodFactory->createGetterSetterBuilder($this->usesBuilder);
+            $propertyMethodsBuilder = $methodFactory->createGetterSetterBuilder($this->usesBuilder);
         }
 
-        $propertyMethodsBuilder->configure($this->propertyBuilder, $this->readOnly, $this->writeOnly);
+        $propertyMethodsBuilder->configure(
+            $this->propertyBuilder,
+            $this->readOnly,
+            $this->writeOnly
+        );
 
         return $propertyMethodsBuilder->getMethods($indent);
     }

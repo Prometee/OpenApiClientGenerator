@@ -12,20 +12,23 @@ class ModelPropertiesBuilder extends PropertiesBuilder implements ModelPropertie
     /**
      * {@inheritDoc}
      */
-    public function configurePropertyFromSwaggerPropertyDefinition(
+    public function addPropertyFromSwaggerPropertyDefinition(
+        ModelPropertyBuilderInterface $propertyBuilder,
         string $propertyName,
         array $types,
+        bool $required = false,
+        bool $inherited = false,
         ?string $description = null
-    ): ModelPropertyBuilderInterface
+    ): void
     {
-        /** @var ModelPropertyBuilderInterface $propertyBuilder */
-        $propertyBuilder = $this->classFactory->createPropertyBuilder($this->getUsesBuilder());
         $propertyBuilder->configure($propertyName, $types);
+        $propertyBuilder->setRequired($required);
+        $propertyBuilder->setInherited($inherited);
+
         if (null !== $description) {
             $propertyBuilder->setDescription($description);
         }
-        $this->addProperty($propertyBuilder);
 
-        return $propertyBuilder;
+        $this->addProperty($propertyBuilder);
     }
 }

@@ -15,11 +15,30 @@ class ModelConstructorBuilder extends ConstructorBuilder implements ModelConstru
      */
     public function configureFromPropertiesBuilder(ModelPropertiesBuilderInterface $modelPropertiesBuilder): void
     {
+        $inheritedRequiredProperties = [];
         /** @var ModelPropertyBuilderInterface $modelPropertyBuilder */
         foreach ($modelPropertiesBuilder->getProperties() as $modelPropertyBuilder) {
             $this->configureParameterFromPropertyBuilder($modelPropertyBuilder);
             $this->configureBodyFromPropertyBuilder($modelPropertyBuilder);
+            if (false === $modelPropertyBuilder->isInherited()) {
+                continue;
+            }
+            if (false === $modelPropertyBuilder->isRequired()) {
+                continue;
+            }
+            $inheritedRequiredProperties[] = $modelPropertyBuilder->getPhpName();
         }
+
+        if (empty($this->getLines())) {
+            return;
+        }
+
+        if (empty($inheritedRequiredProperties)) {
+            return;
+        }
+
+        $this->addLine('');
+        $this->addLine(sprintf('parent::%s(%s);', $this->name, implode(', ', $inheritedRequiredProperties)));
     }
 
     /**
@@ -27,8 +46,13 @@ class ModelConstructorBuilder extends ConstructorBuilder implements ModelConstru
      */
     public function configureBodyFromPropertyBuilder(ModelPropertyBuilderInterface $modelPropertyBuilder): void
     {
+        if ($modelPropertyBuilder->isInherited()) {
+            return;
+        }
+
         if ($modelPropertyBuilder->isRequired()) {
             $this->addLine(sprintf('$this->%1$s = $%1$s;', $modelPropertyBuilder->getName()));
+            return;
         }
 
         $defaultValue = null;
@@ -62,9 +86,7 @@ class ModelConstructorBuilder extends ConstructorBuilder implements ModelConstru
             return;
         }
 
-        $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
-            $this->getUsesBuilder()
-        );
+        $methodParameterBuilder = clone $this->methodParameterBuilderSkel;
         $methodParameterBuilder->configure(
             $modelPropertyBuilder->getTypes(),
             $modelPropertyBuilder->getName(),

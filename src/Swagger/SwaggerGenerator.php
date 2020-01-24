@@ -12,17 +12,17 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
     protected $operationsGenerator;
 
     /** @var string */
-    protected $swaggerUri;
+    protected $swaggerUri = '';
     /** @var string */
-    protected $folder;
+    protected $folder = '';
     /** @var string */
-    protected $namespace;
-
+    protected $namespace = '';
     /** @var array */
-    protected $definitions;
-
+    protected $definitions = [];
     /** @var string */
-    protected $indent;
+    protected $indent = '    ';
+    /** @var bool */
+    protected $override = false;
 
     /**
      * @param SwaggerModelGeneratorInterface $modelGenerator
@@ -40,12 +40,19 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function configure(string $swaggerUri, string $folder, string $namespace, string $indent = '    '): void
+    public function configure(
+        string $swaggerUri,
+        string $folder,
+        string $namespace,
+        string $indent = '    ',
+        bool $override = false
+    ): void
     {
         $this->swaggerUri = $swaggerUri;
         $this->folder = $folder;
         $this->namespace = $namespace;
         $this->indent = $indent;
+        $this->override = $override;
 
         $this->modelGenerator->configure(
             $folder . '/' . static::TYPE_MODEL,
@@ -59,12 +66,13 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
             $namespace . '\\' . static::TYPE_MODEL,
             $indent
         );
+
     }
 
     /**
      * {@inheritDoc}
      */
-    public function generate(bool $overwrite = false): bool
+    public function generate(): bool
     {
         $content = file_get_contents($this->swaggerUri);
         if ($content === false) {
@@ -78,9 +86,9 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
             return false;
         }
 
-        $this->processDefinitions($json, $overwrite);
+        $this->processDefinitions($json);
 
-        $this->processPaths($json, $overwrite);
+        $this->processPaths($json);
 
         return true;
     }
@@ -88,15 +96,16 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function processDefinitions(array $json, bool $overwrite = false): bool
+    public function processDefinitions(array $json): bool
     {
         if (!isset($json['definitions'])) {
             return false;
         }
 
         $this->modelGenerator->setDefinitions($json['definitions']);
+        $this->modelGenerator->setOverwrite($this->override);
 
-        return $this->modelGenerator->generate($overwrite);
+        return $this->modelGenerator->generate();
     }
 
     /**
@@ -109,8 +118,9 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
         }
 
         $this->operationsGenerator->setPaths($json['paths']);
+        $this->operationsGenerator->setOverwrite($this->override);
 
-        return $this->operationsGenerator->generate($overwrite);
+        return $this->operationsGenerator->generate();
     }
 
     /**
@@ -223,5 +233,21 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
     public function setOperationsGenerator(SwaggerOperationsGeneratorInterface $operationsGenerator): void
     {
         $this->operationsGenerator = $operationsGenerator;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isOverride(): bool
+    {
+        return $this->override;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setOverride(bool $override): void
+    {
+        $this->override = $override;
     }
 }

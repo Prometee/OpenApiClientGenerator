@@ -61,7 +61,12 @@ class ClassFactory implements ClassFactoryInterface
      */
     public function createClassBuilder(): ClassBuilderInterface
     {
-        return new $this->classBuilderClass($this);
+        return new $this->classBuilderClass(
+            $this->createUsesBuilder(),
+            $this->createPropertiesBuilder(),
+            $this->createMethodsBuilder(),
+            $this->createTraitsBuilder()
+        );
     }
 
     /**
@@ -85,7 +90,7 @@ class ClassFactory implements ClassFactoryInterface
      */
     public function createPropertiesBuilder(): PropertiesBuilderInterface
     {
-        return new $this->propertiesBuilderClass($this);
+        return new $this->propertiesBuilderClass();
     }
 
     /**

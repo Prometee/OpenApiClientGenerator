@@ -12,14 +12,15 @@ class GeneratorTest extends TestCase
     /** @test */
     public function generate()
     {
-        $baseUri = 'https://github.com/OAI/OpenAPI-Specification/raw/master/examples/v2.0/json/petstore-expanded.json';
+        $baseUri = __DIR__ . '/Resources/swagger.json';
         $folder = __DIR__ . '/../etc/build';
         $namespace = 'Tests\\Prometee\\SwaggerClientBuilder\\PhpBuilder\\Classes\\Build';
+        $indent = '    ';
         $overwrite = true;
 
         $swaggerGeneratorBuilder = new SwaggerGeneratorBuilder();
         $swaggerGenerator = $swaggerGeneratorBuilder->build();
-        $swaggerGenerator->configure($baseUri, $folder, $namespace);
+        $swaggerGenerator->configure($baseUri, $folder, $namespace, $indent, $overwrite);
 
         /*
         $abstractOperationClass = \MyVendor\MyApi\AbstractOperations::class;
@@ -33,7 +34,7 @@ class GeneratorTest extends TestCase
         $operationsGenerator->setThrowsClasses($throwClasses);
         */
 
-        $result = $swaggerGenerator->generate($overwrite);
+        $result = $swaggerGenerator->generate();
 
         $this->assertTrue($result);
     }

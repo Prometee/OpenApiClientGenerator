@@ -28,7 +28,9 @@ class PhpDocBuilder implements PhpDocBuilderInterface
         if (!isset($this->lines[$type])) {
             $this->lines[$type] = [];
         }
-        $this->lines[$type][] = $line;
+        foreach (explode("\n", $line) as $l) {
+            $this->lines[$type][] = $l;
+        }
     }
 
     /**

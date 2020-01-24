@@ -68,8 +68,11 @@ class MethodFactory implements MethodFactoryInterface
      */
     public function createMethodBuilder(UsesBuilderInterface $usesBuilder): MethodBuilderInterface
     {
-        $phpDocBuilder = $this->phpDocFactory->createPhpDocBuilder($usesBuilder);
-        return new $this->methodBuilderClass($usesBuilder, $phpDocBuilder, $this);
+        return new $this->methodBuilderClass(
+            $usesBuilder,
+            $this->phpDocFactory->createPhpDocBuilder($usesBuilder),
+            $this->createMethodParameterBuilder($usesBuilder)
+        );
     }
 
     /**
@@ -77,8 +80,10 @@ class MethodFactory implements MethodFactoryInterface
      */
     public function createConstructorBuilder(UsesBuilderInterface $usesBuilder): ConstructorBuilderInterface
     {
-        $phpDocBuilder = $this->phpDocFactory->createPhpDocBuilder($usesBuilder);
-        return new $this->constructorBuilderClass($usesBuilder, $phpDocBuilder, $this);
+        return new $this->constructorBuilderClass(
+            $usesBuilder,
+            $this->phpDocFactory->createPhpDocBuilder($usesBuilder)
+        );
     }
 
     /**
@@ -94,7 +99,7 @@ class MethodFactory implements MethodFactoryInterface
      */
     public function createPropertyMethodsBuilder(UsesBuilderInterface $usesBuilder): PropertyMethodsBuilderInterface
     {
-        return new $this->propertyMethodsBuilderClass($usesBuilder, $this);
+        return new $this->propertyMethodsBuilderClass($usesBuilder);
     }
 
     /**
@@ -102,7 +107,11 @@ class MethodFactory implements MethodFactoryInterface
      */
     public function createGetterSetterBuilder(UsesBuilderInterface $usesBuilder): GetterSetterBuilderInterface
     {
-        return new $this->getterSetterBuilderClass($usesBuilder, $this);
+        return new $this->getterSetterBuilderClass(
+            $usesBuilder,
+            $this->createMethodBuilder($usesBuilder),
+            $this->createMethodBuilder($usesBuilder)
+        );
     }
 
     /**
@@ -110,7 +119,11 @@ class MethodFactory implements MethodFactoryInterface
      */
     public function createIsserSetterBuilderBuilder(UsesBuilderInterface $usesBuilder): IsserSetterBuilderInterface
     {
-        return new $this->isserSetterBuilderClass($usesBuilder, $this);
+        return new $this->isserSetterBuilderClass(
+            $usesBuilder,
+            $this->createMethodBuilder($usesBuilder),
+            $this->createMethodBuilder($usesBuilder)
+        );
     }
 
     /**
@@ -118,7 +131,14 @@ class MethodFactory implements MethodFactoryInterface
      */
     public function createArrayGetterSetterBuilder(UsesBuilderInterface $usesBuilder): ArrayGetterSetterBuilderInterface
     {
-        return new $this->arrayGetterSetterBuilderClass($usesBuilder, $this);
+        return new $this->arrayGetterSetterBuilderClass(
+            $usesBuilder,
+            $this->createMethodBuilder($usesBuilder),
+            $this->createMethodBuilder($usesBuilder),
+            $this->createMethodBuilder($usesBuilder),
+            $this->createMethodBuilder($usesBuilder),
+            $this->createMethodBuilder($usesBuilder)
+        );
     }
 
     /**

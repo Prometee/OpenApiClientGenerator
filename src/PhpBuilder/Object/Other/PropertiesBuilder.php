@@ -4,26 +4,15 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Attribute\PropertyBuilderInterface;
 
 class PropertiesBuilder implements PropertiesBuilderInterface
 {
-    /** @var ClassFactoryInterface */
-    protected $classFactory;
 
     /** @var UsesBuilderInterface */
     protected $usesBuilder;
     /** @var PropertyBuilderInterface[] */
     protected $properties = [];
-
-    /**
-     * @param ClassFactoryInterface $classFactory
-     */
-    public function __construct(ClassFactoryInterface $classFactory)
-    {
-        $this->classFactory = $classFactory;
-    }
 
     /**
      * {@inheritDoc}

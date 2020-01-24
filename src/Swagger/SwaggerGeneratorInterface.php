@@ -16,8 +16,15 @@ interface SwaggerGeneratorInterface extends GeneratorInterface
      * @param string $folder
      * @param string $namespace
      * @param string $indent
+     * @param bool $override
      */
-    public function configure(string $swaggerUri, string $folder, string $namespace, string $indent = '    ');
+    public function configure(
+        string $swaggerUri,
+        string $folder,
+        string $namespace,
+        string $indent = '    ',
+        bool $override = false
+    );
 
     /**
      * @param string $folder
@@ -25,11 +32,9 @@ interface SwaggerGeneratorInterface extends GeneratorInterface
     public function setFolder(string $folder): void;
 
     /**
-     * @param bool $overwrite
-     *
      * @return bool
      */
-    public function generate(bool $overwrite = false): bool;
+    public function generate(): bool;
 
     /**
      * @param array $definitions
@@ -46,7 +51,12 @@ interface SwaggerGeneratorInterface extends GeneratorInterface
      */
     public function setIndent(string $indent): void;
 
-    public function processPaths(array $json, bool $overwrite = false): bool;
+    /**
+     * @param array $json
+     *
+     * @return bool
+     */
+    public function processPaths(array $json): bool;
 
     /**
      * @param string $namespace
@@ -70,11 +80,10 @@ interface SwaggerGeneratorInterface extends GeneratorInterface
 
     /**
      * @param array $json
-     * @param bool $overwrite
      *
      * @return bool
      */
-    public function processDefinitions(array $json, bool $overwrite = false): bool;
+    public function processDefinitions(array $json): bool;
 
     /**
      * @return string
@@ -105,4 +114,14 @@ interface SwaggerGeneratorInterface extends GeneratorInterface
      * @param SwaggerOperationsGeneratorInterface $operationsGenerator
      */
     public function setOperationsGenerator(SwaggerOperationsGeneratorInterface $operationsGenerator): void;
+
+    /**
+     * @return bool
+     */
+    public function isOverride(): bool;
+
+    /**
+     * @param bool $override
+     */
+    public function setOverride(bool $override): void;
 }

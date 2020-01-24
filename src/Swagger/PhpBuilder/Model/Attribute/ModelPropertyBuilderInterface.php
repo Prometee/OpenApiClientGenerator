@@ -17,4 +17,14 @@ interface ModelPropertyBuilderInterface extends PropertyBuilderInterface
      * @param bool $required
      */
     public function setRequired(bool $required): void;
+
+    /**
+     * @return bool
+     */
+    public function isInherited(): bool;
+
+    /**
+     * @param bool $inherited
+     */
+    public function setInherited(bool $inherited): void;
 }

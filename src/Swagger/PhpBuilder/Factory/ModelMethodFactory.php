@@ -16,6 +16,10 @@ class ModelMethodFactory extends BaseMethodFactory implements ModelMethodFactory
     public function createModelConstructorBuilder(UsesBuilderInterface $usesBuilder): ModelConstructorBuilderInterface
     {
         $phpDocBuilder = $this->phpDocFactory->createPhpDocBuilder($usesBuilder);
-        return new $this->constructorBuilderClass($usesBuilder, $phpDocBuilder, $this);
+        return new $this->constructorBuilderClass(
+            $usesBuilder,
+            $phpDocBuilder,
+            $this->createMethodParameterBuilder($usesBuilder)
+        );
     }
 }

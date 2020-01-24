@@ -15,7 +15,7 @@ class IsserSetterBuilder extends GetterSetterBuilder implements IsserSetterBuild
             $this->getterMethodBuilder->configure(
                 MethodBuilderInterface::SCOPE_PUBLIC,
                 $this->getMethodName(static::ISSER_PREFIX),
-                $this->propertyBuilder->getPhpType()
+                $this->propertyBuilder->getTypes()
             );
 
             $this->getterMethodBuilder->addLine(

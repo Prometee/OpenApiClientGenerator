@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger;
 
+use Exception;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilderInterface;
+use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\ConstructorBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\MethodsBuilderInterface;
 use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerModelHelperInterface;
 use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelClassFactoryInterface;
 use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelMethodFactoryInterface;
+use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Attribute\ModelPropertyBuilderInterface;
 use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Method\ModelConstructorBuilderInterface;
 use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Other\ModelPropertiesBuilderInterface;
 
@@ -29,6 +32,8 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
     protected $indent;
     /** @var array */
     protected $definitions = [];
+    /** @var bool */
+    protected $overwrite = false;
 
     /**
      * @param ModelClassFactoryInterface $classFactory
@@ -61,8 +66,10 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws Exception
      */
-    public function generate(bool $overwrite = false): bool
+    public function generate(): bool
     {
         foreach ($this->definitions as $definitionName => $definition) {
             if (!isset($definition['type'])) {
@@ -71,7 +78,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
             if ($definition['type'] !== 'object') {
                 continue;
             }
-            $this->generateClass($definitionName, $definition, $overwrite);
+            $this->generateClass($definitionName);
         }
 
         return true;
@@ -79,26 +86,39 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws Exception
      */
-    public function generateClass(string $definitionName, array $definition, bool $overwrite = false)
+    public function generateClass(string $definitionName): ?ClassBuilderInterface
     {
         $filePath = $this->getFilePathFromDefinitionName($definitionName);
-        if (!$overwrite && is_file($filePath)) {
-            return false;
+        if (!$this->overwrite && is_file($filePath)) {
+            return null;
         }
 
         // Class
         $classBuilder = $this->classFactory->createClassBuilder();
-        $this->configureClassBuilder($classBuilder, $definitionName, $definition);
+        $this->configureClassBuilder(
+            $classBuilder,
+            $definitionName
+        );
 
         // Properties
         /** @var ModelPropertiesBuilderInterface $modelPropertiesBuilder */
         $modelPropertiesBuilder = $classBuilder->getPropertiesBuilder();
-        $this->configurePropertiesBuilder($classBuilder, $modelPropertiesBuilder, $definitionName, $definition, $overwrite);
+        $this->configurePropertiesBuilder(
+            $classBuilder,
+            $modelPropertiesBuilder,
+            $definitionName
+        );
 
         // Constructor
         $constructorBuilder = $this->methodFactory->createModelConstructorBuilder($classBuilder->getUsesBuilder());
-        $this->configureConstructorBuilder($classBuilder, $modelPropertiesBuilder, $constructorBuilder);
+        $this->configureConstructorBuilder(
+            $classBuilder->getMethodsBuilder(),
+            $modelPropertiesBuilder,
+            $constructorBuilder
+        );
 
         // File creation
         $directory = dirname($filePath);
@@ -106,52 +126,23 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
             mkdir($directory, 0777, true);
         }
 
-        return file_put_contents($filePath, $classBuilder->build($this->indent));
+        if (false === file_put_contents($filePath, $classBuilder->build($this->indent))) {
+            throw new Exception(sprintf('Unable to generate the class : "%s" !', $filePath));
+        }
+
+        return $classBuilder;
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @throws Exception
      */
-    public function processProperty(
-        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
-        MethodsBuilderInterface $methodsBuilder,
-        string $definitionName,
-        array $definition,
-        string $propertyName,
-        array $configuration,
-        bool $overwrite = false
-    ): void {
-        $types = $this->findPropertyTypes(
-            $definitionName,
-            $definition,
-            $propertyName,
-            $configuration,
-            $overwrite
-        );
-
-        $cleanPropertyName = $this->helper::cleanStr($propertyName);
-        $description = isset($configuration['description']) ? $configuration['description'] : null;
-        $propertyBuilder = $modelPropertiesBuilder->configurePropertyFromSwaggerPropertyDefinition(
-            $cleanPropertyName,
-            $types,
-            $description
-        );
-
-        $getterSetterBuilder = $this->methodFactory->createPropertyMethodsBuilder(
-            $methodsBuilder->getUsesBuilder()
-        );
-        $readOnly = isset($definition['readOnly']) && $definition['readOnly'] === 'true';
-        $writeOnly = isset($definition['writeOnly']) && $definition['writeOnly'] === 'true';
-        $getterSetterBuilder->configure($propertyBuilder, $readOnly, $writeOnly);
-
-        $methodBuilders = $getterSetterBuilder->getMethods($this->indent);
-        $methodsBuilder->addMultipleMethod($methodBuilders);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function generateSubClass(string $currentDefinitionName, string $currentProperty, array $currentConfig, bool $overwrite = false): ?string
+    public function generateSubClass(
+        string $currentDefinitionName,
+        string $currentProperty,
+        array $currentConfig
+    ): ?string
     {
         $type = null;
         if (isset($currentConfig['type']) && in_array($currentConfig['type'], ['object', 'array'])) {
@@ -163,7 +154,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
                 $subConfig = $currentConfig['items'];
             }
             if (!empty($subConfig)) {
-                $this->generateClass($subDefinitionName, $subConfig, $overwrite);
+                $this->generateClass($subDefinitionName);
                 [$subNamespace, $subClassName] = $this->getClassNameAndNamespaceFromDefinitionName($subDefinitionName);
                 $type = '\\' . $subNamespace . '\\' . $subClassName;
                 $type .= $currentConfig['type'] === 'array' ? '[]' : '';
@@ -176,7 +167,11 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getClassNameAndNamespaceFromDefinitionName(string $definitionName, string $classPrefix = '', string $classSuffix = ''): array
+    public function getClassNameAndNamespaceFromDefinitionName(
+        string $definitionName,
+        string $classPrefix = '',
+        string $classSuffix = ''
+    ): array
     {
         $classPath = $this->helper::camelize($definitionName);
         $classParts = explode('/', $classPath);
@@ -216,6 +211,221 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         $singleType = rtrim($type, '[]');
         [$propertyNamespace, $propertyClassName] = $this->getClassNameAndNamespaceFromDefinitionName($singleType);
         return $propertyNamespace . '\\' . $propertyClassName;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws Exception
+     */
+    public function configureClassBuilder(
+        ClassBuilderInterface $classBuilder,
+        string $definitionName
+    ): ?ClassBuilderInterface
+    {
+        $subClassBuilder = null;
+        $extendClass = null;
+        if (isset($this->definitions[$definitionName]['allOf'])) {
+            $allOfConfig = $this->definitions[$definitionName]['allOf'][0];
+            $subDefinitionName = $this->helper::getPhpTypeFromSwaggerConfiguration($allOfConfig);
+            $subClassBuilder = $this->generateClass($subDefinitionName);
+            $extendClass = $this->getPhpTypeFromPropertyConfig($allOfConfig);
+        }
+        [$namespace, $className] = $this->getClassNameAndNamespaceFromDefinitionName($definitionName);
+        $classBuilder->configure($namespace, $className, $extendClass);
+
+        return $subClassBuilder;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws Exception
+     */
+    public function configurePropertiesBuilder(
+        ClassBuilderInterface $classBuilder,
+        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
+        string $definitionName
+    ): void
+    {
+        $properties = $this->flattenPropertiesDefinition($this->definitions[$definitionName]);
+        $requires = $this->flattenRequiresDefinition($this->definitions[$definitionName]);
+        $ownedProperties = $this->foundNotInheritedProperties($this->definitions[$definitionName]);
+        $inheritedProperties = array_diff(array_keys($properties), array_keys($ownedProperties));
+
+        foreach ($properties as $propertyName => $configuration) {
+            $required = false !== array_search($propertyName, $requires);
+            $inherited = false !== array_search($propertyName, $inheritedProperties);
+            $this->processProperty(
+                $modelPropertiesBuilder,
+                $classBuilder->getMethodsBuilder(),
+                $definitionName,
+                $propertyName,
+                $configuration,
+                $required,
+                $inherited
+            );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function flattenPropertiesDefinition(array $definition): array
+    {
+        if (isset($definition['properties'])) {
+            return $definition['properties'];
+        }
+
+        if (!isset($definition['allOf'])) {
+            return [];
+        }
+
+        $allOf = $definition['allOf'];
+        $inheritedPropertyName = $this->helper::getPhpTypeFromSwaggerDefinitionName($allOf[0]['$ref']);
+
+        $properties = [];
+        if (isset($allOf[1]['properties'])) {
+            $properties = $allOf[1]['properties'];
+        }
+
+        $inheritedProperties = $this->flattenPropertiesDefinition($this->definitions[$inheritedPropertyName]);
+        return array_merge($properties, $inheritedProperties);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function flattenRequiresDefinition(array $definition): array
+    {
+        if (isset($definition['required'])) {
+            return $definition['required'];
+        }
+
+        if (!isset($definition['allOf'])) {
+            return [];
+        }
+
+        $allOf = $definition['allOf'];
+        $inheritedPropertyName = $this->helper::getPhpTypeFromSwaggerDefinitionName($allOf[0]['$ref']);
+
+        $requires = [];
+        if (isset($allOf[1]['required'])) {
+            $requires = $allOf[1]['required'];
+        }
+
+        $inheritedRequires = $this->flattenRequiresDefinition($this->definitions[$inheritedPropertyName]);
+        return array_merge($requires, $inheritedRequires);
+    }
+
+    public function foundNotInheritedProperties(array $definition): array
+    {
+        if (isset($definition['properties'])) {
+            return $definition['properties'];
+        }
+
+        if (!isset($definition['allOf'])) {
+            return [];
+        }
+
+        $allOf = $definition['allOf'];
+        if (!isset($allOf[1]['properties'])) {
+            return [];
+        }
+
+        return $allOf[1]['properties'];
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws Exception
+     */
+    public function processProperty(
+        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
+        MethodsBuilderInterface $methodsBuilder,
+        string $definitionName,
+        string $propertyName,
+        array $configuration,
+        bool $required = false,
+        bool $inherited = false
+    ): void {
+        $types = $this->findPropertyTypes(
+            $definitionName,
+            $propertyName,
+            $configuration
+        );
+
+        $cleanPropertyName = $this->helper::cleanStr($propertyName);
+        $description = isset($configuration['description']) ? $configuration['description'] : null;
+
+        /** @var ModelPropertyBuilderInterface $propertyBuilder */
+        $propertyBuilder = $this->classFactory->createPropertyBuilder(
+            $modelPropertiesBuilder->getUsesBuilder()
+        );
+        $modelPropertiesBuilder->addPropertyFromSwaggerPropertyDefinition(
+            $propertyBuilder,
+            $cleanPropertyName,
+            $types,
+            $required,
+            $inherited,
+            $description
+        );
+
+        if ($inherited) {
+            return;
+        }
+
+        $getterSetterBuilder = $this->methodFactory->createPropertyMethodsBuilder(
+            $methodsBuilder->getUsesBuilder()
+        );
+        $definition = &$this->definitions[$definitionName];
+        $readOnly = isset($definition['readOnly']) && $definition['readOnly'] === 'true';
+        $writeOnly = isset($definition['writeOnly']) && $definition['writeOnly'] === 'true';
+        $getterSetterBuilder->configure($propertyBuilder, $readOnly, $writeOnly);
+
+        $methodBuilders = $getterSetterBuilder->getMethods($this->methodFactory, $this->indent);
+        $methodsBuilder->addMultipleMethod($methodBuilders);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function configureConstructorBuilder(
+        MethodsBuilderInterface $methodsBuilder,
+        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
+        ModelConstructorBuilderInterface $constructorBuilder
+    ): void
+    {
+        $constructorBuilder->configureFromPropertiesBuilder($modelPropertiesBuilder);
+        $methodsBuilder->addMethod($constructorBuilder);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws Exception
+     */
+    public function findPropertyTypes(
+        string $definitionName,
+        string $propertyName,
+        array $configuration
+    ): array
+    {
+        $cleanPropertyName = $this->helper::cleanStr($propertyName);
+
+        $type = $this->generateSubClass($definitionName, $cleanPropertyName, $configuration);
+        if (null === $type) {
+            $type = $this->getPhpTypeFromPropertyConfig($configuration);
+        }
+
+        $types = [$type];
+
+        if ($this->helper::isNullableBySwaggerConfiguration($propertyName, $this->definitions[$definitionName])) {
+            $types[] = 'null';
+        }
+
+        return $types;
     }
 
     /**
@@ -261,84 +471,16 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function configureClassBuilder(ClassBuilderInterface $classBuilder, string $definitionName, array $definition): void
+    public function isOverwrite(): bool
     {
-        if (isset($definition['properties'])) {
-            $extendClass = null;
-        } else {
-            $extendClass = $this->getPhpTypeFromPropertyConfig($definition['allOf'][0]);
-        }
-        [$namespace, $className] = $this->getClassNameAndNamespaceFromDefinitionName($definitionName);
-        $classBuilder->configure($namespace, $className, $extendClass);
+        return $this->overwrite;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function configurePropertiesBuilder(
-        ClassBuilderInterface $classBuilder,
-        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
-        string $definitionName,
-        array $definition,
-        bool $overwrite = false
-    ): void
+    public function setOverwrite(bool $overwrite): void
     {
-        if (isset($definition['properties'])) {
-            $properties = $definition['properties'];
-        } else {
-            $properties = $definition['allOf'][1]['properties'];
-        }
-
-        foreach ($properties as $propertyName => $configuration) {
-            $this->processProperty(
-                $modelPropertiesBuilder,
-                $classBuilder->getMethodsBuilder(),
-                $definitionName,
-                $definition,
-                $propertyName,
-                $configuration,
-                $overwrite
-            );
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function configureConstructorBuilder(
-        ClassBuilderInterface $classBuilder,
-        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
-        ModelConstructorBuilderInterface $constructorBuilder
-    ): void
-    {
-        $constructorBuilder->configureFromPropertiesBuilder($modelPropertiesBuilder);
-        $classBuilder->getMethodsBuilder()->addMethod($constructorBuilder);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function findPropertyTypes(
-        string $definitionName,
-        array $definition,
-        string $propertyName,
-        array $configuration,
-        bool $overwrite = false
-    ): array
-    {
-        $cleanPropertyName = $this->helper::cleanStr($propertyName);
-
-        $type = $this->generateSubClass($definitionName, $cleanPropertyName, $configuration, $overwrite);
-        $type = $type === null ?
-            $this->getPhpTypeFromPropertyConfig($configuration)
-            : $type;
-
-        $types = [$type];
-
-        if ($this->helper::isNullableBySwaggerConfiguration($propertyName, $definition)) {
-            $types[] = 'null';
-        }
-
-        return $types;
+        $this->overwrite = $overwrite;
     }
 }

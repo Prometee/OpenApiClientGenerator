@@ -33,6 +33,13 @@ interface MethodsBuilderInterface extends BuilderInterface
     /**
      * @param string $name
      *
+     * @return MethodBuilderInterface|null
+     */
+    public function getMethodByName(string $name): ?MethodBuilderInterface;
+
+    /**
+     * @param string $name
+     *
      * @return bool
      */
     public function hasMethod(string $name): bool;

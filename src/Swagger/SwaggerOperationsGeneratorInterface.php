@@ -27,11 +27,9 @@ interface SwaggerOperationsGeneratorInterface
     public function setHelper(SwaggerOperationsHelperInterface $helper): void;
 
     /**
-     * @param bool $overwrite
-     *
      * @return bool
      */
-    public function generate(bool $overwrite = false): bool;
+    public function generate(): bool;
 
     /**
      * @return string[]
@@ -45,16 +43,15 @@ interface SwaggerOperationsGeneratorInterface
 
     /**
      * @param array $json
-     * @param bool $overwrite
      *
      * @return bool
      */
-    public function processPaths(array $json, bool $overwrite = false): bool;
+    public function processPaths(array $json): bool;
 
     /**
-     * @param string $abstractOperationClass
+     * @param string|null $abstractOperationClass
      */
-    public function setAbstractOperationClass(string $abstractOperationClass): void;
+    public function setAbstractOperationClass(?string $abstractOperationClass): void;
 
     /**
      * @param string $path
@@ -79,18 +76,17 @@ interface SwaggerOperationsGeneratorInterface
     public function processOperation(ClassBuilderInterface $classBuilder, string $path, string $operation, array $operationConfiguration): void;
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getAbstractOperationClass(): string;
+    public function getAbstractOperationClass(): ?string;
 
     /**
      * @param string $path
      * @param array $operationConfigurations
-     * @param bool $overwrite
      *
      * @return bool|int
      */
-    public function generateClass(string $path, array $operationConfigurations, bool $overwrite = false);
+    public function generateClass(string $path, array $operationConfigurations);
 
     /**
      * @return array
@@ -123,4 +119,14 @@ interface SwaggerOperationsGeneratorInterface
      * @return MethodParameterBuilderInterface|null
      */
     public function createAnOperationParameter(ClassBuilderInterface $classBuilder, array $parameterConfiguration): ?MethodParameterBuilderInterface;
+
+    /**
+     * @return bool
+     */
+    public function isOverwrite(): bool;
+
+    /**
+     * @param bool $overwrite
+     */
+    public function setOverwrite(bool $overwrite): void;
 }

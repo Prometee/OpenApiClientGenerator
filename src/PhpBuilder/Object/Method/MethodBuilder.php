@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\UsesBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\PhpDoc\PhpDocBuilderInterface;
 
@@ -14,8 +13,8 @@ class MethodBuilder implements MethodBuilderInterface
     protected $phpDocBuilder;
     /** @var UsesBuilderInterface */
     protected $usesBuilder;
-    /** @var MethodFactoryInterface */
-    protected $methodFactory;
+    /** @var MethodParameterBuilderInterface */
+    protected $methodParameterBuilderSkel;
 
     /** @var string */
     protected $scope = '';
@@ -37,17 +36,17 @@ class MethodBuilder implements MethodBuilderInterface
     /**
      * @param UsesBuilderInterface $usesBuilder
      * @param PhpDocBuilderInterface $phpDocBuilder
-     * @param MethodFactoryInterface $methodFactory
+     * @param MethodParameterBuilderInterface $methodParameterBuilderSkel
      */
     public function __construct(
         UsesBuilderInterface $usesBuilder,
         PhpDocBuilderInterface $phpDocBuilder,
-        MethodFactoryInterface $methodFactory
+        MethodParameterBuilderInterface $methodParameterBuilderSkel
     )
     {
         $this->usesBuilder = $usesBuilder;
         $this->phpDocBuilder = $phpDocBuilder;
-        $this->methodFactory = $methodFactory;
+        $this->methodParameterBuilderSkel = $methodParameterBuilderSkel;
     }
 
     /**
@@ -119,13 +118,30 @@ class MethodBuilder implements MethodBuilderInterface
         $static = ($this->static) ? ' static ' : '';
         $content = $indent . $this->scope . $static . ' function ' . $this->name . '(';
 
-        $additionalIndentation = count($this->parameters) > 4 ? "\n" . $indent . $indent : '';
         $parameters = [];
         foreach ($this->parameters as $methodParameterBuilder) {
-            $parameters[] = $additionalIndentation . $methodParameterBuilder->build($indent);
+            $parameters[] = $methodParameterBuilder->build($indent);
         }
-        $content .= implode(', ', $parameters);
-        $content .= (count($this->parameters) > 4 ? "\n" . $indent : '') . ')';
+        $parametersStr = implode(',%1$s', $parameters);
+
+        $parameterStart = '';
+        $additionalIndentation = ' ';
+        $parameterEnd = '';
+        if (strlen($parametersStr) > $this->phpDocBuilder->getWrapOn()*0.75) {
+            $additionalIndentation = "\n" . $indent . $indent;
+            $parameterStart = $additionalIndentation;
+            $parameterEnd = "\n" . $indent;
+        }
+
+
+        $content .= $parameterStart;
+        $content .= sprintf(
+            $parametersStr,
+            $additionalIndentation
+        );
+        $content .= $parameterEnd;
+
+        $content .= ')';
         if (!empty($this->returnTypes) && !in_array('mixed', $this->returnTypes)) {
             $content .= ': ' . $this->getPhpReturnType();
         }
@@ -386,16 +402,16 @@ class MethodBuilder implements MethodBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getMethodFactory(): MethodFactoryInterface
+    public function getMethodParameterBuilderSkel(): MethodParameterBuilderInterface
     {
-        return $this->methodFactory;
+        return $this->methodParameterBuilderSkel;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setMethodFactory(MethodFactoryInterface $methodFactory): void
+    public function setMethodParameterBuilderSkel(MethodParameterBuilderInterface $methodParameterBuilderSkel): void
     {
-        $this->methodFactory = $methodFactory;
+        $this->methodParameterBuilderSkel = $methodParameterBuilderSkel;
     }
 }

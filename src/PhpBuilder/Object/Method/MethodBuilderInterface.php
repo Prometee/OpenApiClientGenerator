@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method;
 
 use Prometee\SwaggerClientBuilder\PhpBuilder\BuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\UsesBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\PhpDoc\PhpDocAwareBuilderInterface;
 
@@ -164,12 +163,12 @@ interface MethodBuilderInterface extends BuilderInterface, PhpDocAwareBuilderInt
     public function setUsesBuilder(UsesBuilderInterface $usesBuilder): void;
 
     /**
-     * @return MethodFactoryInterface
+     * @return MethodParameterBuilderInterface
      */
-    public function getMethodFactory(): MethodFactoryInterface;
+    public function getMethodParameterBuilderSkel(): MethodParameterBuilderInterface;
 
     /**
-     * @param MethodFactoryInterface $methodFactory
+     * @param MethodParameterBuilderInterface $methodParameterBuilderSkel
      */
-    public function setMethodFactory(MethodFactoryInterface $methodFactory): void;
+    public function setMethodParameterBuilderSkel(MethodParameterBuilderInterface $methodParameterBuilderSkel): void;
 }

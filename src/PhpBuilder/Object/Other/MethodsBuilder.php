@@ -73,6 +73,18 @@ class MethodsBuilder implements MethodsBuilderInterface
     /**
      * {@inheritDoc}
      */
+    public function getMethodByName(string $name): ?MethodBuilderInterface
+    {
+        if ($this->hasMethod($name)) {
+            return $this->methods[$name];
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function hasMethod(string $name): bool
     {
         return isset($this->methods[$name]);

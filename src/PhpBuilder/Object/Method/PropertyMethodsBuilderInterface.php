@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method;
 
+use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Attribute\PropertyBuilderInterface;
 
 interface PropertyMethodsBuilderInterface
@@ -30,11 +31,12 @@ interface PropertyMethodsBuilderInterface
     public function setReadOnly(bool $readOnly): void;
 
     /**
+     * @param MethodFactoryInterface $methodFactory
      * @param string|null $indent
      *
      * @return MethodBuilderInterface[]
      */
-    public function getMethods(string $indent = null): array;
+    public function getMethods(MethodFactoryInterface $methodFactory, string $indent = null): array;
 
     /**
      * @param bool $writeOnly

@@ -17,6 +17,10 @@ class OperationsMethodFactory extends BaseMethodFactory implements OperationsMet
     public function createOperationMethodBuilder(UsesBuilderInterface $usesBuilder): OperationsMethodBuilderInterface
     {
         $phpDocBuilder = $this->phpDocFactory->createPhpDocBuilder($usesBuilder);
-        return new $this->methodBuilderClass($usesBuilder, $phpDocBuilder, $this);
+        return new $this->methodBuilderClass(
+            $usesBuilder,
+            $phpDocBuilder,
+            $this->createMethodParameterBuilder($usesBuilder)
+        );
     }
 }

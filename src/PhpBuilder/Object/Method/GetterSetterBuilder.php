@@ -6,14 +6,11 @@ namespace Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method;
 
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\UsesBuilderInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Attribute\PropertyBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\MethodFactoryInterface;
 
 class GetterSetterBuilder implements GetterSetterBuilderInterface
 {
     /** @var UsesBuilderInterface */
     protected $usesBuilder;
-    /** @var MethodFactoryInterface */
-    protected $methodFactory;
     /** @var MethodBuilderInterface */
     protected $getterMethodBuilder;
     /** @var MethodBuilderInterface */
@@ -28,19 +25,20 @@ class GetterSetterBuilder implements GetterSetterBuilderInterface
 
     /**
      * @param UsesBuilderInterface $usesBuilder
-     * @param MethodFactoryInterface $methodFactory
+     * @param MethodBuilderInterface $getterMethodBuilder
+     * @param MethodBuilderInterface $setterMethodBuilder
      */
     public function __construct(
         UsesBuilderInterface $usesBuilder,
-        MethodFactoryInterface $methodFactory
+        MethodBuilderInterface $getterMethodBuilder,
+        MethodBuilderInterface $setterMethodBuilder
     )
     {
         $this->usesBuilder = $usesBuilder;
-        $this->methodFactory = $methodFactory;
-
-        $this->getterMethodBuilder = $this->methodFactory->createMethodBuilder($this->usesBuilder);
-        $this->setterMethodBuilder = $this->methodFactory->createMethodBuilder($this->usesBuilder);
+        $this->getterMethodBuilder = $getterMethodBuilder;
+        $this->setterMethodBuilder = $setterMethodBuilder;
     }
+
 
     /**
      * {@inheritDoc}
@@ -115,9 +113,7 @@ class GetterSetterBuilder implements GetterSetterBuilderInterface
                 $this->getMethodName(static::SETTER_PREFIX),
                 ['void']
             );
-            $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
-                $this->usesBuilder
-            );
+            $methodParameterBuilder = clone $this->setterMethodBuilder->getMethodParameterBuilderSkel();
             $methodParameterBuilder->configure(
                 $this->propertyBuilder->getTypes(),
                 $this->propertyBuilder->getName()

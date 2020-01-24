@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientBuilder\Swagger;
 
+use Exception;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilder;
 use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilderInterface;
@@ -18,30 +19,27 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     protected $classFactory;
     /** @var OperationsMethodFactoryInterface */
     protected $methodFactory;
-
-    /** @var string */
-    protected $folder;
-    /** @var string */
-    protected $namespace;
-    /** @var string */
-    protected $modelNamespace;
-    /** @var string */
-    protected $indent;
-
-    /** @var array */
-    protected $paths = [];
-
     /** @var SwaggerOperationsHelperInterface */
     protected $helper;
 
+    /** @var string */
+    protected $folder = '';
+    /** @var string */
+    protected $namespace = '';
+    /** @var string */
+    protected $modelNamespace = '';
+    /** @var string */
+    protected $indent = '    ';
+    /** @var array */
+    protected $paths = [];
     /** @var ClassBuilder[] */
     protected $classBuilders = [];
-
     /** @var string[] */
     protected $throwsClasses = [];
-
-    /** @var string */
+    /** @var string|null */
     protected $abstractOperationClass;
+    /** @var bool */
+    protected $overwrite = false;
 
     /**
      * @param ClassFactoryInterface $classFactory
@@ -76,11 +74,13 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws Exception
      */
-    public function generate(bool $overwrite = false): bool
+    public function generate(): bool
     {
         foreach ($this->paths as $path => $operationConfigurations) {
-            $this->generateClass($path, $operationConfigurations, $overwrite);
+            $this->generateClass($path, $operationConfigurations);
         }
 
         return true;
@@ -88,14 +88,16 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws Exception
      */
-    public function processPaths(array $json, bool $overwrite = false): bool
+    public function processPaths(array $json): bool
     {
         if (!isset($json['paths'])) {
             return false;
         }
         foreach ($this->paths as $path => $operationConfigurations) {
-            $this->generateClass($path, $operationConfigurations, $overwrite);
+            $this->generateClass($path, $operationConfigurations);
         }
 
         return true;
@@ -103,44 +105,52 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @throws Exception
      */
-    public function generateClass(string $path, array $operationConfigurations, bool $overwrite = false)
+    public function generateClass(string $path, array $operationConfigurations)
     {
         $filePath = $this->getFilePathFromPath(
             $path,
             '',
             static::CLASS_SUFFIX
         );
+        if (!$this->overwrite && is_file($filePath)) {
+            return null;
+        }
 
+        // Class
+        $classBuilder = $this->getOrCreateClassBuilder($path, $filePath);
+
+        // Methods
+        foreach ($operationConfigurations as $operation => $operationConfiguration) {
+            $this->processOperation($classBuilder, $path, $operation, $operationConfiguration);
+        }
+
+        // File creation
+        $directory = dirname($filePath);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
+        if (false === file_put_contents($filePath, $classBuilder->build($this->indent))) {
+            throw new Exception(sprintf('Unable to generate the class : "%s" !', $filePath));
+        }
+
+        return $classBuilder;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getOrCreateClassBuilder(string $path, string $filePath): ClassBuilderInterface
+    {
         [$namespace, $className] = $this->getClassNameAndNamespaceFromPath(
             $path,
             '',
             static::CLASS_SUFFIX
         );
 
-        $classBuilder = $this->getOrCreateClassBuilder($filePath, $namespace, $className);
-
-        foreach ($operationConfigurations as $operation => $operationConfiguration) {
-            $operation = strtolower($operation);
-            if (!in_array($operation, ['get', 'post', 'put', 'delete'])) {
-                continue;
-            }
-            $this->processOperation($classBuilder, $path, $operation, $operationConfiguration);
-        }
-
-        $directory = dirname($filePath);
-        if (!is_dir($directory)) {
-            mkdir($directory, 0777, true);
-        }
-
-        return file_put_contents($filePath, $classBuilder->build($this->indent));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function getOrCreateClassBuilder(string $filePath, string $namespace, string $className): ClassBuilderInterface
-    {
         if ($this->hasClassBuilder($filePath)) {
             return $this->classBuilders[$filePath];
         }
@@ -176,6 +186,12 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         string $operation,
         array $operationConfiguration
     ): void {
+
+        $operation = strtolower($operation);
+        if (!in_array($operation, ['get', 'post', 'put', 'delete'])) {
+            return;
+        }
+
         $returnType = null;
         if (isset($operationConfiguration['responses'])) {
             $returnType = $this->helper::getReturnType($operationConfiguration['responses']);
@@ -194,9 +210,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         $operationMethodBuilder->addReturnType($returnType);
 
         if (isset($operationConfiguration['description'])) {
-            foreach (explode("\n", $operationConfiguration['description']) as $line) {
-                $operationMethodBuilder->getPhpDocBuilder()->addDescriptionLine($line);
-            }
+            $operationMethodBuilder->getPhpDocBuilder()->addDescriptionLine($operationConfiguration['description']);
         }
         $operationMethodBuilder->getPhpDocBuilder()->addDescriptionLine(
             sprintf('path: %s', $path)
@@ -252,6 +266,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         if ($type !== null) {
             $type = $this->getPhpNameFromType($type);
         }
+        $types = [$type];
         $name = lcfirst($this->helper::cleanStr($parameterConfiguration['name']));
         $value = null;
         $description = '';
@@ -268,11 +283,10 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         }
 
         if (isset($parameterConfiguration['required'])) {
-            if ($parameterConfiguration['required']) {
+            if ((bool) $parameterConfiguration['required']) {
                 $value = null;
                 $description .= ' (required)';
             } else {
-                $type = '?' . $type;
                 $value = $value !== null ? $value : 'null';
                 $description .= ' (optional)';
             }
@@ -282,7 +296,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             $classBuilder->getUsesBuilder()
         );
         $methodParameterBuilder->configure(
-            (array) $type,
+            $types,
             $name,
             $value,
             false,
@@ -384,7 +398,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getAbstractOperationClass(): string
+    public function getAbstractOperationClass(): ?string
     {
         return $this->abstractOperationClass;
     }
@@ -392,8 +406,24 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function setAbstractOperationClass(string $abstractOperationClass): void
+    public function setAbstractOperationClass(?string $abstractOperationClass): void
     {
         $this->abstractOperationClass = $abstractOperationClass;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isOverwrite(): bool
+    {
+        return $this->overwrite;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setOverwrite(bool $overwrite): void
+    {
+        $this->overwrite = $overwrite;
     }
 }
