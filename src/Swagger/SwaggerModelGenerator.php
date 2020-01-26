@@ -200,6 +200,10 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
     {
         $type = $this->helper::getPhpTypeFromSwaggerConfiguration($config);
 
+        if (null === $type) {
+            return 'null';
+        }
+
         if (false === $this->hasDefinition($type)) {
             return $type;
         }
@@ -228,6 +232,9 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         if (isset($this->definitions[$definitionName]['allOf'])) {
             $allOfConfig = $this->definitions[$definitionName]['allOf'][0];
             $subDefinitionName = $this->helper::getPhpTypeFromSwaggerConfiguration($allOfConfig);
+            if (null === $subDefinitionName) {
+                return null;
+            }
             $subClassBuilder = $this->generateClass($subDefinitionName);
             $extendClass = $this->getPhpTypeFromPropertyConfig($allOfConfig);
         }
