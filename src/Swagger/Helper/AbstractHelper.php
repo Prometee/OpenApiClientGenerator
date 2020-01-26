@@ -31,9 +31,13 @@ abstract class AbstractHelper implements HelperInterface
                 case 'string':
                     return static::getPhpTypeFromSwaggerStringType($format);
             }
-        } elseif (isset($config['$ref'])) {
+        }
+
+        if (isset($config['$ref'])) {
             return static::getPhpTypeFromSwaggerDefinitionName($config['$ref']);
-        } elseif ($config['schema'] && isset($config['schema']['$ref'])) {
+        }
+
+        if ($config['schema'] && isset($config['schema']['$ref'])) {
             return static::getPhpTypeFromSwaggerDefinitionName($config['schema']['$ref']);
         }
 

@@ -38,6 +38,18 @@ interface PhpDocBuilderInterface extends BuilderInterface
     public static function getPossibleTypesFromTypeNames(array $types = []): string;
 
     /**
+     * @return string[]
+     */
+    public function buildLines(): array;
+
+    /**
+     * @param $type
+     * @param string[] $lines
+     * @param string[] $phpdocLines
+     */
+    public function buildTypedLines(string $type, array $lines, array &$phpdocLines): void;
+
+    /**
      * @param string $line
      * @param int $wrapOn
      *

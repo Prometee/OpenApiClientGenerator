@@ -262,11 +262,13 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         if (!isset($parameterConfiguration['name'])) {
             return null;
         }
+
         $type = $this->helper::getPhpTypeFromSwaggerConfiguration($parameterConfiguration);
         if ($type !== null) {
             $type = $this->getPhpNameFromType($type);
         }
         $types = [$type];
+
         $name = lcfirst($this->helper::cleanStr($parameterConfiguration['name']));
         $value = null;
         $description = '';
@@ -287,7 +289,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
                 $value = null;
                 $description .= ' (required)';
             } else {
-                $value = $value !== null ? $value : 'null';
+                $value = $value ?? 'null';
                 $description .= ' (optional)';
             }
         }

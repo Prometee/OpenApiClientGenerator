@@ -99,42 +99,56 @@ class PhpDocBuilder implements PhpDocBuilderInterface
      */
     public function build(string $indent = null): ?string
     {
-        $content = '';
+        $phpdocLines = $this->buildLines();
 
+        if (empty($phpdocLines)) {
+            return null;
+        }
+
+        if ($this->hasSingleVarLine()) {
+            return sprintf('%1$s/** %3$s */%2$s', $indent, "\n", $phpdocLines[0]);
+        }
+
+        $lines = [];
+        foreach ($phpdocLines as $phpdocLine) {
+            $lines[] = sprintf('%s * %s', $indent,$phpdocLine);
+        }
+
+        return sprintf('%1$s/**%2$s%3$s%2$s%1$s */%2$s', $indent, "\n", implode("\n", $lines));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildLines(): array
+    {
         $phpdocLines = [];
         $previousType = null;
         $this->orderLines();
         foreach ($this->lines as $type => $lines) {
-            if ($previousType !== $type) {
-                if ($previousType !== null) {
-                    $phpdocLines[] = '';
-                }
+            if ($previousType === null) {
                 $previousType = $type;
             }
-            foreach ($lines as $line) {
-                $lineSuffix = ($type === static::TYPE_DESCRIPTION ? '' : '@' . $type . ' ');
-                foreach (static::wrapLines($lineSuffix . $line, $this->wrapOn) as $i => $l) {
-                    $phpdocLines[] = ($i > 0 ? str_repeat(' ', strlen($lineSuffix)) : '') . $l;
-                }
+            if ($previousType !== $type) {
+                $phpdocLines[] = '';
+                $previousType = $type;
+            }
+            $this->buildTypedLines($type, $lines, $phpdocLines);
+        }
+        return $phpdocLines;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildTypedLines(string $type, array $lines, array &$phpdocLines): void
+    {
+        foreach ($lines as $line) {
+            $lineSuffix = ($type === static::TYPE_DESCRIPTION ? '' : '@' . $type . ' ');
+            foreach (static::wrapLines($lineSuffix . $line, $this->wrapOn) as $i => $l) {
+                $phpdocLines[] = ($i > 0 ? str_repeat(' ', strlen($lineSuffix)) : '') . $l;
             }
         }
-
-        if (!empty($phpdocLines)) {
-            if ($this->hasSingleVarLine()) {
-                $content .= $indent . '/** ';
-                $content .= $phpdocLines[0];
-            } else {
-                $content .= $indent . '/**' . "\n";
-                foreach ($phpdocLines as $phpdocLine) {
-                    $content .= $indent . ' * ' . $phpdocLine . "\n";
-                }
-                $content .= $indent;
-            }
-
-            $content .= ' */' . "\n";
-        }
-
-        return $content;
     }
 
     /**
