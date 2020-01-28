@@ -110,7 +110,7 @@ abstract class AbstractHelper implements HelperInterface
      */
     public static function cleanStr(string $str): string
     {
-        return preg_replace('#[^a-z_0-9]#i', '_', $str);
+        return preg_replace('#[^a-z_0-9/]#i', '_', $str);
     }
 
     /**

@@ -144,22 +144,28 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         array $currentConfig
     ): ?string
     {
-        $type = null;
-        if (isset($currentConfig['type']) && in_array($currentConfig['type'], ['object', 'array'])) {
-            $subDefinitionName = $currentDefinitionName . '/' . ucfirst($currentProperty);
-            $subConfig = [];
-            if (isset($currentConfig['properties'])) {
-                $subConfig = $currentConfig;
-            } elseif (isset($currentConfig['items'], $currentConfig['items']['properties'])) {
-                $subConfig = $currentConfig['items'];
-            }
-            if (!empty($subConfig)) {
-                $this->generateClass($subDefinitionName);
-                [$subNamespace, $subClassName] = $this->getClassNameAndNamespaceFromDefinitionName($subDefinitionName);
-                $type = '\\' . $subNamespace . '\\' . $subClassName;
-                $type .= $currentConfig['type'] === 'array' ? '[]' : '';
-            }
+        if (!isset($currentConfig['type'])) {
+            return null;
         }
+
+        $subConfig = null;
+        if ($currentConfig['type'] === 'object') {
+            $subConfig = $currentConfig;
+        }
+        if ($currentConfig['type'] === 'array') {
+            $subConfig = $currentConfig['items'];
+        }
+
+        if (null === $subConfig) {
+            return null;
+        }
+
+        $subDefinitionName = $currentDefinitionName . '/' . ucfirst($currentProperty);
+        $this->definitions[$subDefinitionName] = $subConfig;
+        $this->generateClass($subDefinitionName);
+        [$subNamespace, $subClassName] = $this->getClassNameAndNamespaceFromDefinitionName($subDefinitionName);
+        $type = '\\' . $subNamespace . '\\' . $subClassName;
+        $type .= $currentConfig['type'] === 'array' ? '[]' : '';
 
         return $type;
     }

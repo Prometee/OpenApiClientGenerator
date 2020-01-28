@@ -124,6 +124,9 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
 
         // Methods
         foreach ($operationConfigurations as $operation => $operationConfiguration) {
+            if (!is_array($operationConfiguration)) {
+                continue;
+            }
             $this->processOperation($classBuilder, $path, $operation, $operationConfiguration);
         }
 
