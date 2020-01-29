@@ -116,12 +116,28 @@ class MethodGenerator implements MethodGeneratorInterface
     public function buildMethodSignature(string $indent = null): string
     {
         $static = ($this->static) ? ' static ' : '';
-        $content = $indent . $this->scope . $static . ' function ' . $this->name . '(';
 
+        return sprintf('%s%s%s function %s (%s)%s',
+            $indent,
+            $this->scope,
+            $static,
+            $this->name,
+            $this->buildMethodParameters($indent),
+            $this->buildReturnType($indent)
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildMethodParameters(string $indent): string
+    {
         $parameters = [];
+
         foreach ($this->parameters as $methodParameterBuilder) {
             $parameters[] = $methodParameterBuilder->generate($indent);
         }
+
         $parametersStr = implode(',%1$s', $parameters);
 
         $parameterStart = '';
@@ -134,18 +150,30 @@ class MethodGenerator implements MethodGeneratorInterface
         }
 
 
-        $content .= $parameterStart;
+        $content = $parameterStart;
         $content .= sprintf(
             $parametersStr,
             $additionalIndentation
         );
         $content .= $parameterEnd;
 
-        $content .= ')';
-        if (!empty($this->returnTypes) && !in_array('mixed', $this->returnTypes)) {
-            $content .= ': ' . $this->getPhpReturnType();
-        }
         return $content;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildReturnType(string $indent): string
+    {
+        if (empty($this->returnTypes)) {
+            return '';
+        }
+
+        if (in_array('mixed', $this->returnTypes)) {
+            return '';
+        }
+
+        return sprintf (': %s', $this->getPhpReturnType());
     }
 
     /**
