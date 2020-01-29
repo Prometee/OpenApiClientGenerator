@@ -27,44 +27,37 @@ interface OperationsMethodGeneratorInterface extends MethodGeneratorInterface
     ): void;
 
     /**
+     * @param string $operation
      * @param string $path
      * @param array $operationParameters
+     * @param string|null $bodyParam
      * @param string|null $indent
      */
-    public function addGetOperationLines(string $path, array $operationParameters, string $indent = null): void;
+    public function addOperationTypeLines(string $operation, string $path, array $operationParameters, string $bodyParam = null, string $indent = null): void;
 
     /**
-     * @param string $path
+     * @param string $type
      * @param array $operationParameters
+     * @param string|null $lineBreak
      * @param string|null $indent
-     */
-    public function addPostOperationLines(string $path, array $operationParameters, string $indent = null): void;
-
-    /**
-     * @param string $path
-     * @param array $operationParameters
-     * @param string|null $indent
-     */
-    public function addPutOperationLines(string $path, array $operationParameters, string $indent = null): void;
-
-    /**
-     * @param string $path
-     * @param array $operationParameters
-     * @param string|null $indent
-     */
-    public function addDeleteOperationLines(string $path, array $operationParameters, string $indent = null): void;
-
-    /**
-     * @param array $operationParameters
      *
-     * @return array
+     * @return string
      */
-    public function buildPathAndQueryParams(array $operationParameters): array;
+    public function generateParamsType(string $type, array $operationParameters, string $lineBreak = null, string $indent = null): string;
+
+    /**
+     * @param string $type
+     * @param array $operationParameters
+     * @param string $format
+     *
+     * @return string[]
+     */
+    public function buildParamsType(string $type, array $operationParameters, string $format): array;
 
     /**
      * @param array $operationParameters
      *
      * @return string
      */
-    public function buildQueryParam(array $operationParameters): string;
+    public function buildBodyParam(array $operationParameters): string;
 }

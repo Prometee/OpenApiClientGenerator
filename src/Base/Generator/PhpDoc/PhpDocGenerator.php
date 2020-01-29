@@ -9,15 +9,15 @@ class PhpDocGenerator implements PhpDocGeneratorInterface
     /** @var array */
     protected $lines = [];
     /** @var int */
-    protected $wrapOn = 100;
+    protected $wrapOn = self::DEFAULT_WRAP_ON;
 
     /**
      * {@inheritDoc}
      */
-    public function configure(array $lines = [], int $wrapOn = 100)
+    public function configure(array $lines = [], ?int $wrapOn = null): void
     {
         $this->lines = $lines;
-        $this->wrapOn = $wrapOn;
+        $this->wrapOn = $wrapOn ?? self::DEFAULT_WRAP_ON;
     }
 
     /**

@@ -8,6 +8,7 @@ use Prometee\SwaggerClientGenerator\Base\Generator\GeneratorInterface;
 
 interface PhpDocGeneratorInterface extends GeneratorInterface
 {
+    public const DEFAULT_WRAP_ON = 110;
     public const TYPE_DESCRIPTION = 'description';
     public const TYPE_VAR = 'var';
     public const TYPE_RETURN = 'return';
@@ -24,11 +25,11 @@ interface PhpDocGeneratorInterface extends GeneratorInterface
 
     /**
      * @param array $lines
-     * @param int $wrapOn
+     * @param int|null $wrapOn
      *
      * @return mixed
      */
-    public function configure(array $lines = [], int $wrapOn = 100);
+    public function configure(array $lines = [], ?int $wrapOn = null): void;
 
     /**
      * @param string[] $types

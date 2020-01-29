@@ -56,131 +56,38 @@ class OperationsMethodGenerator extends MethodGenerator implements OperationsMet
      */
     public function addMethodBodyFromSwaggerConfiguration(string $path, string $operation, array $operationParameters, string $indent = null): void
     {
-        switch ($operation) {
-            case 'get':
-                $this->addGetOperationLines($path, $operationParameters, $indent);
+        $bodyParam = null;
 
-                break;
-            case 'post':
-                $this->addPostOperationLines($path, $operationParameters, $indent);
-
-                break;
-            case 'put':
-                $this->addPutOperationLines($path, $operationParameters, $indent);
-
-                break;
-            case 'delete':
-                $this->addDeleteOperationLines($path, $operationParameters, $indent);
-
-                break;
+        if (in_array($operation, ['post', 'put'])) {
+            $bodyParam = $this->buildBodyParam($operationParameters);
         }
+
+        $this->addOperationTypeLines($operation, $path, $operationParameters, $bodyParam, $indent);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function addGetOperationLines(string $path, array $operationParameters, string $indent = null): void
+    public function addOperationTypeLines(string $operation, string $path, array $operationParameters, string $bodyParam = null, string $indent = null): void
     {
-        [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
+        $pathParamsFormat = $this->generateParamsType('path', $operationParameters, '%1$s', '%2$s%2$s');
+        $queryParamsFormat = $this->generateParamsType('query', $operationParameters, '%1$s', '%2$s%2$s');
 
-        $format  = $this->returnTypes === ['void'] ? '' : 'return ';
-        $format .=
-            '$this->execGetOperation(' . "\n"
-                . '%1$s\'%2$s\',' . "\n"
-                . '%1$s%3$s,' . "\n"
-                . '%1$s[' . $pathParams . '],' . "\n"
-                . '%1$s[' . $queryParams . ']' . "\n"
-            . ');' . "\n"
+        $format =
+            '%3$s$this->exec%4$sOperation(%1$s'
+                . '%2$s\'%5$s\',%1$s'
+                . '%2$s%6$s,%1$s'
+                . (null === $bodyParam ? '' : '%2$s'.$bodyParam.',%1$s')
+                . '%2$s['.$pathParamsFormat.(empty($pathParamsFormat) ? '' : '%1$s%2$s').'],%1$s'
+                . '%2$s['.$queryParamsFormat.(empty($queryParamsFormat) ? '' : '%1$s%2$s').']%1$s'
+            . ');%1$s'
         ;
 
-        $this->addLine(sprintf(
-            $format,
+        $this->addLine(sprintf($format,
+            "\n",
             $indent,
-            $path,
-            $this->getMinifiedReturnType(),
-            $pathParams,
-            $queryParams
-        ));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addPostOperationLines(string $path, array $operationParameters, string $indent = null): void
-    {
-        [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
-
-        $format  = $this->returnTypes === ['void'] ? '' : 'return ';
-        $format .=
-            '$this->execPostOperation(' . "\n"
-            . '%1$s\'%2$s\',' . "\n"
-            . '%1$s%3$s,' . "\n"
-            . '%1$s%4$s,' . "\n"
-            . '%1$s[' . $pathParams . '],' . "\n"
-            . '%1$s[' . $queryParams . ']' . "\n"
-            . ');' . "\n"
-        ;
-
-        $bodyParam = $this->buildQueryParam($operationParameters);
-
-        $this->addLine(sprintf(
-            $format,
-            $indent,
-            $path,
-            $bodyParam,
-            $this->getMinifiedReturnType()
-        ));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addPutOperationLines(string $path, array $operationParameters, string $indent = null): void
-    {
-        [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
-
-        $format  = $this->returnTypes === ['void'] ? '' : 'return ';
-        $format .=
-            '$this->execPutOperation(' . "\n"
-            . '%1$s\'%2$s\',' . "\n"
-            . '%1$s%3$s,' . "\n"
-            . '%1$s%4$s,' . "\n"
-            . '%1$s[' . $pathParams . '],' . "\n"
-            . '%1$s[' . $queryParams . ']' . "\n"
-            . ');' . "\n"
-        ;
-
-        $bodyParam = $this->buildQueryParam($operationParameters);
-
-        $this->addLine(sprintf(
-            $format,
-            $indent,
-            $path,
-            $bodyParam,
-            $this->getMinifiedReturnType()
-        ));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addDeleteOperationLines(string $path, array $operationParameters, string $indent = null): void
-    {
-        [$pathParams, $queryParams] = $this->buildPathAndQueryParams($operationParameters);
-
-        $format  = $this->returnTypes === ['void'] ? '' : 'return ';
-        $format .=
-            '$this->execDeleteOperation(' . "\n"
-            . '%1$s\'%2$s\',' . "\n"
-            . '%1$s%3$s,' . "\n"
-            . '%1$s[' . $pathParams . '],' . "\n"
-            . '%1$s[' . $queryParams . ']' . "\n"
-            . ');' . "\n"
-        ;
-
-        $this->addLine(sprintf(
-            $format,
-            $indent,
+            $this->returnTypes === ['void'] ? '' : 'return ',
+            ucfirst($operation),
             $path,
             $this->getMinifiedReturnType()
         ));
@@ -189,57 +96,53 @@ class OperationsMethodGenerator extends MethodGenerator implements OperationsMet
     /**
      * {@inheritDoc}
      */
-    public function buildPathAndQueryParams(array $operationParameters): array
+    public function generateParamsType(string $type, array $operationParameters, string $lineBreak = null, string $indent = null): string
     {
-        $pathParams = '';
-        $queryParams = '';
+        $params = $this->buildParamsType($type, $operationParameters, '\'%1$s\' => $%1$s');
+        if (count($params) === 0) {
+            return '';
+        }
+
+        $glue = sprintf(',%s%2$s', $lineBreak, $indent);
+        return sprintf('%1$s%2$s%3$s',
+            $lineBreak,
+            $indent,
+            implode($glue, $params)
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildParamsType(string $type, array $operationParameters, string $format): array
+    {
+        $pathParams = [];
         foreach ($operationParameters as $operationParameter) {
             if (!isset($operationParameter['in'])) {
+                continue;
+            }
+            if ($type !== $operationParameter['in']) {
                 continue;
             }
             if (!isset($operationParameter['name'])) {
                 continue;
             }
             $parameterName = lcfirst(SwaggerOperationsHelper::cleanStr($operationParameter['name']));
-            switch ($operationParameter['in']) {
-                case 'query':
-                    $queryParams .= "\n" . '%1$s%1$s\'' . $parameterName . '\' => $' . $parameterName . ',';
-                    break;
-                case 'path':
-                    $pathParams .= "\n" . '%1$s%1$s\'' . $parameterName . '\' => $' . $parameterName . ',';
-                    break;
-            }
-        }
-        if (!empty($pathParams)) {
-            $pathParams .= "\n" . '%1$s';
-        }
-        if (!empty($queryParams)) {
-            $queryParams .= "\n" . '%1$s';
+            $param = sprintf($format, $parameterName);
+            $pathParams[] = $param;
         }
 
-        return [$pathParams, $queryParams];
+        return $pathParams;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function buildQueryParam(array $operationParameters): string
+    public function buildBodyParam(array $operationParameters): string
     {
-        $bodyParam = 'null';
-        foreach ($operationParameters as $operationParameter) {
-            if (!isset($operationParameter['in'])) {
-                continue;
-            }
-            if ($operationParameter['in'] !== 'body') {
-                continue;
-            }
-            if (!isset($operationParameter['name'])) {
-                continue;
-            }
-            $parameterName = lcfirst(SwaggerOperationsHelper::cleanStr($operationParameter['name']));
-            $bodyParam = '$' . $parameterName;
-        }
+        $bodyParams = $this->buildParamsType('body', $operationParameters, '$%s');
 
-        return $bodyParam;
+        // only one should exists
+        return implode('', $bodyParams);
     }
 }

@@ -44,18 +44,19 @@ interface MethodGeneratorInterface extends GeneratorInterface, PhpDocAwareGenera
     public function buildMethodSignature(string $indent = null): string;
 
     /**
-     * @param string $indent
+     * @param string|null $indent
+     * @param string $formatVar
      *
      * @return string
      */
-    public function buildMethodParameters(string $indent): string;
+    public function buildMethodParameters(string $indent = null, string $formatVar = ' '): string;
 
     /**
-     * @param string $indent
+     * @param string|null $indent
      *
      * @return string
      */
-    public function buildReturnType(string $indent): string;
+    public function buildReturnType(string $indent = null): string;
 
     /**
      * @return string

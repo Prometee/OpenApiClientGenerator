@@ -81,19 +81,15 @@ class MethodGenerator implements MethodGeneratorInterface
             return '';
         }
 
-        $content = "\n";
-
         $this->configurePhpDocBuilder();
-        $content .= $this->phpDocBuilder->generate($indent);
 
-        $content .= $this->buildMethodSignature($indent);
-        $content .= "\n";
-
-        $content .= $indent . '{' . "\n";
-        $content .= $this->buildMethodBody($indent);
-        $content .= $indent . '}' . "\n";
-
-        return $content;
+        return sprintf('%1$s%3$s%4$s%1$s%2$s{%1$s%5$s%2$s}%1$s',
+            "\n",
+            $indent,
+            $this->phpDocBuilder->generate($indent),
+            $this->buildMethodSignature($indent),
+            $this->buildMethodBody($indent)
+        );
     }
 
     /**
@@ -104,7 +100,7 @@ class MethodGenerator implements MethodGeneratorInterface
         $content = '';
         foreach ($this->lines as $line) {
             foreach (explode("\n", $line) as $innerLine) {
-                $content .= $indent . $indent . $innerLine . "\n";
+                $content .= $indent.$indent.$innerLine. "\n";
             }
         }
         return $content;
@@ -117,20 +113,43 @@ class MethodGenerator implements MethodGeneratorInterface
     {
         $static = ($this->static) ? ' static ' : '';
 
-        return sprintf('%s%s%s function %s (%s)%s',
+        // result example : "string $first,%1$sstring $second,%1$sstring $third"
+        $methodParameters = $this->buildMethodParameters($indent, '%1$s');
+        // 3 = length of $formatVar - 1 (see line just below)
+        // -1 because the first parameter don't have $formatVar
+        $methodParametersLength = strlen($methodParameters) - 3*(count($this->parameters)-1);
+        $parametersFutureFormat = '%s%s%s';
+        $content = sprintf('%s%s%s function %s (%s)%s',
             $indent,
             $this->scope,
             $static,
             $this->name,
-            $this->buildMethodParameters($indent),
+            $parametersFutureFormat,
             $this->buildReturnType($indent)
+        );
+
+        $parametersStart = '';
+        $additionalIndentation = ' ';
+        $parametersEnd = '';
+        $contentLength = strlen($content) - strlen($parametersFutureFormat) + $methodParametersLength;
+        if ($contentLength > $this->phpDocBuilder->getWrapOn()) {
+            // Make parameters go into multiline formation
+            $additionalIndentation = "\n".$indent.$indent;
+            $parametersStart = $additionalIndentation;
+            $parametersEnd = "\n".$indent;
+        }
+
+        return sprintf($content,
+            $parametersStart,
+            sprintf($methodParameters, $additionalIndentation),
+            $parametersEnd
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildMethodParameters(string $indent): string
+    public function buildMethodParameters(string $indent = null, string $formatVar = ' '): string
     {
         $parameters = [];
 
@@ -138,32 +157,13 @@ class MethodGenerator implements MethodGeneratorInterface
             $parameters[] = $methodParameterBuilder->generate($indent);
         }
 
-        $parametersStr = implode(',%1$s', $parameters);
-
-        $parameterStart = '';
-        $additionalIndentation = ' ';
-        $parameterEnd = '';
-        if (strlen($parametersStr) > $this->phpDocBuilder->getWrapOn()*0.75) {
-            $additionalIndentation = "\n" . $indent . $indent;
-            $parameterStart = $additionalIndentation;
-            $parameterEnd = "\n" . $indent;
-        }
-
-
-        $content = $parameterStart;
-        $content .= sprintf(
-            $parametersStr,
-            $additionalIndentation
-        );
-        $content .= $parameterEnd;
-
-        return $content;
+        return implode(sprintf(',%s', $formatVar), $parameters);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildReturnType(string $indent): string
+    public function buildReturnType(string $indent = null): string
     {
         if (empty($this->returnTypes)) {
             return '';
