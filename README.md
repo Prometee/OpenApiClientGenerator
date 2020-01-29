@@ -25,7 +25,7 @@ use Prometee\SwaggerClientGenerator\Swagger\Builder\SwaggerGeneratorBuilder;
 use Prometee\SwaggerClientGenerator\Swagger\SwaggerGeneratorInterface;
 
 $baseUri = 'https://github.com/OAI/OpenAPI-Specification/raw/master/examples/v2.0/json/petstore-expanded.json';
-$folder = __DIR__ . '/../etc/build';
+$folder = __DIR__ . '/build';
 $namespace = 'Tests\\Prometee\\SwaggerClientGenerator\\Build';
 $indent = '    ';
 $overwrite = true;
