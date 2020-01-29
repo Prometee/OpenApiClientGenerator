@@ -43,19 +43,35 @@ interface PhpDocGeneratorInterface extends GeneratorInterface
     public function buildLines(): array;
 
     /**
-     * @param $type
+     * @param string $type
      * @param string[] $lines
-     * @param string[] $phpdocLines
-     */
-    public function buildTypedLines(string $type, array $lines, array &$phpdocLines): void;
-
-    /**
-     * @param string $line
-     * @param int $wrapOn
      *
      * @return string[]
      */
-    public static function wrapLines(string $line, int $wrapOn = 110): array;
+    public function buildTypedLines(string $type, array $lines): array;
+
+    /**
+     * @param string $type
+     *
+     * @return string
+     */
+    public function buildTypedLinePrefix(string $type): string;
+
+    /**
+     * @param string $linePrefix
+     * @param string $line
+     *
+     * @return string[]
+     */
+    public function buildLinesFromSingleLine(string $linePrefix, string $line): array;
+
+    /**
+     * @param string $line
+     * @param int|null $wrapOn
+     *
+     * @return string[]
+     */
+    public function wrapLines(string $line, ?int $wrapOn = null): array;
 
     /**
      * @return bool
