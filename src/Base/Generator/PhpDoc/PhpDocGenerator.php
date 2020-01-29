@@ -61,8 +61,9 @@ class PhpDocGenerator implements PhpDocGeneratorInterface
      */
     public function addParamLine(string $name, string $type = '', string $description = ''): void
     {
+        $line = sprintf('%s %s %s', $type, $name, $description);
         $this->addLine(
-            (empty($type) ? '' : $type . ' ') . $name . (empty($description) ? '' : ' ' . $description),
+            trim($line),
             static::TYPE_PARAM
         );
     }

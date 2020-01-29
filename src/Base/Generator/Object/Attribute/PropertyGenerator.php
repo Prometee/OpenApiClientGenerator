@@ -69,9 +69,9 @@ class PropertyGenerator implements PropertyGeneratorInterface
         $this->configurePhpDocBuilder();
         $content .= $this->phpDocBuilder->generate($indent);
 
-        $content .= $indent . $this->scope . ' ';
+        $content .= $indent.$this->scope.' ';
         $content .= $this->getPhpName();
-        $content .= ($this->value !== null) ? ' = ' . $this->value : '';
+        $content .= ($this->value !== null) ? ' = '.$this->value : '';
         $content .= ';';
 
         $content .= "\n";
@@ -96,7 +96,7 @@ class PropertyGenerator implements PropertyGeneratorInterface
      */
     public function getPhpName(): string
     {
-        return '$' . $this->name;
+        return sprintf('$%s', $this->name);
     }
 
     /**

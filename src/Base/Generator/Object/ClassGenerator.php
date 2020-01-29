@@ -83,9 +83,9 @@ class ClassGenerator implements ClassGeneratorInterface
 
         $content .= '<?php' . "\n";
         $content .= "\n";
-        $content .= 'declare(strict_types=1);' . "\n";
+        $content .= 'declare(strict_types=1);'."\n";
         $content .= "\n";
-        $content .= 'namespace ' . $this->namespace . ';' . "\n";
+        $content .= 'namespace '.$this->namespace.';'."\n";
         $content .= "\n";
         $content .= $this->usesBuilder->generate($indent);
         $content .= $this->buildClassSignature() . "\n";
@@ -95,7 +95,7 @@ class ClassGenerator implements ClassGeneratorInterface
         }
         $content .= $this->propertiesBuilder->generate($indent);
         $content .= $this->methodsBuilder->generate($indent);
-        $content .= '}' . "\n";
+        $content .= '}'."\n";
 
         return $content;
     }
@@ -105,10 +105,10 @@ class ClassGenerator implements ClassGeneratorInterface
      */
     public function buildClassSignature(): string
     {
-        $extends = ($this->extendClassName !== null) ? ' extends ' . $this->extendClassName : '';
-        $implements = (!empty($this->implements)) ? ' implements ' . implode(', ', $this->implements) : '';
+        $extends = ($this->extendClassName !== null) ? ' extends '.$this->extendClassName : '';
+        $implements = (!empty($this->implements)) ? ' implements '.implode(', ', $this->implements) : '';
 
-        return $this->builderType . ' ' . $this->className . $extends . $implements;
+        return $this->builderType.' '.$this->className.$extends.$implements;
     }
 
     /**
