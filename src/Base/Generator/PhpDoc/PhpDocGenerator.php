@@ -70,7 +70,7 @@ class PhpDocGenerator implements PhpDocGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function addReturnLine(?string $line): void
+    public function addReturnLine(string $line): void
     {
         $this->addLine($line, static::TYPE_RETURN);
     }
@@ -78,7 +78,7 @@ class PhpDocGenerator implements PhpDocGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function addThrowsLine(?string $line): void
+    public function addThrowsLine(string $line): void
     {
         $this->addLine($line, static::TYPE_THROWS);
     }

@@ -79,14 +79,14 @@ interface PhpDocGeneratorInterface extends GeneratorInterface
     public function hasSingleVarLine(): bool;
 
     /**
-     * @param string|null $line
+     * @param string $line
      */
-    public function addReturnLine(?string $line): void;
+    public function addReturnLine(string $line): void;
 
     /**
-     * @param string|null $line
+     * @param string $line
      */
-    public function addThrowsLine(?string $line): void;
+    public function addThrowsLine(string $line): void;
 
     /**
      * @return int
