@@ -26,7 +26,7 @@ class MethodGenerator implements MethodGeneratorInterface
     protected $static = false;
     /** @var string */
     protected $description = '';
-    /** @var MethodParameterGenerator[] */
+    /** @var MethodParameterGeneratorInterface[] */
     protected $parameters = [];
     /** @var string[] */
     protected $lines = [];
@@ -240,7 +240,7 @@ class MethodGenerator implements MethodGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function addParameter(MethodParameterGenerator $methodParameterBuilder): void
+    public function addParameter(MethodParameterGeneratorInterface $methodParameterBuilder): void
     {
         if (!$this->hasParameter($methodParameterBuilder)) {
             $this->setParameter($methodParameterBuilder);
@@ -250,7 +250,7 @@ class MethodGenerator implements MethodGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function hasParameter(MethodParameterGenerator $methodParameterBuilder): bool
+    public function hasParameter(MethodParameterGeneratorInterface $methodParameterBuilder): bool
     {
         return isset($this->parameters[$methodParameterBuilder->getName()]);
     }
@@ -258,7 +258,7 @@ class MethodGenerator implements MethodGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function setParameter(MethodParameterGenerator $methodParameterBuilder): void
+    public function setParameter(MethodParameterGeneratorInterface $methodParameterBuilder): void
     {
         $this->parameters[$methodParameterBuilder->getName()] = $methodParameterBuilder;
     }

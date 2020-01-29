@@ -64,7 +64,7 @@ interface MethodGeneratorInterface extends GeneratorInterface, PhpDocAwareGenera
     public function isStatic(): bool;
 
     /**
-     * @param array $parameters
+     * @param MethodParameterGeneratorInterface[] $parameters
      */
     public function setParameters(array $parameters): void;
 
@@ -76,7 +76,7 @@ interface MethodGeneratorInterface extends GeneratorInterface, PhpDocAwareGenera
     /**
      * {@inheritdoc}
      */
-    public function hasParameter(MethodParameterGenerator $methodParameterBuilder): bool;
+    public function hasParameter(MethodParameterGeneratorInterface $methodParameterBuilder): bool;
 
     /**
      * @param bool $static
@@ -84,7 +84,7 @@ interface MethodGeneratorInterface extends GeneratorInterface, PhpDocAwareGenera
     public function setStatic(bool $static): void;
 
     /**
-     * @return array
+     * @return MethodParameterGeneratorInterface[]
      */
     public function getParameters(): array;
 
@@ -123,14 +123,14 @@ interface MethodGeneratorInterface extends GeneratorInterface, PhpDocAwareGenera
     /**
      * {@inheritdoc}
      */
-    public function setParameter(MethodParameterGenerator $methodParameterBuilder): void;
+    public function setParameter(MethodParameterGeneratorInterface $methodParameterBuilder): void;
 
     public function configurePhpDocBuilder(): void;
 
     /**
      * {@inheritdoc}
      */
-    public function addParameter(MethodParameterGenerator $methodParameterBuilder): void;
+    public function addParameter(MethodParameterGeneratorInterface $methodParameterBuilder): void;
 
     /**
      * @param string $description
