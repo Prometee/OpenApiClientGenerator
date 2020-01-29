@@ -290,10 +290,8 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         if (isset($parameterConfiguration['required'])) {
             if ((bool) $parameterConfiguration['required']) {
                 $value = null;
-                $description .= ' (required)';
             } else {
                 $value = $value ?? 'null';
-                $description .= ' (optional)';
             }
         }
 
