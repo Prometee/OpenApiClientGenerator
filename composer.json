@@ -1,6 +1,6 @@
 {
-    "name": "prometee/swagger-client-builder",
-    "description": "Swagger PHP7 client builder",
+    "name": "prometee/swagger-client-generator",
+    "description": "Swagger PHP7 client generator",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -18,10 +18,10 @@
         "phpunit/phpunit": "^6.5"
     },
     "autoload": {
-        "psr-4": { "Prometee\\SwaggerClientBuilder\\": "src/" }
+        "psr-4": { "Prometee\\SwaggerClientGenerator\\": "src/" }
     },
     "autoload-dev": {
-        "psr-4": { "Tests\\Prometee\\SwaggerClientBuilder\\": "tests/" }
+        "psr-4": { "Tests\\Prometee\\SwaggerClientGenerator\\": "tests/" }
     },
     "extra": {
         "branch-alias": {

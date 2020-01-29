@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger;
+namespace Prometee\SwaggerClientGenerator\Swagger;
 
-use Prometee\SwaggerClientBuilder\GeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\GeneratorInterface;
 
 interface SwaggerGeneratorInterface extends GeneratorInterface
 {
@@ -34,7 +34,7 @@ interface SwaggerGeneratorInterface extends GeneratorInterface
     /**
      * @return bool
      */
-    public function generate(): bool;
+    public function generateClasses(): bool;
 
     /**
      * @param array $definitions

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger;
+namespace Prometee\SwaggerClientGenerator\Swagger;
 
 use Exception;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\ClassFactoryInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodParameterBuilderInterface;
-use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelperInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\OperationsMethodFactoryInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Factory\ClassFactoryInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodParameterGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerOperationsHelperInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\OperationsMethodFactoryInterface;
 
 class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
 {
@@ -32,7 +32,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     protected $indent = '    ';
     /** @var array */
     protected $paths = [];
-    /** @var ClassBuilder[] */
+    /** @var ClassGenerator[] */
     protected $classBuilders = [];
     /** @var string[] */
     protected $throwsClasses = [];
@@ -108,7 +108,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
      *
      * @throws Exception
      */
-    public function generateClass(string $path, array $operationConfigurations)
+    public function generateClass(string $path, array $operationConfigurations): ClassGeneratorInterface
     {
         $filePath = $this->getFilePathFromPath(
             $path,
@@ -136,7 +136,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             mkdir($directory, 0777, true);
         }
 
-        if (false === file_put_contents($filePath, $classBuilder->build($this->indent))) {
+        if (false === file_put_contents($filePath, $classBuilder->generate($this->indent))) {
             throw new Exception(sprintf('Unable to generate the class : "%s" !', $filePath));
         }
 
@@ -146,7 +146,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    protected function getOrCreateClassBuilder(string $path, string $filePath): ClassBuilderInterface
+    protected function getOrCreateClassBuilder(string $path, string $filePath): ClassGeneratorInterface
     {
         [$namespace, $className] = $this->getClassNameAndNamespaceFromPath(
             $path,
@@ -184,7 +184,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
      * {@inheritDoc}
      */
     public function processOperation(
-        ClassBuilderInterface $classBuilder,
+        ClassGeneratorInterface $classBuilder,
         string $path,
         string $operation,
         array $operationConfiguration
@@ -246,7 +246,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function processOperationParameters(ClassBuilderInterface $classBuilder, MethodBuilderInterface $methodBuilder, array $operationParameters): void
+    public function processOperationParameters(ClassGeneratorInterface $classBuilder, MethodGeneratorInterface $methodBuilder, array $operationParameters): void
     {
         foreach ($operationParameters as $parameterConfiguration) {
             $methodParameterBuilder = $this->createAnOperationParameter($classBuilder, $parameterConfiguration);
@@ -260,7 +260,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function createAnOperationParameter(ClassBuilderInterface $classBuilder, array $parameterConfiguration): ?MethodParameterBuilderInterface
+    public function createAnOperationParameter(ClassGeneratorInterface $classBuilder, array $parameterConfiguration): ?MethodParameterGeneratorInterface
     {
         if (!isset($parameterConfiguration['name'])) {
             return null;

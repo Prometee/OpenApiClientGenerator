@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger;
+namespace Prometee\SwaggerClientGenerator\Swagger;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodParameterBuilderInterface;
-use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelperInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodParameterGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerOperationsHelperInterface;
 
 interface SwaggerOperationsGeneratorInterface
 {
@@ -68,12 +68,12 @@ interface SwaggerOperationsGeneratorInterface
     public function getHelper(): SwaggerOperationsHelperInterface;
 
     /**
-     * @param ClassBuilderInterface $classBuilder
+     * @param ClassGeneratorInterface $classBuilder
      * @param string $path
      * @param string $operation
      * @param array $operationConfiguration
      */
-    public function processOperation(ClassBuilderInterface $classBuilder, string $path, string $operation, array $operationConfiguration): void;
+    public function processOperation(ClassGeneratorInterface $classBuilder, string $path, string $operation, array $operationConfiguration): void;
 
     /**
      * @return string|null
@@ -84,9 +84,9 @@ interface SwaggerOperationsGeneratorInterface
      * @param string $path
      * @param array $operationConfigurations
      *
-     * @return bool|int
+     * @return ClassGeneratorInterface
      */
-    public function generateClass(string $path, array $operationConfigurations);
+    public function generateClass(string $path, array $operationConfigurations): ClassGeneratorInterface;
 
     /**
      * @return array
@@ -106,19 +106,19 @@ interface SwaggerOperationsGeneratorInterface
     public function setThrowsClasses(array $throwsClasses): void;
 
     /**
-     * @param ClassBuilderInterface $classBuilder
-     * @param MethodBuilderInterface $methodBuilder
+     * @param ClassGeneratorInterface $classBuilder
+     * @param MethodGeneratorInterface $methodBuilder
      * @param array $operationParameters
      */
-    public function processOperationParameters(ClassBuilderInterface $classBuilder, MethodBuilderInterface $methodBuilder, array $operationParameters): void;
+    public function processOperationParameters(ClassGeneratorInterface $classBuilder, MethodGeneratorInterface $methodBuilder, array $operationParameters): void;
 
     /**
-     * @param ClassBuilderInterface $classBuilder
+     * @param ClassGeneratorInterface $classBuilder
      * @param array $parameterConfiguration
      *
-     * @return MethodParameterBuilderInterface|null
+     * @return MethodParameterGeneratorInterface|null
      */
-    public function createAnOperationParameter(ClassBuilderInterface $classBuilder, array $parameterConfiguration): ?MethodParameterBuilderInterface;
+    public function createAnOperationParameter(ClassGeneratorInterface $classBuilder, array $parameterConfiguration): ?MethodParameterGeneratorInterface;
 
     /**
      * @return bool

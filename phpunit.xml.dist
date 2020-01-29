@@ -8,7 +8,7 @@
 >
 
     <testsuites>
-        <testsuite name="Swagger PHP7 client builder">
+        <testsuite name="Swagger PHP7 client generator">
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>

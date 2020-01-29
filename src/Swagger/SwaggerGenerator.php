@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger;
+namespace Prometee\SwaggerClientGenerator\Swagger;
 
 class SwaggerGenerator implements SwaggerGeneratorInterface
 {
@@ -72,7 +72,7 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function generate(): bool
+    public function generateClasses(): bool
     {
         $content = file_get_contents($this->swaggerUri);
         if ($content === false) {
@@ -91,6 +91,14 @@ class SwaggerGenerator implements SwaggerGeneratorInterface
         $this->processPaths($json);
 
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function generate(string $indent = null): ?string
+    {
+        return null;
     }
 
     /**

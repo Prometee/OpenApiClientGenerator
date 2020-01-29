@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger\Helper;
+namespace Prometee\SwaggerClientGenerator\Swagger\Helper;
 
 use Exception;
 
@@ -10,6 +10,8 @@ abstract class AbstractHelper implements HelperInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @throws Exception
      */
     public static function getPhpTypeFromSwaggerConfiguration(array $config): ?string
     {

@@ -2,39 +2,39 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger\Builder;
+namespace Prometee\SwaggerClientGenerator\Swagger\Builder;
 
-use Prometee\SwaggerClientBuilder\Builder\GeneratorBuilder;
-use Prometee\SwaggerClientBuilder\GeneratorInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\PhpDocFactoryInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\ArrayGetterSetterBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\ConstructorBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\GetterSetterBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\IsserSetterBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\MethodParameterBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\PropertyMethodsBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\MethodsBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\TraitsBuilder;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\UsesBuilder;
-use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerModelHelper;
-use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerOperationsHelper;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelClassFactory;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelClassFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelMethodFactory;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelMethodFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\OperationsMethodFactory;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\OperationsMethodFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Attribute\ModelPropertyBuilder;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Method\ModelConstructorBuilder;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Other\ModelPropertiesBuilder;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Operation\OperationsMethodBuilder;
-use Prometee\SwaggerClientBuilder\Swagger\SwaggerGenerator;
-use Prometee\SwaggerClientBuilder\Swagger\SwaggerModelGenerator;
-use Prometee\SwaggerClientBuilder\Swagger\SwaggerModelGeneratorInterface;
-use Prometee\SwaggerClientBuilder\Swagger\SwaggerOperationsGenerator;
-use Prometee\SwaggerClientBuilder\Swagger\SwaggerOperationsGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Builder\GeneratorBuilder;
+use Prometee\SwaggerClientGenerator\Base\Generator\Factory\PhpDocFactoryInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\GeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\ArrayGetterSetterGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\ConstructorGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\GetterSetterGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\IsserSetterGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodParameterGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\PropertyMethodsGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\MethodsGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\TraitsGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\UsesGenerator;
+use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerModelHelper;
+use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerOperationsHelper;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelClassFactory;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelClassFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelMethodFactory;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelMethodFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\OperationsMethodFactory;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\OperationsMethodFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Attribute\ModelPropertyGenerator;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Method\ModelConstructorGenerator;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Other\ModelPropertiesGenerator;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Operation\OperationsMethodGenerator;
+use Prometee\SwaggerClientGenerator\Swagger\SwaggerGenerator;
+use Prometee\SwaggerClientGenerator\Swagger\SwaggerModelGenerator;
+use Prometee\SwaggerClientGenerator\Swagger\SwaggerModelGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\SwaggerOperationsGenerator;
+use Prometee\SwaggerClientGenerator\Swagger\SwaggerOperationsGeneratorInterface;
 
 class SwaggerGeneratorBuilder extends GeneratorBuilder implements SwaggerGeneratorBuilderInterface
 {
@@ -77,12 +77,12 @@ class SwaggerGeneratorBuilder extends GeneratorBuilder implements SwaggerGenerat
     {
         return new ModelClassFactory(
             $phpDocFactory,
-            ClassBuilder::class,
-            UsesBuilder::class,
-            TraitsBuilder::class,
-            ModelPropertiesBuilder::class,
-            MethodsBuilder::class,
-            ModelPropertyBuilder::class
+            ClassGenerator::class,
+            UsesGenerator::class,
+            TraitsGenerator::class,
+            ModelPropertiesGenerator::class,
+            MethodsGenerator::class,
+            ModelPropertyGenerator::class
         );
     }
 
@@ -93,13 +93,13 @@ class SwaggerGeneratorBuilder extends GeneratorBuilder implements SwaggerGenerat
     {
         return new ModelMethodFactory(
             $phpDocFactory,
-            MethodBuilder::class,
-            ModelConstructorBuilder::class,
-            MethodParameterBuilder::class,
-            GetterSetterBuilder::class,
-            IsserSetterBuilder::class,
-            ArrayGetterSetterBuilder::class,
-            PropertyMethodsBuilder::class
+            MethodGenerator::class,
+            ModelConstructorGenerator::class,
+            MethodParameterGenerator::class,
+            GetterSetterGenerator::class,
+            IsserSetterGenerator::class,
+            ArrayGetterSetterGenerator::class,
+            PropertyMethodsGenerator::class
         );
     }
 
@@ -110,13 +110,13 @@ class SwaggerGeneratorBuilder extends GeneratorBuilder implements SwaggerGenerat
     {
         return new OperationsMethodFactory(
             $phpDocFactory,
-            OperationsMethodBuilder::class,
-            ConstructorBuilder::class,
-            MethodParameterBuilder::class,
-            GetterSetterBuilder::class,
-            IsserSetterBuilder::class,
-            ArrayGetterSetterBuilder::class,
-            PropertyMethodsBuilder::class
+            OperationsMethodGenerator::class,
+            ConstructorGenerator::class,
+            MethodParameterGenerator::class,
+            GetterSetterGenerator::class,
+            IsserSetterGenerator::class,
+            ArrayGetterSetterGenerator::class,
+            PropertyMethodsGenerator::class
         );
     }
 

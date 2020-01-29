@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger;
+namespace Prometee\SwaggerClientGenerator\Swagger;
 
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\MethodsBuilderInterface;
-use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerModelHelperInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Method\ModelConstructorBuilderInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Other\ModelPropertiesBuilderInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\MethodsGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerModelHelperInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Method\ModelConstructorGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Other\ModelPropertiesGeneratorInterface;
 
 interface SwaggerModelGeneratorInterface
 {
@@ -88,8 +88,8 @@ interface SwaggerModelGeneratorInterface
     ): array;
 
     /**
-     * @param ModelPropertiesBuilderInterface $modelPropertiesBuilder
-     * @param MethodsBuilderInterface $methodsBuilder
+     * @param ModelPropertiesGeneratorInterface $modelPropertiesBuilder
+     * @param MethodsGeneratorInterface $methodsBuilder
      * @param string $definitionName
      * @param string $propertyName
      * @param array $configuration
@@ -97,8 +97,8 @@ interface SwaggerModelGeneratorInterface
      * @param bool $inherited
      */
     public function processProperty(
-        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
-        MethodsBuilderInterface $methodsBuilder,
+        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
+        MethodsGeneratorInterface $methodsBuilder,
         string $definitionName,
         string $propertyName,
         array $configuration,
@@ -109,9 +109,9 @@ interface SwaggerModelGeneratorInterface
     /**
      * @param string $definitionName
      *
-     * @return null|ClassBuilderInterface
+     * @return null|ClassGeneratorInterface
      */
-    public function generateClass(string $definitionName): ?ClassBuilderInterface;
+    public function generateClass(string $definitionName): ?ClassGeneratorInterface;
 
     /**
      * @param string $definitionName
@@ -121,35 +121,35 @@ interface SwaggerModelGeneratorInterface
     public function hasDefinition(string $definitionName): bool;
 
     /**
-     * @param MethodsBuilderInterface $methodsBuilder
-     * @param ModelPropertiesBuilderInterface $modelPropertiesBuilder
-     * @param ModelConstructorBuilderInterface $constructorBuilder
+     * @param MethodsGeneratorInterface $methodsBuilder
+     * @param ModelPropertiesGeneratorInterface $modelPropertiesBuilder
+     * @param ModelConstructorGeneratorInterface $constructorBuilder
      */
     public function configureConstructorBuilder(
-        MethodsBuilderInterface $methodsBuilder,
-        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
-        ModelConstructorBuilderInterface $constructorBuilder
+        MethodsGeneratorInterface $methodsBuilder,
+        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
+        ModelConstructorGeneratorInterface $constructorBuilder
     ): void;
 
     /**
-     * @param ClassBuilderInterface $classBuilder
+     * @param ClassGeneratorInterface $classBuilder
      * @param string $definitionName
      *
-     * @return ClassBuilderInterface|null
+     * @return ClassGeneratorInterface|null
      */
     public function configureClassBuilder(
-        ClassBuilderInterface $classBuilder,
+        ClassGeneratorInterface $classBuilder,
         string $definitionName
-    ): ?ClassBuilderInterface;
+    ): ?ClassGeneratorInterface;
 
     /**
-     * @param ClassBuilderInterface $classBuilder
-     * @param ModelPropertiesBuilderInterface $modelPropertiesBuilder
+     * @param ClassGeneratorInterface $classBuilder
+     * @param ModelPropertiesGeneratorInterface $modelPropertiesBuilder
      * @param string $definitionName
      */
     public function configurePropertiesBuilder(
-        ClassBuilderInterface $classBuilder,
-        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
+        ClassGeneratorInterface $classBuilder,
+        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
         string $definitionName
     ): void;
 

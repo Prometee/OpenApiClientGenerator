@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger\Helper;
+namespace Prometee\SwaggerClientGenerator\Swagger\Helper;
 
 class SwaggerOperationsHelper extends AbstractHelper implements SwaggerOperationsHelperInterface
 {

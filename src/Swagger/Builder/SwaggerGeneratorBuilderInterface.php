@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger\Builder;
+namespace Prometee\SwaggerClientGenerator\Swagger\Builder;
 
-use Prometee\SwaggerClientBuilder\Builder\GeneratorBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Factory\PhpDocFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelClassFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelMethodFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\OperationsMethodFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\SwaggerModelGeneratorInterface;
-use Prometee\SwaggerClientBuilder\Swagger\SwaggerOperationsGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Builder\GeneratorBuilderInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Factory\PhpDocFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelClassFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelMethodFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\OperationsMethodFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\SwaggerModelGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\SwaggerOperationsGeneratorInterface;
 
 interface SwaggerGeneratorBuilderInterface extends GeneratorBuilderInterface
 {

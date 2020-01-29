@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Prometee\SwaggerClientBuilder\Swagger;
+namespace Prometee\SwaggerClientGenerator\Swagger;
 
 use Exception;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\ClassBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Method\ConstructorBuilderInterface;
-use Prometee\SwaggerClientBuilder\PhpBuilder\Object\Other\MethodsBuilderInterface;
-use Prometee\SwaggerClientBuilder\Swagger\Helper\SwaggerModelHelperInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelClassFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Factory\ModelMethodFactoryInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Attribute\ModelPropertyBuilderInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Method\ModelConstructorBuilderInterface;
-use Prometee\SwaggerClientBuilder\Swagger\PhpBuilder\Model\Other\ModelPropertiesBuilderInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\MethodsGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerModelHelperInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelClassFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelMethodFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Attribute\ModelPropertyGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Method\ModelConstructorGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Other\ModelPropertiesGeneratorInterface;
 
 class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
 {
@@ -89,7 +88,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
      *
      * @throws Exception
      */
-    public function generateClass(string $definitionName): ?ClassBuilderInterface
+    public function generateClass(string $definitionName): ?ClassGeneratorInterface
     {
         $filePath = $this->getFilePathFromDefinitionName($definitionName);
         if (!$this->overwrite && is_file($filePath)) {
@@ -104,7 +103,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         );
 
         // Properties
-        /** @var ModelPropertiesBuilderInterface $modelPropertiesBuilder */
+        /** @var ModelPropertiesGeneratorInterface $modelPropertiesBuilder */
         $modelPropertiesBuilder = $classBuilder->getPropertiesBuilder();
         $this->configurePropertiesBuilder(
             $classBuilder,
@@ -126,7 +125,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
             mkdir($directory, 0777, true);
         }
 
-        if (false === file_put_contents($filePath, $classBuilder->build($this->indent))) {
+        if (false === file_put_contents($filePath, $classBuilder->generate($this->indent))) {
             throw new Exception(sprintf('Unable to generate the class : "%s" !', $filePath));
         }
 
@@ -229,9 +228,9 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
      * @throws Exception
      */
     public function configureClassBuilder(
-        ClassBuilderInterface $classBuilder,
+        ClassGeneratorInterface $classBuilder,
         string $definitionName
-    ): ?ClassBuilderInterface
+    ): ?ClassGeneratorInterface
     {
         $subClassBuilder = null;
         $extendClass = null;
@@ -256,8 +255,8 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
      * @throws Exception
      */
     public function configurePropertiesBuilder(
-        ClassBuilderInterface $classBuilder,
-        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
+        ClassGeneratorInterface $classBuilder,
+        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
         string $definitionName
     ): void
     {
@@ -355,8 +354,8 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
      * @throws Exception
      */
     public function processProperty(
-        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
-        MethodsBuilderInterface $methodsBuilder,
+        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
+        MethodsGeneratorInterface $methodsBuilder,
         string $definitionName,
         string $propertyName,
         array $configuration,
@@ -372,7 +371,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         $cleanPropertyName = $this->helper::cleanStr($propertyName);
         $description = isset($configuration['description']) ? $configuration['description'] : null;
 
-        /** @var ModelPropertyBuilderInterface $propertyBuilder */
+        /** @var ModelPropertyGeneratorInterface $propertyBuilder */
         $propertyBuilder = $this->classFactory->createPropertyBuilder(
             $modelPropertiesBuilder->getUsesBuilder()
         );
@@ -405,9 +404,9 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
      * {@inheritDoc}
      */
     public function configureConstructorBuilder(
-        MethodsBuilderInterface $methodsBuilder,
-        ModelPropertiesBuilderInterface $modelPropertiesBuilder,
-        ModelConstructorBuilderInterface $constructorBuilder
+        MethodsGeneratorInterface $methodsBuilder,
+        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
+        ModelConstructorGeneratorInterface $constructorBuilder
     ): void
     {
         $constructorBuilder->configureFromPropertiesBuilder($modelPropertiesBuilder);
