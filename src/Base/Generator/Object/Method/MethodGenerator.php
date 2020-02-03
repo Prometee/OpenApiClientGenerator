@@ -189,15 +189,21 @@ class MethodGenerator implements MethodGeneratorInterface
             $this->phpDocBuilder->addDescriptionLine($this->getDescription());
         }
         foreach ($this->parameters as $parameter) {
-            $type = $this->phpDocBuilder::getPossibleTypesFromTypeNames([$parameter->getType(), $parameter->getValueType()]);
-            $this->phpDocBuilder->addParamLine($parameter->getPhpName(), $type, $parameter->getDescription());
+            $this->phpDocBuilder->addParamLine($parameter->getPhpName(), $parameter->getType(), $parameter->getDescription());
         }
         if (!empty($this->returnTypes) && !in_array('void', $this->returnTypes)) {
-            $type = $this->phpDocBuilder::getPossibleTypesFromTypeNames($this->returnTypes);
-            $this->phpDocBuilder->addReturnLine($type);
+            $this->phpDocBuilder->addReturnLine($this->getReturnType());
         }
 
         $this->hasAlreadyBeenGenerated = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getReturnType(): string
+    {
+        return implode('|', $this->returnTypes);
     }
 
     /**

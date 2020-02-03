@@ -84,9 +84,9 @@ interface SwaggerOperationsGeneratorInterface
      * @param string $path
      * @param array $operationConfigurations
      *
-     * @return ClassGeneratorInterface
+     * @return ClassGeneratorInterface|null
      */
-    public function generateClass(string $path, array $operationConfigurations): ClassGeneratorInterface;
+    public function generateClass(string $path, array $operationConfigurations): ?ClassGeneratorInterface;
 
     /**
      * @return array

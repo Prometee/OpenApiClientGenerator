@@ -108,7 +108,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
      *
      * @throws Exception
      */
-    public function generateClass(string $path, array $operationConfigurations): ClassGeneratorInterface
+    public function generateClass(string $path, array $operationConfigurations): ?ClassGeneratorInterface
     {
         $filePath = $this->getFilePathFromPath(
             $path,

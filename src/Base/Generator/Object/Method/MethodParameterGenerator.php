@@ -141,9 +141,9 @@ class MethodParameterGenerator implements MethodParameterGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getValueType()
+    public function getValueType(): ?string
     {
-        if ($this->value === null) {
+        if (null === $this->value) {
             return null;
         }
 
@@ -167,18 +167,14 @@ class MethodParameterGenerator implements MethodParameterGeneratorInterface
             return 'float';
         }
 
-        return $this->value;
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getType(): ?string
+    public function getType(): string
     {
-        if (empty($this->types)) {
-            return null;
-        }
-
         return implode('|', $this->types);
     }
 

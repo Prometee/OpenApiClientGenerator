@@ -32,13 +32,6 @@ interface PhpDocGeneratorInterface extends GeneratorInterface
     public function configure(array $lines = [], ?int $wrapOn = null): void;
 
     /**
-     * @param string[] $types
-     *
-     * @return string
-     */
-    public static function getPossibleTypesFromTypeNames(array $types = []): string;
-
-    /**
      * @return string[]
      */
     public function buildLines(): array;

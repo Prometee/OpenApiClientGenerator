@@ -50,6 +50,13 @@ interface SwaggerModelGeneratorInterface
     /**
      * @param array $config
      *
+     * @return array|null
+     */
+    public function getArrayEmbeddedObjectConfig(array $config): ?array;
+
+    /**
+     * @param array $config
+     *
      * @return string
      */
     public function getPhpTypeFromPropertyConfig(array $config): string;

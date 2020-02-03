@@ -76,8 +76,8 @@ class OperationsMethodGenerator extends MethodGenerator implements OperationsMet
         $format =
             '%3$s$this->exec%4$sOperation(%1$s'
                 . '%2$s\'%5$s\',%1$s'
-                . '%2$s%6$s,%1$s'
                 . (null === $bodyParam ? '' : '%2$s'.$bodyParam.',%1$s')
+                . '%2$s%6$s,%1$s'
                 . '%2$s['.$pathParamsFormat.(empty($pathParamsFormat) ? '' : '%1$s%2$s').'],%1$s'
                 . '%2$s['.$queryParamsFormat.(empty($queryParamsFormat) ? '' : '%1$s%2$s').']%1$s'
             . ');%1$s'
@@ -103,8 +103,8 @@ class OperationsMethodGenerator extends MethodGenerator implements OperationsMet
             return '';
         }
 
-        $glue = sprintf(',%s%2$s', $lineBreak, $indent);
-        return sprintf('%1$s%2$s%3$s',
+        $glue = sprintf(',%s%s', $lineBreak, $indent);
+        return sprintf('%s%s%s',
             $lineBreak,
             $indent,
             implode($glue, $params)
@@ -143,6 +143,12 @@ class OperationsMethodGenerator extends MethodGenerator implements OperationsMet
         $bodyParams = $this->buildParamsType('body', $operationParameters, '$%s');
 
         // only one should exists
-        return implode('', $bodyParams);
+        $bodyParam = implode('', $bodyParams);
+
+        if (empty($bodyParams)) {
+            return 'null';
+        }
+
+        return $bodyParam;
     }
 }

@@ -151,15 +151,16 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         if ($currentConfig['type'] === 'object') {
             $subConfig = $currentConfig;
         }
+
         if ($currentConfig['type'] === 'array') {
-            $subConfig = $currentConfig['items'];
+            $subConfig = $this->getArrayEmbeddedObjectConfig($currentConfig);
         }
 
         if (null === $subConfig) {
             return null;
         }
 
-        $subDefinitionName = $currentDefinitionName . '/' . ucfirst($currentProperty);
+        $subDefinitionName = sprintf('%s/%s', $currentDefinitionName, ucfirst($currentProperty));
         $this->definitions[$subDefinitionName] = $subConfig;
         $this->generateClass($subDefinitionName);
         [$subNamespace, $subClassName] = $this->getClassNameAndNamespaceFromDefinitionName($subDefinitionName);
@@ -167,6 +168,26 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         $type .= $currentConfig['type'] === 'array' ? '[]' : '';
 
         return $type;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getArrayEmbeddedObjectConfig(array $config): ?array
+    {
+        if (!isset($config['items'])) {
+            return null;
+        }
+
+        if (!isset($config['items']['type'])) {
+            return null;
+        }
+
+        if ('object' !== $config['items']['type']) {
+            return null;
+        }
+
+        return $config['items'];
     }
 
     /**
@@ -182,7 +203,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         $classParts = explode('/', $classPath);
         $className = array_pop($classParts);
         $namespace = implode('\\', $classParts);
-        $namespace = $this->namespace . ($namespace === '' ? '' : $namespace);
+        $namespace = $this->namespace . ($namespace === '' ? '' : '\\'.$namespace);
 
         return [
             $namespace,

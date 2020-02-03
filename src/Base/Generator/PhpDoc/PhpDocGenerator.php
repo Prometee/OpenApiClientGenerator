@@ -73,6 +73,10 @@ class PhpDocGenerator implements PhpDocGeneratorInterface
      */
     public function addReturnLine(string $line): void
     {
+        if (empty($line)) {
+            return;
+        }
+
         $this->addLine($line, static::TYPE_RETURN);
     }
 
@@ -223,31 +227,6 @@ class PhpDocGenerator implements PhpDocGeneratorInterface
         $lines[] = $currentLine;
 
         return $lines;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public static function getPossibleTypesFromTypeNames(array $types = []): string
-    {
-        if (empty($types)) {
-            return '';
-        }
-        $typesFound = [];
-
-        foreach ($types as $type) {
-            if ($type === null) {
-                continue;
-            }
-            if (preg_match('#^\?#', $type)) {
-                $typesFound[] = 'null';
-            }
-            $typesFound[] = ltrim($type, '?');
-        }
-
-        $typesFound = array_unique($typesFound);
-
-        return implode('|', $typesFound);
     }
 
     /**
