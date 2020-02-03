@@ -12,12 +12,12 @@ interface GetterSetterGeneratorInterface
     public const SETTER_PREFIX = 'set';
 
     /**
-     * @param PropertyGeneratorInterface $propertyBuilder
+     * @param PropertyGeneratorInterface $propertyGenerator
      * @param bool $readOnly
      * @param bool $writeOnly
      */
     public function configure(
-        PropertyGeneratorInterface $propertyBuilder,
+        PropertyGeneratorInterface $propertyGenerator,
         bool $readOnly = false,
         bool $writeOnly = false
     ): void;

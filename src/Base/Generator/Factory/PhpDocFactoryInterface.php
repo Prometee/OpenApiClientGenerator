@@ -10,19 +10,19 @@ use Prometee\SwaggerClientGenerator\Base\Generator\PhpDoc\PhpDocGeneratorInterfa
 interface PhpDocFactoryInterface
 {
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return PhpDocGeneratorInterface
      */
-    public function createPhpDocBuilder(UsesGeneratorInterface $usesBuilder): PhpDocGeneratorInterface;
+    public function createPhpDocGenerator(UsesGeneratorInterface $usesGenerator): PhpDocGeneratorInterface;
 
     /**
-     * @param string $phpDocBuilderClass
+     * @param string $phpDocGeneratorClass
      */
-    public function setPhpDocBuilderClass(string $phpDocBuilderClass): void;
+    public function setPhpDocGeneratorClass(string $phpDocGeneratorClass): void;
 
     /**
      * @return string
      */
-    public function getPhpDocBuilderClass(): string;
+    public function getPhpDocGeneratorClass(): string;
 }

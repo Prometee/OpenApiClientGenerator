@@ -10,7 +10,7 @@ use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Attribute\ModelPrope
 interface ModelPropertiesGeneratorInterface extends PropertiesGeneratorInterface
 {
     /**
-     * @param ModelPropertyGeneratorInterface $propertyBuilder
+     * @param ModelPropertyGeneratorInterface $propertyGenerator
      * @param string $propertyName
      * @param string[] $types
      * @param bool $required
@@ -18,7 +18,7 @@ interface ModelPropertiesGeneratorInterface extends PropertiesGeneratorInterface
      * @param string|null $description
      */
     public function addPropertyFromSwaggerPropertyDefinition(
-        ModelPropertyGeneratorInterface $propertyBuilder,
+        ModelPropertyGeneratorInterface $propertyGenerator,
         string $propertyName,
         array $types,
         bool $required = false,

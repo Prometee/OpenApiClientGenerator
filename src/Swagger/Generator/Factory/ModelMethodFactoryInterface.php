@@ -11,9 +11,9 @@ use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Method\ModelConstruc
 interface ModelMethodFactoryInterface extends BaseMethodFactoryInterface
 {
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return ModelConstructorGeneratorInterface
      */
-    public function createModelConstructorBuilder(UsesGeneratorInterface $usesBuilder): ModelConstructorGeneratorInterface;
+    public function createModelConstructorGenerator(UsesGeneratorInterface $usesGenerator): ModelConstructorGeneratorInterface;
 }

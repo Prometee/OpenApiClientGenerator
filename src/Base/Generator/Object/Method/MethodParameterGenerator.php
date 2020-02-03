@@ -9,7 +9,7 @@ use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\UsesGeneratorInt
 class MethodParameterGenerator implements MethodParameterGeneratorInterface
 {
     /** @var UsesGeneratorInterface */
-    protected $usesBuilder;
+    protected $usesGenerator;
 
     /** @var string[] */
     protected $types = [];
@@ -23,11 +23,11 @@ class MethodParameterGenerator implements MethodParameterGeneratorInterface
     protected $description = '';
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      */
-    public function __construct(UsesGeneratorInterface $usesBuilder)
+    public function __construct(UsesGeneratorInterface $usesGenerator)
     {
-        $this->usesBuilder = $usesBuilder;
+        $this->usesGenerator = $usesGenerator;
     }
 
     /**
@@ -95,7 +95,7 @@ class MethodParameterGenerator implements MethodParameterGeneratorInterface
      */
     public function addType(string $type): void
     {
-        $type = $this->usesBuilder->guessUseOrReturnType($type);
+        $type = $this->usesGenerator->guessUseOrReturnType($type);
         if (false === $this->hasType($type)) {
             $this->types[] = $type;
         }

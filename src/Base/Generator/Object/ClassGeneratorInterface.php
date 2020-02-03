@@ -28,37 +28,37 @@ interface ClassGeneratorInterface extends GeneratorInterface
     /**
      * @return TraitsGeneratorInterface
      */
-    public function getTraitsBuilder(): TraitsGeneratorInterface;
+    public function getTraitsGenerator(): TraitsGeneratorInterface;
 
     /**
-     * @param PropertiesGeneratorInterface $propertiesBuilder
+     * @param PropertiesGeneratorInterface $propertiesGenerator
      */
-    public function setPropertiesBuilder(PropertiesGeneratorInterface $propertiesBuilder): void;
+    public function setPropertiesGenerator(PropertiesGeneratorInterface $propertiesGenerator): void;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      */
-    public function setUsesBuilder(UsesGeneratorInterface $usesBuilder): void;
+    public function setUsesGenerator(UsesGeneratorInterface $usesGenerator): void;
 
     /**
-     * @param TraitsGeneratorInterface $traitsBuilder
+     * @param TraitsGeneratorInterface $traitsGenerator
      */
-    public function setTraitsBuilder(TraitsGeneratorInterface $traitsBuilder): void;
+    public function setTraitsGenerator(TraitsGeneratorInterface $traitsGenerator): void;
 
     /**
      * @return string
      */
-    public function getBuilderType(): string;
+    public function getGeneratorType(): string;
 
     /**
      * @return MethodsGeneratorInterface
      */
-    public function getMethodsBuilder(): MethodsGeneratorInterface;
+    public function getMethodsGenerator(): MethodsGeneratorInterface;
 
     /**
-     * @param MethodsGeneratorInterface $methodsBuilder
+     * @param MethodsGeneratorInterface $methodsGenerator
      */
-    public function setMethodsBuilder(MethodsGeneratorInterface $methodsBuilder): void;
+    public function setMethodsGenerator(MethodsGeneratorInterface $methodsGenerator): void;
 
     /**
      * @param string $namespace
@@ -83,7 +83,7 @@ interface ClassGeneratorInterface extends GeneratorInterface
     /**
      * @return UsesGeneratorInterface
      */
-    public function getUsesBuilder(): UsesGeneratorInterface;
+    public function getUsesGenerator(): UsesGeneratorInterface;
 
     /**
      * @return string
@@ -103,7 +103,7 @@ interface ClassGeneratorInterface extends GeneratorInterface
     /**
      * @return PropertiesGeneratorInterface
      */
-    public function getPropertiesBuilder(): PropertiesGeneratorInterface;
+    public function getPropertiesGenerator(): PropertiesGeneratorInterface;
 
     /**
      * @param string|null $extendClass

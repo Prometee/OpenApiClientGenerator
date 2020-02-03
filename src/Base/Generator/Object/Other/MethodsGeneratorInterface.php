@@ -10,20 +10,20 @@ use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGenerator
 interface MethodsGeneratorInterface extends GeneratorInterface
 {
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      * @param MethodGeneratorInterface[] $methods
      */
-    public function configure(UsesGeneratorInterface $usesBuilder, array $methods = []): void;
+    public function configure(UsesGeneratorInterface $usesGenerator, array $methods = []): void;
 
     /**
-     * @param MethodGeneratorInterface[] $methodBuilders
+     * @param MethodGeneratorInterface[] $methodGenerators
      */
-    public function addMultipleMethod(array $methodBuilders): void;
+    public function addMultipleMethod(array $methodGenerators): void;
 
     /**
-     * @param MethodGeneratorInterface $methodBuilder
+     * @param MethodGeneratorInterface $methodGenerator
      */
-    public function addMethod(MethodGeneratorInterface $methodBuilder): void;
+    public function addMethod(MethodGeneratorInterface $methodGenerator): void;
 
     /**
      * Order methods to prioritize the one starting with "__"
@@ -55,12 +55,12 @@ interface MethodsGeneratorInterface extends GeneratorInterface
     public function setMethods(array $methods): void;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      */
-    public function setUsesBuilder(UsesGeneratorInterface $usesBuilder): void;
+    public function setUsesGenerator(UsesGeneratorInterface $usesGenerator): void;
 
     /**
      * @return UsesGeneratorInterface
      */
-    public function getUsesBuilder(): UsesGeneratorInterface;
+    public function getUsesGenerator(): UsesGeneratorInterface;
 }

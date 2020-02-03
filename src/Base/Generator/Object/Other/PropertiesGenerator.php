@@ -10,16 +10,16 @@ class PropertiesGenerator implements PropertiesGeneratorInterface
 {
 
     /** @var UsesGeneratorInterface */
-    protected $usesBuilder;
+    protected $usesGenerator;
     /** @var PropertyGeneratorInterface[] */
     protected $properties = [];
 
     /**
      * {@inheritDoc}
      */
-    public function configure(UsesGeneratorInterface $usesBuilder, array $properties = []): void
+    public function configure(UsesGeneratorInterface $usesGenerator, array $properties = []): void
     {
-        $this->usesBuilder = $usesBuilder;
+        $this->usesGenerator = $usesGenerator;
         $this->properties = $properties;
     }
 
@@ -40,10 +40,10 @@ class PropertiesGenerator implements PropertiesGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function addProperty(PropertyGeneratorInterface $propertyBuilder)
+    public function addProperty(PropertyGeneratorInterface $propertyGenerator)
     {
-        if (!$this->hasProperty($propertyBuilder->getPhpName())) {
-            $this->properties[$propertyBuilder->getPhpName()] = $propertyBuilder;
+        if (!$this->hasProperty($propertyGenerator->getPhpName())) {
+            $this->properties[$propertyGenerator->getPhpName()] = $propertyGenerator;
         }
     }
 
@@ -88,16 +88,16 @@ class PropertiesGenerator implements PropertiesGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getUsesBuilder(): UsesGeneratorInterface
+    public function getUsesGenerator(): UsesGeneratorInterface
     {
-        return $this->usesBuilder;
+        return $this->usesGenerator;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setUsesBuilder(UsesGeneratorInterface $usesBuilder): void
+    public function setUsesGenerator(UsesGeneratorInterface $usesGenerator): void
     {
-        $this->usesBuilder = $usesBuilder;
+        $this->usesGenerator = $usesGenerator;
     }
 }

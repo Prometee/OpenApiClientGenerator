@@ -16,23 +16,23 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
     protected $removeSetterMethod;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
-     * @param MethodGeneratorInterface $getterMethodBuilder
-     * @param MethodGeneratorInterface $setterMethodBuilder
+     * @param UsesGeneratorInterface $usesGenerator
+     * @param MethodGeneratorInterface $getterMethodGenerator
+     * @param MethodGeneratorInterface $setterMethodGenerator
      * @param MethodGeneratorInterface $hasGetterMethod
      * @param MethodGeneratorInterface $addSetterMethod
      * @param MethodGeneratorInterface $removeSetterMethod
      */
     public function __construct(
-        UsesGeneratorInterface $usesBuilder,
-        MethodGeneratorInterface $getterMethodBuilder,
-        MethodGeneratorInterface $setterMethodBuilder,
+        UsesGeneratorInterface $usesGenerator,
+        MethodGeneratorInterface $getterMethodGenerator,
+        MethodGeneratorInterface $setterMethodGenerator,
         MethodGeneratorInterface $hasGetterMethod,
         MethodGeneratorInterface $addSetterMethod,
         MethodGeneratorInterface $removeSetterMethod
     )
     {
-        parent::__construct($usesBuilder, $getterMethodBuilder, $setterMethodBuilder);
+        parent::__construct($usesGenerator, $getterMethodGenerator, $setterMethodGenerator);
 
         $this->hasGetterMethod = $hasGetterMethod;
         $this->addSetterMethod = $addSetterMethod;
@@ -89,23 +89,23 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
             ['bool']
         );
 
-        $methodParameterBuilder = clone clone $this->hasGetterMethod->getMethodParameterBuilderSkel();
-        $methodParameterBuilder->configure(
+        $methodParameterGenerator = clone clone $this->hasGetterMethod->getMethodParameterGeneratorSkel();
+        $methodParameterGenerator->configure(
             (array) $this->getSingleTypeName(),
             $this->getSingleName()
         );
-        $this->hasGetterMethod->addParameter($methodParameterBuilder);
+        $this->hasGetterMethod->addParameter($methodParameterGenerator);
 
-        $methodParameterBuilder2 = clone $this->hasGetterMethod->getMethodParameterBuilderSkel();
-        $methodParameterBuilder2->configure(
+        $methodParameterGenerator2 = clone $this->hasGetterMethod->getMethodParameterGeneratorSkel();
+        $methodParameterGenerator2->configure(
             (array) 'bool',
             'strict',
             'true'
         );
-        $this->hasGetterMethod->addParameter($methodParameterBuilder2);
+        $this->hasGetterMethod->addParameter($methodParameterGenerator2);
 
         $format = '';
-        if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
+        if (preg_match('#^\?#', $methodParameterGenerator->getPhpType())) {
             $format .= 'if (null === $this->%2$s) {' . "\n";
             $format .= '%4$sreturn false;' . "\n";
             $format .= '}' . "\n\n";
@@ -116,8 +116,8 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
             sprintf(
                 $format,
                 $this->getSingleName(),
-                $this->propertyBuilder->getName(),
-                $methodParameterBuilder2->getPhpName(),
+                $this->propertyGenerator->getName(),
+                $methodParameterGenerator2->getPhpName(),
                 $indent
             )
         );
@@ -134,17 +134,17 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
             ['void']
         );
 
-        $methodParameterBuilder = clone $this->addSetterMethod->getMethodParameterBuilderSkel();
-        $methodParameterBuilder->configure(
+        $methodParameterGenerator = clone $this->addSetterMethod->getMethodParameterGeneratorSkel();
+        $methodParameterGenerator->configure(
             (array) $this->getSingleTypeName(),
             $this->getSingleName()
         );
-        $this->addSetterMethod->addParameter($methodParameterBuilder);
+        $this->addSetterMethod->addParameter($methodParameterGenerator);
 
         $format  = 'if ($this->%1$s(%2$s)) {' . "\n";
         $format .= '%3$sreturn;' . "\n";
         $format .= '}' . "\n\n";
-        if (preg_match('#^\?#', $methodParameterBuilder->getPhpType())) {
+        if (preg_match('#^\?#', $methodParameterGenerator->getPhpType())) {
             $format .= 'if (null === $this->%4$s) {' . "\n";
             $format .= '%3$s$this->%4$s = [];' . "\n";
             $format .= '}' . "\n\n";
@@ -155,9 +155,9 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
             sprintf(
                 $format,
                 $this->getSingleMethodName(static::HAS_GETTER_PREFIX),
-                $methodParameterBuilder->getPhpName(),
+                $methodParameterGenerator->getPhpName(),
                 $indent,
-                $this->propertyBuilder->getName()
+                $this->propertyGenerator->getName()
             )
         );
     }
@@ -172,13 +172,13 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
             $this->getSingleMethodName(static::REMOVE_SETTER_PREFIX),
             ['void']
         );
-        $methodParameterBuilder = clone $this->removeSetterMethod->getMethodParameterBuilderSkel();
-        $methodParameterBuilder->configure(
+        $methodParameterGenerator = clone $this->removeSetterMethod->getMethodParameterGeneratorSkel();
+        $methodParameterGenerator->configure(
             (array) $this->getSingleTypeName(),
             $this->getSingleName()
         );
 
-        $this->removeSetterMethod->addParameter($methodParameterBuilder);
+        $this->removeSetterMethod->addParameter($methodParameterGenerator);
 
         $format = 'if ($this->%1$s(%2$s)) {' . "\n";
         $format .= '%3$s$index = array_search(%2$s, $this->%4$s);' . "\n";
@@ -189,9 +189,9 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
             sprintf(
                 $format,
                 $this->getSingleMethodName(static::HAS_GETTER_PREFIX),
-                $methodParameterBuilder->getPhpName(),
+                $methodParameterGenerator->getPhpName(),
                 $indent,
-                $this->propertyBuilder->getName()
+                $this->propertyGenerator->getName()
             )
         );
     }
@@ -209,15 +209,15 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
      */
     public function getSingleTypeName(): ?string
     {
-        if (empty($this->propertyBuilder->getTypes())) {
+        if (empty($this->propertyGenerator->getTypes())) {
             return null;
         }
 
         $phpType = '';
-        if (in_array('null', $this->propertyBuilder->getTypes())) {
+        if (in_array('null', $this->propertyGenerator->getTypes())) {
             $phpType = '?';
         }
-        foreach ($this->propertyBuilder->getTypes() as $type) {
+        foreach ($this->propertyGenerator->getTypes() as $type) {
             if (preg_match('#\[\]$#', $type)) {
                 $phpType .= rtrim($type, '[]');
 
@@ -238,6 +238,6 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
      */
     public function getSingleName(): string
     {
-        return $this->propertyBuilder->getName();
+        return $this->propertyGenerator->getName();
     }
 }

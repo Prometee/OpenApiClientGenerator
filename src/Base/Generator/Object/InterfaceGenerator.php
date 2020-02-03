@@ -7,5 +7,5 @@ namespace Prometee\SwaggerClientGenerator\Base\Generator\Object;
 class InterfaceGenerator extends ClassGenerator implements InterfaceGeneratorInterface
 {
     /** {@inheritDoc} */
-    protected $builderType = 'interface';
+    protected $generatorType = 'interface';
 }

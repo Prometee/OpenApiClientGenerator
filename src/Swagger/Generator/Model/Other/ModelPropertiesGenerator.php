@@ -13,7 +13,7 @@ class ModelPropertiesGenerator extends PropertiesGenerator implements ModelPrope
      * {@inheritDoc}
      */
     public function addPropertyFromSwaggerPropertyDefinition(
-        ModelPropertyGeneratorInterface $propertyBuilder,
+        ModelPropertyGeneratorInterface $propertyGenerator,
         string $propertyName,
         array $types,
         bool $required = false,
@@ -21,14 +21,14 @@ class ModelPropertiesGenerator extends PropertiesGenerator implements ModelPrope
         ?string $description = null
     ): void
     {
-        $propertyBuilder->setRequired($required);
-        $propertyBuilder->setInherited($inherited);
-        $propertyBuilder->configure($propertyName, $types);
+        $propertyGenerator->setRequired($required);
+        $propertyGenerator->setInherited($inherited);
+        $propertyGenerator->configure($propertyName, $types);
 
         if (null !== $description) {
-            $propertyBuilder->setDescription($description);
+            $propertyGenerator->setDescription($description);
         }
 
-        $this->addProperty($propertyBuilder);
+        $this->addProperty($propertyGenerator);
     }
 }

@@ -28,7 +28,7 @@ class ModelPropertyGenerator extends PropertyGenerator implements ModelPropertyG
     public function addType(string $type): void
     {
         if (false === $this->isInherited()) {
-            $type = $this->usesBuilder->guessUseOrReturnType($type);
+            $type = $this->usesGenerator->guessUseOrReturnType($type);
         }
 
         if (false === $this->hasType($type)) {

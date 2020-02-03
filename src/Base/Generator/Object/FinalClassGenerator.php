@@ -7,5 +7,5 @@ namespace Prometee\SwaggerClientGenerator\Base\Generator\Object;
 class FinalClassGenerator extends ClassGenerator implements FinalClassGeneratorInterface
 {
     /** {@inheritDoc} */
-    protected $builderType = 'final class';
+    protected $generatorType = 'final class';
 }

@@ -12,16 +12,16 @@ use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\UsesGeneratorInt
 class ClassGenerator implements ClassGeneratorInterface
 {
     /** @var UsesGeneratorInterface */
-    protected $usesBuilder;
+    protected $usesGenerator;
     /** @var PropertiesGeneratorInterface */
-    protected $propertiesBuilder;
+    protected $propertiesGenerator;
     /** @var MethodsGeneratorInterface */
-    protected $methodsBuilder;
+    protected $methodsGenerator;
     /** @var TraitsGeneratorInterface */
-    protected $traitsBuilder;
+    protected $traitsGenerator;
 
     /** @var string */
-    protected $builderType = 'class';
+    protected $generatorType = 'class';
     /** @var string */
     protected $namespace;
     /** @var string */
@@ -32,22 +32,22 @@ class ClassGenerator implements ClassGeneratorInterface
     protected $implements;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
-     * @param PropertiesGeneratorInterface $propertiesBuilder
-     * @param MethodsGeneratorInterface $methodsBuilder
-     * @param TraitsGeneratorInterface $traitsBuilder
+     * @param UsesGeneratorInterface $usesGenerator
+     * @param PropertiesGeneratorInterface $propertiesGenerator
+     * @param MethodsGeneratorInterface $methodsGenerator
+     * @param TraitsGeneratorInterface $traitsGenerator
      */
     public function __construct(
-        UsesGeneratorInterface $usesBuilder,
-        PropertiesGeneratorInterface $propertiesBuilder,
-        MethodsGeneratorInterface $methodsBuilder,
-        TraitsGeneratorInterface $traitsBuilder
+        UsesGeneratorInterface $usesGenerator,
+        PropertiesGeneratorInterface $propertiesGenerator,
+        MethodsGeneratorInterface $methodsGenerator,
+        TraitsGeneratorInterface $traitsGenerator
     )
     {
-        $this->usesBuilder = $usesBuilder;
-        $this->propertiesBuilder = $propertiesBuilder;
-        $this->methodsBuilder = $methodsBuilder;
-        $this->traitsBuilder = $traitsBuilder;
+        $this->usesGenerator = $usesGenerator;
+        $this->propertiesGenerator = $propertiesGenerator;
+        $this->methodsGenerator = $methodsGenerator;
+        $this->traitsGenerator = $traitsGenerator;
     }
 
     /**
@@ -68,10 +68,10 @@ class ClassGenerator implements ClassGeneratorInterface
         $this->setExtendClassName($extendClass);
         $this->setImplements($implements);
 
-        $this->usesBuilder->configure($this->namespace);
-        $this->traitsBuilder->configure($this->usesBuilder);
-        $this->propertiesBuilder->configure($this->usesBuilder);
-        $this->methodsBuilder->configure($this->usesBuilder);
+        $this->usesGenerator->configure($this->namespace);
+        $this->traitsGenerator->configure($this->usesGenerator);
+        $this->propertiesGenerator->configure($this->usesGenerator);
+        $this->methodsGenerator->configure($this->usesGenerator);
     }
 
     /**
@@ -87,14 +87,14 @@ class ClassGenerator implements ClassGeneratorInterface
         $content .= "\n";
         $content .= 'namespace '.$this->namespace.';'."\n";
         $content .= "\n";
-        $content .= $this->usesBuilder->generate($indent);
+        $content .= $this->usesGenerator->generate($indent);
         $content .= $this->buildClassSignature() . "\n";
         $content .= '{';
-        if (null !== $this->traitsBuilder) {
-            $content .= $this->traitsBuilder->generate($indent);
+        if (null !== $this->traitsGenerator) {
+            $content .= $this->traitsGenerator->generate($indent);
         }
-        $content .= $this->propertiesBuilder->generate($indent);
-        $content .= $this->methodsBuilder->generate($indent);
+        $content .= $this->propertiesGenerator->generate($indent);
+        $content .= $this->methodsGenerator->generate($indent);
         $content .= '}'."\n";
 
         return $content;
@@ -108,7 +108,7 @@ class ClassGenerator implements ClassGeneratorInterface
         $extends = ($this->extendClassName !== null) ? ' extends '.$this->extendClassName : '';
         $implements = (!empty($this->implements)) ? ' implements '.implode(', ', $this->implements) : '';
 
-        return $this->builderType.' '.$this->className.$extends.$implements;
+        return $this->generatorType.' '.$this->className.$extends.$implements;
     }
 
     /**
@@ -130,17 +130,17 @@ class ClassGenerator implements ClassGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getUsesBuilder(): UsesGeneratorInterface
+    public function getUsesGenerator(): UsesGeneratorInterface
     {
-        return $this->usesBuilder;
+        return $this->usesGenerator;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setUsesBuilder(UsesGeneratorInterface $usesBuilder): void
+    public function setUsesGenerator(UsesGeneratorInterface $usesGenerator): void
     {
-        $this->usesBuilder = $usesBuilder;
+        $this->usesGenerator = $usesGenerator;
     }
 
     /**
@@ -162,25 +162,25 @@ class ClassGenerator implements ClassGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getBuilderType(): string
+    public function getGeneratorType(): string
     {
-        return $this->builderType;
+        return $this->generatorType;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getTraitsBuilder(): TraitsGeneratorInterface
+    public function getTraitsGenerator(): TraitsGeneratorInterface
     {
-        return $this->traitsBuilder;
+        return $this->traitsGenerator;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setTraitsBuilder(TraitsGeneratorInterface $traitsBuilder): void
+    public function setTraitsGenerator(TraitsGeneratorInterface $traitsGenerator): void
     {
-        $this->traitsBuilder = $traitsBuilder;
+        $this->traitsGenerator = $traitsGenerator;
     }
 
     /**
@@ -201,8 +201,8 @@ class ClassGenerator implements ClassGeneratorInterface
             return;
         }
 
-        $this->usesBuilder->guessUse($extendClass);
-        $this->extendClassName = $this->usesBuilder->getInternalUseName($extendClass);
+        $this->usesGenerator->guessUse($extendClass);
+        $this->extendClassName = $this->usesGenerator->getInternalUseName($extendClass);
     }
 
     /**
@@ -220,8 +220,8 @@ class ClassGenerator implements ClassGeneratorInterface
     {
         $internalImplements = [];
         foreach ($implements as $implement) {
-            $this->usesBuilder->guessUse($implement);
-            $internalImplements[] = $this->usesBuilder->getInternalUseName($implement);
+            $this->usesGenerator->guessUse($implement);
+            $internalImplements[] = $this->usesGenerator->getInternalUseName($implement);
         }
         $this->implements = $internalImplements;
     }
@@ -229,32 +229,32 @@ class ClassGenerator implements ClassGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getPropertiesBuilder(): PropertiesGeneratorInterface
+    public function getPropertiesGenerator(): PropertiesGeneratorInterface
     {
-        return $this->propertiesBuilder;
+        return $this->propertiesGenerator;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setPropertiesBuilder(PropertiesGeneratorInterface $propertiesBuilder): void
+    public function setPropertiesGenerator(PropertiesGeneratorInterface $propertiesGenerator): void
     {
-        $this->propertiesBuilder = $propertiesBuilder;
+        $this->propertiesGenerator = $propertiesGenerator;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getMethodsBuilder(): MethodsGeneratorInterface
+    public function getMethodsGenerator(): MethodsGeneratorInterface
     {
-        return $this->methodsBuilder;
+        return $this->methodsGenerator;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setMethodsBuilder(MethodsGeneratorInterface $methodsBuilder): void
+    public function setMethodsGenerator(MethodsGeneratorInterface $methodsGenerator): void
     {
-        $this->methodsBuilder = $methodsBuilder;
+        $this->methodsGenerator = $methodsGenerator;
     }
 }

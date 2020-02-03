@@ -13,20 +13,20 @@ class ModelConstructorGenerator extends ConstructorGenerator implements ModelCon
     /**
      * {@inheritDoc}
      */
-    public function configureFromPropertiesBuilder(ModelPropertiesGeneratorInterface $modelPropertiesBuilder): void
+    public function configureFromPropertiesGenerator(ModelPropertiesGeneratorInterface $modelPropertiesGenerator): void
     {
         $inheritedRequiredProperties = [];
-        /** @var ModelPropertyGeneratorInterface $modelPropertyBuilder */
-        foreach ($modelPropertiesBuilder->getProperties() as $modelPropertyBuilder) {
-            $this->configureParameterFromPropertyBuilder($modelPropertyBuilder);
-            $this->configureBodyFromPropertyBuilder($modelPropertyBuilder);
-            if (false === $modelPropertyBuilder->isInherited()) {
+        /** @var ModelPropertyGeneratorInterface $modelPropertyGenerator */
+        foreach ($modelPropertiesGenerator->getProperties() as $modelPropertyGenerator) {
+            $this->configureParameterFromPropertyGenerator($modelPropertyGenerator);
+            $this->configureBodyFromPropertyGenerator($modelPropertyGenerator);
+            if (false === $modelPropertyGenerator->isInherited()) {
                 continue;
             }
-            if (false === $modelPropertyBuilder->isRequired()) {
+            if (false === $modelPropertyGenerator->isRequired()) {
                 continue;
             }
-            $inheritedRequiredProperties[] = $modelPropertyBuilder->getPhpName();
+            $inheritedRequiredProperties[] = $modelPropertyGenerator->getPhpName();
         }
 
         if (empty($this->getLines())) {
@@ -44,19 +44,19 @@ class ModelConstructorGenerator extends ConstructorGenerator implements ModelCon
     /**
      * {@inheritDoc}
      */
-    public function configureBodyFromPropertyBuilder(ModelPropertyGeneratorInterface $modelPropertyBuilder): void
+    public function configureBodyFromPropertyGenerator(ModelPropertyGeneratorInterface $modelPropertyGenerator): void
     {
-        if ($modelPropertyBuilder->isInherited()) {
+        if ($modelPropertyGenerator->isInherited()) {
             return;
         }
 
-        if ($modelPropertyBuilder->isRequired()) {
-            $this->addLine(sprintf('$this->%1$s = $%1$s;', $modelPropertyBuilder->getName()));
+        if ($modelPropertyGenerator->isRequired()) {
+            $this->addLine(sprintf('$this->%1$s = $%1$s;', $modelPropertyGenerator->getName()));
             return;
         }
 
         $defaultValue = null;
-        switch ($modelPropertyBuilder->getPhpType()) {
+        switch ($modelPropertyGenerator->getPhpType()) {
             case 'array':
                 $defaultValue = '[]';
                 break;
@@ -74,27 +74,27 @@ class ModelConstructorGenerator extends ConstructorGenerator implements ModelCon
                 break;
         }
 
-        $modelPropertyBuilder->setValue($defaultValue);
+        $modelPropertyGenerator->setValue($defaultValue);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function configureParameterFromPropertyBuilder(ModelPropertyGeneratorInterface $modelPropertyBuilder): void
+    public function configureParameterFromPropertyGenerator(ModelPropertyGeneratorInterface $modelPropertyGenerator): void
     {
-        if (false === $modelPropertyBuilder->isRequired()) {
+        if (false === $modelPropertyGenerator->isRequired()) {
             return;
         }
 
-        $methodParameterBuilder = clone $this->methodParameterBuilderSkel;
-        $methodParameterBuilder->configure(
-            $modelPropertyBuilder->getTypes(),
-            $modelPropertyBuilder->getName(),
-            $modelPropertyBuilder->getValue(),
+        $methodParameterGenerator = clone $this->methodParameterGeneratorSkel;
+        $methodParameterGenerator->configure(
+            $modelPropertyGenerator->getTypes(),
+            $modelPropertyGenerator->getName(),
+            $modelPropertyGenerator->getValue(),
             false,
-            $modelPropertyBuilder->getDescription()
+            $modelPropertyGenerator->getDescription()
         );
 
-        $this->addParameter($methodParameterBuilder);
+        $this->addParameter($methodParameterGenerator);
     }
 }

@@ -10,37 +10,37 @@ use Prometee\SwaggerClientGenerator\Base\Generator\PhpDoc\PhpDocGeneratorInterfa
 class PhpDocFactory implements PhpDocFactoryInterface
 {
     /** @var string */
-    protected $phpDocBuilderClass;
+    protected $phpDocGeneratorClass;
 
     /**
-     * @param string $phpDocBuilderClass
+     * @param string $phpDocGeneratorClass
      */
-    public function __construct(string $phpDocBuilderClass)
+    public function __construct(string $phpDocGeneratorClass)
     {
-        $this->phpDocBuilderClass = $phpDocBuilderClass;
+        $this->phpDocGeneratorClass = $phpDocGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createPhpDocBuilder(UsesGeneratorInterface $usesBuilder): PhpDocGeneratorInterface
+    public function createPhpDocGenerator(UsesGeneratorInterface $usesGenerator): PhpDocGeneratorInterface
     {
-        return new $this->phpDocBuilderClass($usesBuilder);
+        return new $this->phpDocGeneratorClass($usesGenerator);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getPhpDocBuilderClass(): string
+    public function getPhpDocGeneratorClass(): string
     {
-        return $this->phpDocBuilderClass;
+        return $this->phpDocGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setPhpDocBuilderClass(string $phpDocBuilderClass): void
+    public function setPhpDocGeneratorClass(string $phpDocGeneratorClass): void
     {
-        $this->phpDocBuilderClass = $phpDocBuilderClass;
+        $this->phpDocGeneratorClass = $phpDocGeneratorClass;
     }
 }

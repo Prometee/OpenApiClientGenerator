@@ -13,13 +13,13 @@ class OperationsMethodFactory extends BaseMethodFactory implements OperationsMet
     /**
      * {@inheritDoc}
      */
-    public function createOperationMethodBuilder(UsesGeneratorInterface $usesBuilder): OperationsMethodGeneratorInterface
+    public function createOperationMethodGenerator(UsesGeneratorInterface $usesGenerator): OperationsMethodGeneratorInterface
     {
-        $phpDocBuilder = $this->phpDocFactory->createPhpDocBuilder($usesBuilder);
-        return new $this->methodBuilderClass(
-            $usesBuilder,
-            $phpDocBuilder,
-            $this->createMethodParameterBuilder($usesBuilder)
+        $phpDocGenerator = $this->phpDocFactory->createPhpDocGenerator($usesGenerator);
+        return new $this->methodGeneratorClass(
+            $usesGenerator,
+            $phpDocGenerator,
+            $this->createMethodParameterGenerator($usesGenerator)
         );
     }
 }

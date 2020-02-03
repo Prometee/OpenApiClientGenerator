@@ -11,9 +11,9 @@ use Prometee\SwaggerClientGenerator\Swagger\Generator\Operation\OperationsMethod
 interface OperationsMethodFactoryInterface extends BaseMethodFactoryInterface
 {
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return OperationsMethodGeneratorInterface
      */
-    public function createOperationMethodBuilder(UsesGeneratorInterface $usesBuilder): OperationsMethodGeneratorInterface;
+    public function createOperationMethodGenerator(UsesGeneratorInterface $usesGenerator): OperationsMethodGeneratorInterface;
 }

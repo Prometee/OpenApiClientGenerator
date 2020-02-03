@@ -7,5 +7,5 @@ namespace Prometee\SwaggerClientGenerator\Base\Generator\Object;
 class TraitGenerator extends ClassGenerator implements TraitGeneratorInterface
 {
     /** {@inheritDoc} */
-    protected $builderType = 'trait';
+    protected $generatorType = 'trait';
 }

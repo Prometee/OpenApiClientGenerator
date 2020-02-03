@@ -10,33 +10,33 @@ use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\UsesGeneratorInt
 class GetterSetterGenerator implements GetterSetterGeneratorInterface
 {
     /** @var UsesGeneratorInterface */
-    protected $usesBuilder;
+    protected $usesGenerator;
     /** @var MethodGeneratorInterface */
-    protected $getterMethodBuilder;
+    protected $getterMethodGenerator;
     /** @var MethodGeneratorInterface */
-    protected $setterMethodBuilder;
+    protected $setterMethodGenerator;
 
     /** @var PropertyGeneratorInterface */
-    protected $propertyBuilder;
+    protected $propertyGenerator;
     /** @var bool */
     protected $readOnly = false;
     /** @var bool */
     protected $writeOnly = false;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
-     * @param MethodGeneratorInterface $getterMethodBuilder
-     * @param MethodGeneratorInterface $setterMethodBuilder
+     * @param UsesGeneratorInterface $usesGenerator
+     * @param MethodGeneratorInterface $getterMethodGenerator
+     * @param MethodGeneratorInterface $setterMethodGenerator
      */
     public function __construct(
-        UsesGeneratorInterface $usesBuilder,
-        MethodGeneratorInterface $getterMethodBuilder,
-        MethodGeneratorInterface $setterMethodBuilder
+        UsesGeneratorInterface $usesGenerator,
+        MethodGeneratorInterface $getterMethodGenerator,
+        MethodGeneratorInterface $setterMethodGenerator
     )
     {
-        $this->usesBuilder = $usesBuilder;
-        $this->getterMethodBuilder = $getterMethodBuilder;
-        $this->setterMethodBuilder = $setterMethodBuilder;
+        $this->usesGenerator = $usesGenerator;
+        $this->getterMethodGenerator = $getterMethodGenerator;
+        $this->setterMethodGenerator = $setterMethodGenerator;
     }
 
 
@@ -44,12 +44,12 @@ class GetterSetterGenerator implements GetterSetterGeneratorInterface
      * {@inheritDoc}
      */
     public function configure(
-        PropertyGeneratorInterface $propertyBuilder,
+        PropertyGeneratorInterface $propertyGenerator,
         bool $readOnly = false,
         bool $writeOnly = false
     ): void
     {
-        $this->propertyBuilder = $propertyBuilder;
+        $this->propertyGenerator = $propertyGenerator;
         $this->readOnly = $readOnly;
         $this->writeOnly = $writeOnly;
     }
@@ -63,8 +63,8 @@ class GetterSetterGenerator implements GetterSetterGeneratorInterface
         $this->configureSetter($indent);
 
         return [
-            $this->getterMethodBuilder,
-            $this->setterMethodBuilder,
+            $this->getterMethodGenerator,
+            $this->setterMethodGenerator,
         ];
     }
 
@@ -73,7 +73,7 @@ class GetterSetterGenerator implements GetterSetterGeneratorInterface
      */
     public function getMethodName(?string $prefix = null, ?string $suffix = null): string
     {
-        $name = trim($this->propertyBuilder->getName(), '_');
+        $name = trim($this->propertyGenerator->getName(), '_');
         $words = explode('_', $name);
         $words = array_map('ucfirst', $words);
         $name = '';
@@ -90,14 +90,14 @@ class GetterSetterGenerator implements GetterSetterGeneratorInterface
     public function configureGetter(string $indent = null): void
     {
         if (!$this->isWriteOnly()) {
-            $this->getterMethodBuilder->configure(
+            $this->getterMethodGenerator->configure(
                 MethodGeneratorInterface::SCOPE_PUBLIC,
                 $this->getMethodName(static::GETTER_PREFIX),
-                $this->propertyBuilder->getTypes()
+                $this->propertyGenerator->getTypes()
             );
 
-            $this->getterMethodBuilder->addLine(
-                sprintf('return $this->%s;', $this->propertyBuilder->getName())
+            $this->getterMethodGenerator->addLine(
+                sprintf('return $this->%s;', $this->propertyGenerator->getName())
             );
         }
     }
@@ -108,21 +108,21 @@ class GetterSetterGenerator implements GetterSetterGeneratorInterface
     public function configureSetter(string $indent = null): void
     {
         if (!$this->isReadOnly()) {
-            $this->setterMethodBuilder->configure(
+            $this->setterMethodGenerator->configure(
                 MethodGeneratorInterface::SCOPE_PUBLIC,
                 $this->getMethodName(static::SETTER_PREFIX),
                 ['void']
             );
-            $methodParameterBuilder = clone $this->setterMethodBuilder->getMethodParameterBuilderSkel();
-            $methodParameterBuilder->configure(
-                $this->propertyBuilder->getTypes(),
-                $this->propertyBuilder->getName()
+            $methodParameterGenerator = clone $this->setterMethodGenerator->getMethodParameterGeneratorSkel();
+            $methodParameterGenerator->configure(
+                $this->propertyGenerator->getTypes(),
+                $this->propertyGenerator->getName()
             );
 
-            $this->setterMethodBuilder->addParameter($methodParameterBuilder);
+            $this->setterMethodGenerator->addParameter($methodParameterGenerator);
 
-            $this->setterMethodBuilder->addLine(
-                sprintf('$this->%s = %s;', $this->propertyBuilder->getName(), $methodParameterBuilder->getPhpName())
+            $this->setterMethodGenerator->addLine(
+                sprintf('$this->%s = %s;', $this->propertyGenerator->getName(), $methodParameterGenerator->getPhpName())
             );
         }
     }

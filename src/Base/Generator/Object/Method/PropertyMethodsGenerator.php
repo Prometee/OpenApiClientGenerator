@@ -11,35 +11,35 @@ use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\UsesGeneratorInt
 class PropertyMethodsGenerator implements PropertyMethodsGeneratorInterface
 {
     /** @var UsesGeneratorInterface */
-    protected $usesBuilder;
+    protected $usesGenerator;
 
     /** @var PropertyGeneratorInterface */
-    protected $propertyBuilder;
+    protected $propertyGenerator;
     /** @var bool */
     protected $readOnly = false;
     /** @var bool */
     protected $writeOnly = false;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      */
     public function __construct(
-        UsesGeneratorInterface $usesBuilder
+        UsesGeneratorInterface $usesGenerator
     )
     {
-        $this->usesBuilder = $usesBuilder;
+        $this->usesGenerator = $usesGenerator;
     }
 
     /**
      * @inheritDoc
      */
     public function configure(
-        PropertyGeneratorInterface $propertyBuilder,
+        PropertyGeneratorInterface $propertyGenerator,
         bool $readOnly = false,
         bool $writeOnly = false
     ): void
     {
-        $this->propertyBuilder = $propertyBuilder;
+        $this->propertyGenerator = $propertyGenerator;
         $this->readOnly = $readOnly;
         $this->writeOnly = $writeOnly;
     }
@@ -49,31 +49,31 @@ class PropertyMethodsGenerator implements PropertyMethodsGeneratorInterface
      */
     public function getMethods(MethodFactoryInterface $methodFactory, string $indent = null): array
     {
-        $propertyMethodsBuilder = null;
-        if (null !== $this->propertyBuilder->getTypes()) {
-            foreach ($this->propertyBuilder->getTypes() as $type) {
+        $propertyMethodsGenerator = null;
+        if (null !== $this->propertyGenerator->getTypes()) {
+            foreach ($this->propertyGenerator->getTypes() as $type) {
                 if ('bool' === $type) {
-                    $propertyMethodsBuilder = $methodFactory->createIsserSetterBuilderBuilder($this->usesBuilder);
+                    $propertyMethodsGenerator = $methodFactory->createIsserSetterGenerator($this->usesGenerator);
                     break;
                 }
                 if (preg_match('#\[\]$#', $type)) {
-                    $propertyMethodsBuilder = $methodFactory->createArrayGetterSetterBuilder($this->usesBuilder);
+                    $propertyMethodsGenerator = $methodFactory->createArrayGetterSetterGenerator($this->usesGenerator);
                     break;
                 }
             }
         }
 
-        if (null === $propertyMethodsBuilder) {
-            $propertyMethodsBuilder = $methodFactory->createGetterSetterBuilder($this->usesBuilder);
+        if (null === $propertyMethodsGenerator) {
+            $propertyMethodsGenerator = $methodFactory->createGetterSetterGenerator($this->usesGenerator);
         }
 
-        $propertyMethodsBuilder->configure(
-            $this->propertyBuilder,
+        $propertyMethodsGenerator->configure(
+            $this->propertyGenerator,
             $this->readOnly,
             $this->writeOnly
         );
 
-        return $propertyMethodsBuilder->getMethods($indent);
+        return $propertyMethodsGenerator->getMethods($indent);
     }
 
     /**

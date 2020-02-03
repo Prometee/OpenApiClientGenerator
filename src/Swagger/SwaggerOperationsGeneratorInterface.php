@@ -68,12 +68,12 @@ interface SwaggerOperationsGeneratorInterface
     public function getHelper(): SwaggerOperationsHelperInterface;
 
     /**
-     * @param ClassGeneratorInterface $classBuilder
+     * @param ClassGeneratorInterface $classGenerator
      * @param string $path
      * @param string $operation
      * @param array $operationConfiguration
      */
-    public function processOperation(ClassGeneratorInterface $classBuilder, string $path, string $operation, array $operationConfiguration): void;
+    public function processOperation(ClassGeneratorInterface $classGenerator, string $path, string $operation, array $operationConfiguration): void;
 
     /**
      * @return string|null
@@ -106,19 +106,27 @@ interface SwaggerOperationsGeneratorInterface
     public function setThrowsClasses(array $throwsClasses): void;
 
     /**
-     * @param ClassGeneratorInterface $classBuilder
-     * @param MethodGeneratorInterface $methodBuilder
+     * @param ClassGeneratorInterface $classGenerator
+     * @param MethodGeneratorInterface $methodGenerator
      * @param array $operationParameters
      */
-    public function processOperationParameters(ClassGeneratorInterface $classBuilder, MethodGeneratorInterface $methodBuilder, array $operationParameters): void;
+    public function processOperationParameters(ClassGeneratorInterface $classGenerator, MethodGeneratorInterface $methodGenerator, array $operationParameters): void;
 
     /**
-     * @param ClassGeneratorInterface $classBuilder
+     * @param ClassGeneratorInterface $classGenerator
      * @param array $parameterConfiguration
      *
      * @return MethodParameterGeneratorInterface|null
      */
-    public function createAnOperationParameter(ClassGeneratorInterface $classBuilder, array $parameterConfiguration): ?MethodParameterGeneratorInterface;
+    public function createAnOperationParameter(ClassGeneratorInterface $classGenerator, array $parameterConfiguration): ?MethodParameterGeneratorInterface;
+
+    /**
+     * @param array $parameterConfiguration
+     * @param string|null $type
+     *
+     * @return string|null
+     */
+    public function buildValueForOperationParameter(array $parameterConfiguration, ?string $type): ?string;
 
     /**
      * @return bool

@@ -9,10 +9,10 @@ use Prometee\SwaggerClientGenerator\Base\Generator\GeneratorInterface;
 interface TraitsGeneratorInterface extends GeneratorInterface
 {
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      * @param string[] $traits
      */
-    public function configure(UsesGeneratorInterface $usesBuilder, array $traits = []): void;
+    public function configure(UsesGeneratorInterface $usesGenerator, array $traits = []): void;
 
     /**
      * @param string $class

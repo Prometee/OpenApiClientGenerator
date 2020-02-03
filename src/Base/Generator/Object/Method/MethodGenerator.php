@@ -10,11 +10,11 @@ use Prometee\SwaggerClientGenerator\Base\Generator\PhpDoc\PhpDocGeneratorInterfa
 class MethodGenerator implements MethodGeneratorInterface
 {
     /** @var PhpDocGeneratorInterface */
-    protected $phpDocBuilder;
+    protected $phpDocGenerator;
     /** @var UsesGeneratorInterface */
-    protected $usesBuilder;
+    protected $usesGenerator;
     /** @var MethodParameterGeneratorInterface */
-    protected $methodParameterBuilderSkel;
+    protected $methodParameterGeneratorSkel;
 
     /** @var string */
     protected $scope = '';
@@ -34,19 +34,19 @@ class MethodGenerator implements MethodGeneratorInterface
     protected $hasAlreadyBeenGenerated = false;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
-     * @param PhpDocGeneratorInterface $phpDocBuilder
-     * @param MethodParameterGeneratorInterface $methodParameterBuilderSkel
+     * @param UsesGeneratorInterface $usesGenerator
+     * @param PhpDocGeneratorInterface $phpDocGenerator
+     * @param MethodParameterGeneratorInterface $methodParameterGeneratorSkel
      */
     public function __construct(
-        UsesGeneratorInterface $usesBuilder,
-        PhpDocGeneratorInterface $phpDocBuilder,
-        MethodParameterGeneratorInterface $methodParameterBuilderSkel
+        UsesGeneratorInterface $usesGenerator,
+        PhpDocGeneratorInterface $phpDocGenerator,
+        MethodParameterGeneratorInterface $methodParameterGeneratorSkel
     )
     {
-        $this->usesBuilder = $usesBuilder;
-        $this->phpDocBuilder = $phpDocBuilder;
-        $this->methodParameterBuilderSkel = $methodParameterBuilderSkel;
+        $this->usesGenerator = $usesGenerator;
+        $this->phpDocGenerator = $phpDocGenerator;
+        $this->methodParameterGeneratorSkel = $methodParameterGeneratorSkel;
     }
 
     /**
@@ -68,7 +68,7 @@ class MethodGenerator implements MethodGeneratorInterface
         $this->setParameters([]);
         $this->setLines([]);
 
-        $this->phpDocBuilder->configure();
+        $this->phpDocGenerator->configure();
         $this->hasAlreadyBeenGenerated = false;
     }
 
@@ -81,12 +81,12 @@ class MethodGenerator implements MethodGeneratorInterface
             return '';
         }
 
-        $this->configurePhpDocBuilder();
+        $this->configurePhpDocGenerator();
 
         return sprintf('%1$s%3$s%4$s%1$s%2$s{%1$s%5$s%2$s}%1$s',
             "\n",
             $indent,
-            $this->phpDocBuilder->generate($indent),
+            $this->phpDocGenerator->generate($indent),
             $this->buildMethodSignature($indent),
             $this->buildMethodBody($indent)
         );
@@ -132,7 +132,7 @@ class MethodGenerator implements MethodGeneratorInterface
         $additionalIndentation = ' ';
         $parametersEnd = '';
         $contentLength = strlen($content) - strlen($parametersFutureFormat) + $methodParametersLength;
-        if ($contentLength > $this->phpDocBuilder->getWrapOn()) {
+        if ($contentLength > $this->phpDocGenerator->getWrapOn()) {
             // Make parameters go into multiline formation
             $additionalIndentation = "\n".$indent.$indent;
             $parametersStart = $additionalIndentation;
@@ -153,8 +153,8 @@ class MethodGenerator implements MethodGeneratorInterface
     {
         $parameters = [];
 
-        foreach ($this->parameters as $methodParameterBuilder) {
-            $parameters[] = $methodParameterBuilder->generate($indent);
+        foreach ($this->parameters as $methodParameterGenerator) {
+            $parameters[] = $methodParameterGenerator->generate($indent);
         }
 
         return implode(sprintf(',%s', $formatVar), $parameters);
@@ -179,20 +179,20 @@ class MethodGenerator implements MethodGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function configurePhpDocBuilder(): void
+    public function configurePhpDocGenerator(): void
     {
         if ($this->hasAlreadyBeenGenerated) {
             return;
         }
 
         if (!empty($this->getDescription())) {
-            $this->phpDocBuilder->addDescriptionLine($this->getDescription());
+            $this->phpDocGenerator->addDescriptionLine($this->getDescription());
         }
         foreach ($this->parameters as $parameter) {
-            $this->phpDocBuilder->addParamLine($parameter->getPhpName(), $parameter->getType(), $parameter->getDescription());
+            $this->phpDocGenerator->addParamLine($parameter->getPhpName(), $parameter->getType(), $parameter->getDescription());
         }
         if (!empty($this->returnTypes) && !in_array('void', $this->returnTypes)) {
-            $this->phpDocBuilder->addReturnLine($this->getReturnType());
+            $this->phpDocGenerator->addReturnLine($this->getReturnType());
         }
 
         $this->hasAlreadyBeenGenerated = true;
@@ -257,7 +257,7 @@ class MethodGenerator implements MethodGeneratorInterface
      */
     public function addReturnType(string $returnType): void
     {
-        $returnType = $this->usesBuilder->guessUseOrReturnType($returnType);
+        $returnType = $this->usesGenerator->guessUseOrReturnType($returnType);
         if (false === $this->hasReturnType($returnType)) {
             $this->returnTypes[] = $returnType;
         }
@@ -274,27 +274,27 @@ class MethodGenerator implements MethodGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function addParameter(MethodParameterGeneratorInterface $methodParameterBuilder): void
+    public function addParameter(MethodParameterGeneratorInterface $methodParameterGenerator): void
     {
-        if (!$this->hasParameter($methodParameterBuilder)) {
-            $this->setParameter($methodParameterBuilder);
+        if (!$this->hasParameter($methodParameterGenerator)) {
+            $this->setParameter($methodParameterGenerator);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasParameter(MethodParameterGeneratorInterface $methodParameterBuilder): bool
+    public function hasParameter(MethodParameterGeneratorInterface $methodParameterGenerator): bool
     {
-        return isset($this->parameters[$methodParameterBuilder->getName()]);
+        return isset($this->parameters[$methodParameterGenerator->getName()]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setParameter(MethodParameterGeneratorInterface $methodParameterBuilder): void
+    public function setParameter(MethodParameterGeneratorInterface $methodParameterGenerator): void
     {
-        $this->parameters[$methodParameterBuilder->getName()] = $methodParameterBuilder;
+        $this->parameters[$methodParameterGenerator->getName()] = $methodParameterGenerator;
     }
 
     /**
@@ -404,48 +404,48 @@ class MethodGenerator implements MethodGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function getPhpDocBuilder(): PhpDocGeneratorInterface
+    public function getPhpDocGenerator(): PhpDocGeneratorInterface
     {
-        return $this->phpDocBuilder;
+        return $this->phpDocGenerator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setPhpDocBuilder(PhpDocGeneratorInterface $phpDocBuilder): void
+    public function setPhpDocGenerator(PhpDocGeneratorInterface $phpDocGenerator): void
     {
-        $this->phpDocBuilder = $phpDocBuilder;
+        $this->phpDocGenerator = $phpDocGenerator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getUsesBuilder(): UsesGeneratorInterface
+    public function getUsesGenerator(): UsesGeneratorInterface
     {
-        return $this->usesBuilder;
+        return $this->usesGenerator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setUsesBuilder(UsesGeneratorInterface $usesBuilder): void
+    public function setUsesGenerator(UsesGeneratorInterface $usesGenerator): void
     {
-        $this->usesBuilder = $usesBuilder;
+        $this->usesGenerator = $usesGenerator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getMethodParameterBuilderSkel(): MethodParameterGeneratorInterface
+    public function getMethodParameterGeneratorSkel(): MethodParameterGeneratorInterface
     {
-        return $this->methodParameterBuilderSkel;
+        return $this->methodParameterGeneratorSkel;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setMethodParameterBuilderSkel(MethodParameterGeneratorInterface $methodParameterBuilderSkel): void
+    public function setMethodParameterGeneratorSkel(MethodParameterGeneratorInterface $methodParameterGeneratorSkel): void
     {
-        $this->methodParameterBuilderSkel = $methodParameterBuilderSkel;
+        $this->methodParameterGeneratorSkel = $methodParameterGeneratorSkel;
     }
 }

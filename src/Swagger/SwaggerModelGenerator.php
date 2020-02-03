@@ -88,35 +88,35 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
      *
      * @throws Exception
      */
-    public function generateClass(string $definitionName): ?ClassGeneratorInterface
+    public function generateClass(string $definitionName): void
     {
         $filePath = $this->getFilePathFromDefinitionName($definitionName);
         if (!$this->overwrite && is_file($filePath)) {
-            return null;
+            return;
         }
 
         // Class
-        $classBuilder = $this->classFactory->createClassBuilder();
-        $this->configureClassBuilder(
-            $classBuilder,
+        $classGenerator = $this->classFactory->createClassGenerator();
+        $this->configureClassGenerator(
+            $classGenerator,
             $definitionName
         );
 
         // Properties
-        /** @var ModelPropertiesGeneratorInterface $modelPropertiesBuilder */
-        $modelPropertiesBuilder = $classBuilder->getPropertiesBuilder();
-        $this->configurePropertiesBuilder(
-            $classBuilder,
-            $modelPropertiesBuilder,
+        /** @var ModelPropertiesGeneratorInterface $modelPropertiesGenerator */
+        $modelPropertiesGenerator = $classGenerator->getPropertiesGenerator();
+        $this->configurePropertiesGenerator(
+            $classGenerator,
+            $modelPropertiesGenerator,
             $definitionName
         );
 
         // Constructor
-        $constructorBuilder = $this->methodFactory->createModelConstructorBuilder($classBuilder->getUsesBuilder());
-        $this->configureConstructorBuilder(
-            $classBuilder->getMethodsBuilder(),
-            $modelPropertiesBuilder,
-            $constructorBuilder
+        $constructorGenerator = $this->methodFactory->createModelConstructorGenerator($classGenerator->getUsesGenerator());
+        $this->configureConstructorGenerator(
+            $classGenerator->getMethodsGenerator(),
+            $modelPropertiesGenerator,
+            $constructorGenerator
         );
 
         // File creation
@@ -125,11 +125,9 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
             mkdir($directory, 0777, true);
         }
 
-        if (false === file_put_contents($filePath, $classBuilder->generate($this->indent))) {
+        if (false === file_put_contents($filePath, $classGenerator->generate($this->indent))) {
             throw new Exception(sprintf('Unable to generate the class : "%s" !', $filePath));
         }
-
-        return $classBuilder;
     }
 
     /**
@@ -248,26 +246,24 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
      *
      * @throws Exception
      */
-    public function configureClassBuilder(
-        ClassGeneratorInterface $classBuilder,
+    public function configureClassGenerator(
+        ClassGeneratorInterface $classGenerator,
         string $definitionName
-    ): ?ClassGeneratorInterface
+    ): void
     {
-        $subClassBuilder = null;
+        $subClassGenerator = null;
         $extendClass = null;
         if (isset($this->definitions[$definitionName]['allOf'])) {
             $allOfConfig = $this->definitions[$definitionName]['allOf'][0];
             $subDefinitionName = $this->helper::getPhpTypeFromSwaggerConfiguration($allOfConfig);
             if (null === $subDefinitionName) {
-                return null;
+                return;
             }
-            $subClassBuilder = $this->generateClass($subDefinitionName);
+            $this->generateClass($subDefinitionName);
             $extendClass = $this->getPhpTypeFromPropertyConfig($allOfConfig);
         }
         [$namespace, $className] = $this->getClassNameAndNamespaceFromDefinitionName($definitionName);
-        $classBuilder->configure($namespace, $className, $extendClass);
-
-        return $subClassBuilder;
+        $classGenerator->configure($namespace, $className, $extendClass);
     }
 
     /**
@@ -275,9 +271,9 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
      *
      * @throws Exception
      */
-    public function configurePropertiesBuilder(
-        ClassGeneratorInterface $classBuilder,
-        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
+    public function configurePropertiesGenerator(
+        ClassGeneratorInterface $classGenerator,
+        ModelPropertiesGeneratorInterface $modelPropertiesGenerator,
         string $definitionName
     ): void
     {
@@ -290,8 +286,8 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
             $required = false !== array_search($propertyName, $requires);
             $inherited = false !== array_search($propertyName, $inheritedProperties);
             $this->processProperty(
-                $modelPropertiesBuilder,
-                $classBuilder->getMethodsBuilder(),
+                $modelPropertiesGenerator,
+                $classGenerator->getMethodsGenerator(),
                 $definitionName,
                 $propertyName,
                 $configuration,
@@ -375,8 +371,8 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
      * @throws Exception
      */
     public function processProperty(
-        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
-        MethodsGeneratorInterface $methodsBuilder,
+        ModelPropertiesGeneratorInterface $modelPropertiesGenerator,
+        MethodsGeneratorInterface $methodsGenerator,
         string $definitionName,
         string $propertyName,
         array $configuration,
@@ -392,12 +388,12 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         $cleanPropertyName = $this->helper::cleanStr($propertyName);
         $description = isset($configuration['description']) ? $configuration['description'] : null;
 
-        /** @var ModelPropertyGeneratorInterface $propertyBuilder */
-        $propertyBuilder = $this->classFactory->createPropertyBuilder(
-            $modelPropertiesBuilder->getUsesBuilder()
+        /** @var ModelPropertyGeneratorInterface $propertyGenerator */
+        $propertyGenerator = $this->classFactory->createPropertyGenerator(
+            $modelPropertiesGenerator->getUsesGenerator()
         );
-        $modelPropertiesBuilder->addPropertyFromSwaggerPropertyDefinition(
-            $propertyBuilder,
+        $modelPropertiesGenerator->addPropertyFromSwaggerPropertyDefinition(
+            $propertyGenerator,
             $cleanPropertyName,
             $types,
             $required,
@@ -409,29 +405,29 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
             return;
         }
 
-        $getterSetterBuilder = $this->methodFactory->createPropertyMethodsBuilder(
-            $methodsBuilder->getUsesBuilder()
+        $getterSetterGenerator = $this->methodFactory->createPropertyMethodsGenerator(
+            $methodsGenerator->getUsesGenerator()
         );
         $definition = &$this->definitions[$definitionName];
         $readOnly = isset($definition['readOnly']) && $definition['readOnly'] === 'true';
         $writeOnly = isset($definition['writeOnly']) && $definition['writeOnly'] === 'true';
-        $getterSetterBuilder->configure($propertyBuilder, $readOnly, $writeOnly);
+        $getterSetterGenerator->configure($propertyGenerator, $readOnly, $writeOnly);
 
-        $methodBuilders = $getterSetterBuilder->getMethods($this->methodFactory, $this->indent);
-        $methodsBuilder->addMultipleMethod($methodBuilders);
+        $methodGenerators = $getterSetterGenerator->getMethods($this->methodFactory, $this->indent);
+        $methodsGenerator->addMultipleMethod($methodGenerators);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function configureConstructorBuilder(
-        MethodsGeneratorInterface $methodsBuilder,
-        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
-        ModelConstructorGeneratorInterface $constructorBuilder
+    public function configureConstructorGenerator(
+        MethodsGeneratorInterface $methodsGenerator,
+        ModelPropertiesGeneratorInterface $modelPropertiesGenerator,
+        ModelConstructorGeneratorInterface $constructorGenerator
     ): void
     {
-        $constructorBuilder->configureFromPropertiesBuilder($modelPropertiesBuilder);
-        $methodsBuilder->addMethod($constructorBuilder);
+        $constructorGenerator->configureFromPropertiesGenerator($modelPropertiesGenerator);
+        $methodsGenerator->addMethod($constructorGenerator);
     }
 
     /**

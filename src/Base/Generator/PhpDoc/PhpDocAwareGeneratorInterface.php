@@ -9,10 +9,10 @@ interface PhpDocAwareGeneratorInterface
     /**
      * @return PhpDocGeneratorInterface
      */
-    public function getPhpDocBuilder(): PhpDocGeneratorInterface;
+    public function getPhpDocGenerator(): PhpDocGeneratorInterface;
 
     /**
-     * @param PhpDocGeneratorInterface $phpDocBuilder
+     * @param PhpDocGeneratorInterface $phpDocGenerator
      */
-    public function setPhpDocBuilder(PhpDocGeneratorInterface $phpDocBuilder): void;
+    public function setPhpDocGenerator(PhpDocGeneratorInterface $phpDocGenerator): void;
 }

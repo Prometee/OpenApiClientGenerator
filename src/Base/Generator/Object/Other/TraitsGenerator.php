@@ -7,16 +7,16 @@ namespace Prometee\SwaggerClientGenerator\Base\Generator\Object\Other;
 class TraitsGenerator implements TraitsGeneratorInterface
 {
     /** @var UsesGeneratorInterface */
-    protected $usesBuilder;
+    protected $usesGenerator;
     /** @var string[] */
     protected $traits = [];
 
     /**
      * @inheritDoc
      */
-    public function configure(UsesGeneratorInterface $usesBuilder, array $traits = []): void
+    public function configure(UsesGeneratorInterface $usesGenerator, array $traits = []): void
     {
-        $this->usesBuilder = $usesBuilder;
+        $this->usesGenerator = $usesGenerator;
         $this->traits = $traits;
     }
 
@@ -57,7 +57,7 @@ class TraitsGenerator implements TraitsGeneratorInterface
      */
     public function setTrait(string $class, string $alias = ''): void
     {
-        $this->usesBuilder->guessUse($class, $alias);
-        $this->traits[$class] = $this->usesBuilder->getInternalUseName($class);
+        $this->usesGenerator->guessUse($class, $alias);
+        $this->traits[$class] = $this->usesGenerator->getInternalUseName($class);
     }
 }

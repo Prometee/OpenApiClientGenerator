@@ -33,7 +33,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     /** @var array */
     protected $paths = [];
     /** @var ClassGenerator[] */
-    protected $classBuilders = [];
+    protected $classGenerators = [];
     /** @var string[] */
     protected $throwsClasses = [];
     /** @var string|null */
@@ -68,7 +68,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         $this->indent = $indent;
 
         $this->paths = [];
-        $this->classBuilders = [];
+        $this->classGenerators = [];
         $this->throwsClasses = [];
     }
 
@@ -120,14 +120,14 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         }
 
         // Class
-        $classBuilder = $this->getOrCreateClassBuilder($path, $filePath);
+        $classGenerator = $this->getOrCreateClassGenerator($path, $filePath);
 
         // Methods
         foreach ($operationConfigurations as $operation => $operationConfiguration) {
             if (!is_array($operationConfiguration)) {
                 continue;
             }
-            $this->processOperation($classBuilder, $path, $operation, $operationConfiguration);
+            $this->processOperation($classGenerator, $path, $operation, $operationConfiguration);
         }
 
         // File creation
@@ -136,17 +136,17 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             mkdir($directory, 0777, true);
         }
 
-        if (false === file_put_contents($filePath, $classBuilder->generate($this->indent))) {
+        if (false === file_put_contents($filePath, $classGenerator->generate($this->indent))) {
             throw new Exception(sprintf('Unable to generate the class : "%s" !', $filePath));
         }
 
-        return $classBuilder;
+        return $classGenerator;
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function getOrCreateClassBuilder(string $path, string $filePath): ClassGeneratorInterface
+    protected function getOrCreateClassGenerator(string $path, string $filePath): ClassGeneratorInterface
     {
         [$namespace, $className] = $this->getClassNameAndNamespaceFromPath(
             $path,
@@ -154,37 +154,37 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             static::CLASS_SUFFIX
         );
 
-        if ($this->hasClassBuilder($filePath)) {
-            return $this->classBuilders[$filePath];
+        if ($this->hasClassGenerator($filePath)) {
+            return $this->classGenerators[$filePath];
         }
 
-        $classBuilder = $this->classFactory->createClassBuilder();
-        $classBuilder->configure($namespace, $className);
+        $classGenerator = $this->classFactory->createClassGenerator();
+        $classGenerator->configure($namespace, $className);
         if ($this->abstractOperationClass !== null) {
-            $useBuilder = $classBuilder->getUsesBuilder();
-            $useBuilder->addUse($this->abstractOperationClass);
-            $extendClassName = $useBuilder->getInternalUseName($this->abstractOperationClass);
-            $classBuilder->setExtendClassName($extendClassName);
+            $useGenerator = $classGenerator->getUsesGenerator();
+            $useGenerator->addUse($this->abstractOperationClass);
+            $extendClassName = $useGenerator->getInternalUseName($this->abstractOperationClass);
+            $classGenerator->setExtendClassName($extendClassName);
         }
 
-        $this->classBuilders[$filePath] = $classBuilder;
+        $this->classGenerators[$filePath] = $classGenerator;
 
-        return $classBuilder;
+        return $classGenerator;
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function hasClassBuilder(string $filePath): bool
+    protected function hasClassGenerator(string $filePath): bool
     {
-        return isset($this->classBuilders[$filePath]);
+        return isset($this->classGenerators[$filePath]);
     }
 
     /**
      * {@inheritDoc}
      */
     public function processOperation(
-        ClassGeneratorInterface $classBuilder,
+        ClassGeneratorInterface $classGenerator,
         string $path,
         string $operation,
         array $operationConfiguration
@@ -205,62 +205,62 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             $returnType = 'void';
         }
 
-        $operationMethodBuilder = $this->methodFactory->createOperationMethodBuilder(
-            $classBuilder->getUsesBuilder()
+        $operationMethodGenerator = $this->methodFactory->createOperationMethodGenerator(
+            $classGenerator->getUsesGenerator()
         );
         $operationMethodName = $this->helper::getOperationMethodName($path, $operation, $operationConfiguration);
-        $operationMethodBuilder->setName($operationMethodName);
-        $operationMethodBuilder->addReturnType($returnType);
+        $operationMethodGenerator->setName($operationMethodName);
+        $operationMethodGenerator->addReturnType($returnType);
 
         if (isset($operationConfiguration['description'])) {
-            $operationMethodBuilder->getPhpDocBuilder()->addDescriptionLine($operationConfiguration['description']);
+            $operationMethodGenerator->getPhpDocGenerator()->addDescriptionLine($operationConfiguration['description']);
         }
-        $operationMethodBuilder->getPhpDocBuilder()->addDescriptionLine(
+        $operationMethodGenerator->getPhpDocGenerator()->addDescriptionLine(
             sprintf('path: %s', $path)
         );
-        $operationMethodBuilder->getPhpDocBuilder()->addDescriptionLine(
+        $operationMethodGenerator->getPhpDocGenerator()->addDescriptionLine(
             sprintf('method: %s', strtoupper($operation))
         );
 
         $operationParameters = [];
         if (isset($operationConfiguration['parameters'])) {
             $operationParameters = $operationConfiguration['parameters'];
-            $this->processOperationParameters($classBuilder, $operationMethodBuilder, $operationParameters);
+            $this->processOperationParameters($classGenerator, $operationMethodGenerator, $operationParameters);
         }
 
         foreach ($this->throwsClasses as $throwsClass => $className) {
-            $classBuilder->getUsesBuilder()->addUse($throwsClass);
-            $operationMethodBuilder->getPhpDocBuilder()->addThrowsLine($className);
+            $classGenerator->getUsesGenerator()->addUse($throwsClass);
+            $operationMethodGenerator->getPhpDocGenerator()->addThrowsLine($className);
         }
 
-        $operationMethodBuilder->addMethodBodyFromSwaggerConfiguration(
+        $operationMethodGenerator->addMethodBodyFromSwaggerConfiguration(
             $path,
             $operation,
             $operationParameters,
             $this->indent
         );
 
-        $classBuilder->getMethodsBuilder()->addMethod($operationMethodBuilder);
+        $classGenerator->getMethodsGenerator()->addMethod($operationMethodGenerator);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function processOperationParameters(ClassGeneratorInterface $classBuilder, MethodGeneratorInterface $methodBuilder, array $operationParameters): void
+    public function processOperationParameters(ClassGeneratorInterface $classGenerator, MethodGeneratorInterface $methodGenerator, array $operationParameters): void
     {
         foreach ($operationParameters as $parameterConfiguration) {
-            $methodParameterBuilder = $this->createAnOperationParameter($classBuilder, $parameterConfiguration);
-            if ($methodParameterBuilder === null) {
+            $methodParameterGenerator = $this->createAnOperationParameter($classGenerator, $parameterConfiguration);
+            if ($methodParameterGenerator === null) {
                 continue;
             }
-            $methodBuilder->addParameter($methodParameterBuilder);
+            $methodGenerator->addParameter($methodParameterGenerator);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createAnOperationParameter(ClassGeneratorInterface $classBuilder, array $parameterConfiguration): ?MethodParameterGeneratorInterface
+    public function createAnOperationParameter(ClassGeneratorInterface $classGenerator, array $parameterConfiguration): ?MethodParameterGeneratorInterface
     {
         if (!isset($parameterConfiguration['name'])) {
             return null;
@@ -273,32 +273,18 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         $types = [$type];
 
         $name = lcfirst($this->helper::cleanStr($parameterConfiguration['name']));
-        $value = null;
+
+        $value = $this->buildValueForOperationParameter($parameterConfiguration, $type);
+
         $description = '';
-
-        if (isset($parameterConfiguration['default'])) {
-            $value = (string) $parameterConfiguration['default'];
-            if ($type === 'string') {
-                $value = "'" . addslashes($value) . "'";
-            }
-        }
-
         if (isset($parameterConfiguration['description'])) {
             $description = $parameterConfiguration['description'];
         }
 
-        if (isset($parameterConfiguration['required'])) {
-            if ((bool) $parameterConfiguration['required']) {
-                $value = null;
-            } else {
-                $value = $value ?? 'null';
-            }
-        }
-
-        $methodParameterBuilder = $this->methodFactory->createMethodParameterBuilder(
-            $classBuilder->getUsesBuilder()
+        $methodParameterGenerator = $this->methodFactory->createMethodParameterGenerator(
+            $classGenerator->getUsesGenerator()
         );
-        $methodParameterBuilder->configure(
+        $methodParameterGenerator->configure(
             $types,
             $name,
             $value,
@@ -306,7 +292,31 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             $description
         );
 
-        return $methodParameterBuilder;
+        return $methodParameterGenerator;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function buildValueForOperationParameter(array $parameterConfiguration, ?string $type): ?string
+    {
+        $value = null;
+        if (isset($parameterConfiguration['default'])) {
+            $value = (string) $parameterConfiguration['default'];
+            if ($type === 'string') {
+                $value = "'" . addslashes($value) . "'";
+            }
+        }
+
+        if (isset($parameterConfiguration['required'])) {
+            if ((bool)$parameterConfiguration['required']) {
+                $value = null;
+            } else {
+                $value = $value ?? 'null';
+            }
+        }
+
+        return $value;
     }
 
     /**

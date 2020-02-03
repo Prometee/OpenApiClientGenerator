@@ -10,12 +10,12 @@ use Prometee\SwaggerClientGenerator\Base\Generator\Object\Attribute\PropertyGene
 interface PropertyMethodsGeneratorInterface
 {
     /**
-     * @param PropertyGeneratorInterface $propertyBuilder
+     * @param PropertyGeneratorInterface $propertyGenerator
      * @param bool $readOnly
      * @param bool $writeOnly
      */
     public function configure(
-        PropertyGeneratorInterface $propertyBuilder,
+        PropertyGeneratorInterface $propertyGenerator,
         bool $readOnly = false,
         bool $writeOnly = false
     ): void;

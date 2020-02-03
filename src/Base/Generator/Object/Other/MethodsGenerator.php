@@ -9,16 +9,16 @@ use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGenerator
 class MethodsGenerator implements MethodsGeneratorInterface
 {
     /** @var UsesGeneratorInterface */
-    protected $usesBuilder;
+    protected $usesGenerator;
     /** @var MethodGeneratorInterface[] */
     protected $methods = [];
 
     /**
      * {@inheritDoc}
      */
-    public function configure(UsesGeneratorInterface $usesBuilder, array $methods = []): void
+    public function configure(UsesGeneratorInterface $usesGenerator, array $methods = []): void
     {
-        $this->usesBuilder = $usesBuilder;
+        $this->usesGenerator = $usesGenerator;
         $this->methods = $methods;
     }
 
@@ -40,20 +40,20 @@ class MethodsGenerator implements MethodsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function addMultipleMethod(array $methodBuilders): void
+    public function addMultipleMethod(array $methodGenerators): void
     {
-        foreach ($methodBuilders as $methodBuilder) {
-            $this->addMethod($methodBuilder);
+        foreach ($methodGenerators as $methodGenerator) {
+            $this->addMethod($methodGenerator);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public function addMethod(MethodGeneratorInterface $methodBuilder): void
+    public function addMethod(MethodGeneratorInterface $methodGenerator): void
     {
-        if (!$this->hasMethod($methodBuilder->getName())) {
-            $this->methods[$methodBuilder->getName()] = $methodBuilder;
+        if (!$this->hasMethod($methodGenerator->getName())) {
+            $this->methods[$methodGenerator->getName()] = $methodGenerator;
         }
     }
 
@@ -109,16 +109,16 @@ class MethodsGenerator implements MethodsGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function getUsesBuilder(): UsesGeneratorInterface
+    public function getUsesGenerator(): UsesGeneratorInterface
     {
-        return $this->usesBuilder;
+        return $this->usesGenerator;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setUsesBuilder(UsesGeneratorInterface $usesBuilder): void
+    public function setUsesGenerator(UsesGeneratorInterface $usesGenerator): void
     {
-        $this->usesBuilder = $usesBuilder;
+        $this->usesGenerator = $usesGenerator;
     }
 }

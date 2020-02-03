@@ -16,98 +16,98 @@ class ClassFactory implements ClassFactoryInterface
     /** @var PhpDocFactoryInterface */
     protected $phpDocFactory;
     /** @var string */
-    protected $classBuilderClass;
+    protected $classGeneratorClass;
     /** @var string */
-    protected $usesBuilderClass;
+    protected $usesGeneratorClass;
     /** @var string */
-    protected $traitsBuilderClass;
+    protected $traitsGeneratorClass;
     /** @var string */
-    protected $propertiesBuilderClass;
+    protected $propertiesGeneratorClass;
     /** @var string */
-    protected $methodsBuilderClass;
+    protected $methodsGeneratorClass;
     /** @var string */
-    protected $propertyBuilderClass;
+    protected $propertyGeneratorClass;
 
     /**
      * @param PhpDocFactoryInterface $phpDocFactory
-     * @param string $classBuilderClass
-     * @param string $usesBuilderClass
-     * @param string $traitsBuilderClass
-     * @param string $propertiesBuilderClass
-     * @param string $methodsBuilderClass
-     * @param string $propertyBuilderClass
+     * @param string $classGeneratorClass
+     * @param string $usesGeneratorClass
+     * @param string $traitsGeneratorClass
+     * @param string $propertiesGeneratorClass
+     * @param string $methodsGeneratorClass
+     * @param string $propertyGeneratorClass
      */
     public function __construct(
         PhpDocFactoryInterface $phpDocFactory,
-        string $classBuilderClass,
-        string $usesBuilderClass,
-        string $traitsBuilderClass,
-        string $propertiesBuilderClass,
-        string $methodsBuilderClass,
-        string $propertyBuilderClass
+        string $classGeneratorClass,
+        string $usesGeneratorClass,
+        string $traitsGeneratorClass,
+        string $propertiesGeneratorClass,
+        string $methodsGeneratorClass,
+        string $propertyGeneratorClass
     )
     {
         $this->phpDocFactory = $phpDocFactory;
-        $this->classBuilderClass = $classBuilderClass;
-        $this->usesBuilderClass = $usesBuilderClass;
-        $this->traitsBuilderClass = $traitsBuilderClass;
-        $this->propertiesBuilderClass = $propertiesBuilderClass;
-        $this->methodsBuilderClass = $methodsBuilderClass;
-        $this->propertyBuilderClass = $propertyBuilderClass;
+        $this->classGeneratorClass = $classGeneratorClass;
+        $this->usesGeneratorClass = $usesGeneratorClass;
+        $this->traitsGeneratorClass = $traitsGeneratorClass;
+        $this->propertiesGeneratorClass = $propertiesGeneratorClass;
+        $this->methodsGeneratorClass = $methodsGeneratorClass;
+        $this->propertyGeneratorClass = $propertyGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createClassBuilder(): ClassGeneratorInterface
+    public function createClassGenerator(): ClassGeneratorInterface
     {
-        return new $this->classBuilderClass(
-            $this->createUsesBuilder(),
-            $this->createPropertiesBuilder(),
-            $this->createMethodsBuilder(),
-            $this->createTraitsBuilder()
+        return new $this->classGeneratorClass(
+            $this->createUsesGenerator(),
+            $this->createPropertiesGenerator(),
+            $this->createMethodsGenerator(),
+            $this->createTraitsGenerator()
         );
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createUsesBuilder(): UsesGeneratorInterface
+    public function createUsesGenerator(): UsesGeneratorInterface
     {
-        return new $this->usesBuilderClass();
+        return new $this->usesGeneratorClass();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createTraitsBuilder(): TraitsGeneratorInterface
+    public function createTraitsGenerator(): TraitsGeneratorInterface
     {
-        return new $this->traitsBuilderClass();
+        return new $this->traitsGeneratorClass();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createPropertiesBuilder(): PropertiesGeneratorInterface
+    public function createPropertiesGenerator(): PropertiesGeneratorInterface
     {
-        return new $this->propertiesBuilderClass();
+        return new $this->propertiesGeneratorClass();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createMethodsBuilder(): MethodsGeneratorInterface
+    public function createMethodsGenerator(): MethodsGeneratorInterface
     {
-        return new $this->methodsBuilderClass();
+        return new $this->methodsGeneratorClass();
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createPropertyBuilder(UsesGeneratorInterface $usesBuilder): PropertyGeneratorInterface
+    public function createPropertyGenerator(UsesGeneratorInterface $usesGenerator): PropertyGeneratorInterface
     {
-        $phpDocBuilder = $this->phpDocFactory->createPhpDocBuilder($usesBuilder);
-        return new $this->propertyBuilderClass($usesBuilder, $phpDocBuilder);
+        $phpDocGenerator = $this->phpDocFactory->createPhpDocGenerator($usesGenerator);
+        return new $this->propertyGeneratorClass($usesGenerator, $phpDocGenerator);
     }
 
     /**
@@ -129,96 +129,96 @@ class ClassFactory implements ClassFactoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getClassBuilderClass(): string
+    public function getClassGeneratorClass(): string
     {
-        return $this->classBuilderClass;
+        return $this->classGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setClassBuilderClass(string $classBuilderClass): void
+    public function setClassGeneratorClass(string $classGeneratorClass): void
     {
-        $this->classBuilderClass = $classBuilderClass;
+        $this->classGeneratorClass = $classGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getUsesBuilderClass(): string
+    public function getUsesGeneratorClass(): string
     {
-        return $this->usesBuilderClass;
+        return $this->usesGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setUsesBuilderClass(string $usesBuilderClass): void
+    public function setUsesGeneratorClass(string $usesGeneratorClass): void
     {
-        $this->usesBuilderClass = $usesBuilderClass;
+        $this->usesGeneratorClass = $usesGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getTraitsBuilderClass(): string
+    public function getTraitsGeneratorClass(): string
     {
-        return $this->traitsBuilderClass;
+        return $this->traitsGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setTraitsBuilderClass(string $traitsBuilderClass): void
+    public function setTraitsGeneratorClass(string $traitsGeneratorClass): void
     {
-        $this->traitsBuilderClass = $traitsBuilderClass;
+        $this->traitsGeneratorClass = $traitsGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getPropertiesBuilderClass(): string
+    public function getPropertiesGeneratorClass(): string
     {
-        return $this->propertiesBuilderClass;
+        return $this->propertiesGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setPropertiesBuilderClass(string $propertiesBuilderClass): void
+    public function setPropertiesGeneratorClass(string $propertiesGeneratorClass): void
     {
-        $this->propertiesBuilderClass = $propertiesBuilderClass;
+        $this->propertiesGeneratorClass = $propertiesGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getMethodsBuilderClass(): string
+    public function getMethodsGeneratorClass(): string
     {
-        return $this->methodsBuilderClass;
+        return $this->methodsGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setMethodsBuilderClass(string $methodsBuilderClass): void
+    public function setMethodsGeneratorClass(string $methodsGeneratorClass): void
     {
-        $this->methodsBuilderClass = $methodsBuilderClass;
+        $this->methodsGeneratorClass = $methodsGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getPropertyBuilderClass(): string
+    public function getPropertyGeneratorClass(): string
     {
-        return $this->propertyBuilderClass;
+        return $this->propertyGeneratorClass;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setPropertyBuilderClass(string $propertyBuilderClass): void
+    public function setPropertyGeneratorClass(string $propertyGeneratorClass): void
     {
-        $this->propertyBuilderClass = $propertyBuilderClass;
+        $this->propertyGeneratorClass = $propertyGeneratorClass;
     }
 }

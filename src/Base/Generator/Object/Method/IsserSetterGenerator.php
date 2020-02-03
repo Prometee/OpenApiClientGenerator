@@ -12,14 +12,14 @@ class IsserSetterGenerator extends GetterSetterGenerator implements IsserSetterG
     public function configureGetter(string $indent = null): void
     {
         if (!$this->isWriteOnly()) {
-            $this->getterMethodBuilder->configure(
+            $this->getterMethodGenerator->configure(
                 MethodGeneratorInterface::SCOPE_PUBLIC,
                 $this->getMethodName(static::ISSER_PREFIX),
-                $this->propertyBuilder->getTypes()
+                $this->propertyGenerator->getTypes()
             );
 
-            $this->getterMethodBuilder->addLine(
-                sprintf('return $this->%s;', $this->propertyBuilder->getName())
+            $this->getterMethodGenerator->addLine(
+                sprintf('return $this->%s;', $this->propertyGenerator->getName())
             );
         }
     }

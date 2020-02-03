@@ -96,7 +96,7 @@ interface MethodGeneratorInterface extends GeneratorInterface, PhpDocAwareGenera
     /**
      * {@inheritdoc}
      */
-    public function hasParameter(MethodParameterGeneratorInterface $methodParameterBuilder): bool;
+    public function hasParameter(MethodParameterGeneratorInterface $methodParameterGenerator): bool;
 
     /**
      * @param bool $static
@@ -143,14 +143,14 @@ interface MethodGeneratorInterface extends GeneratorInterface, PhpDocAwareGenera
     /**
      * {@inheritdoc}
      */
-    public function setParameter(MethodParameterGeneratorInterface $methodParameterBuilder): void;
+    public function setParameter(MethodParameterGeneratorInterface $methodParameterGenerator): void;
 
-    public function configurePhpDocBuilder(): void;
+    public function configurePhpDocGenerator(): void;
 
     /**
      * {@inheritdoc}
      */
-    public function addParameter(MethodParameterGeneratorInterface $methodParameterBuilder): void;
+    public function addParameter(MethodParameterGeneratorInterface $methodParameterGenerator): void;
 
     /**
      * @param string $description
@@ -175,20 +175,20 @@ interface MethodGeneratorInterface extends GeneratorInterface, PhpDocAwareGenera
     /**
      * @return UsesGeneratorInterface
      */
-    public function getUsesBuilder(): UsesGeneratorInterface;
+    public function getUsesGenerator(): UsesGeneratorInterface;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      */
-    public function setUsesBuilder(UsesGeneratorInterface $usesBuilder): void;
+    public function setUsesGenerator(UsesGeneratorInterface $usesGenerator): void;
 
     /**
      * @return MethodParameterGeneratorInterface
      */
-    public function getMethodParameterBuilderSkel(): MethodParameterGeneratorInterface;
+    public function getMethodParameterGeneratorSkel(): MethodParameterGeneratorInterface;
 
     /**
-     * @param MethodParameterGeneratorInterface $methodParameterBuilderSkel
+     * @param MethodParameterGeneratorInterface $methodParameterGeneratorSkel
      */
-    public function setMethodParameterBuilderSkel(MethodParameterGeneratorInterface $methodParameterBuilderSkel): void;
+    public function setMethodParameterGeneratorSkel(MethodParameterGeneratorInterface $methodParameterGeneratorSkel): void;
 }

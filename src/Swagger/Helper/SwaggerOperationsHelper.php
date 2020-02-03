@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Swagger\Helper;
 
+use Exception;
+
 class SwaggerOperationsHelper extends AbstractHelper implements SwaggerOperationsHelperInterface
 {
     /**
@@ -45,6 +47,8 @@ class SwaggerOperationsHelper extends AbstractHelper implements SwaggerOperation
 
     /**
      * {@inheritdoc}
+     *
+     * @throws Exception
      */
     public static function getReturnType(array $responseConfiguration): ?string
     {

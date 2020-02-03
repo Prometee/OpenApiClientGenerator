@@ -95,8 +95,8 @@ interface SwaggerModelGeneratorInterface
     ): array;
 
     /**
-     * @param ModelPropertiesGeneratorInterface $modelPropertiesBuilder
-     * @param MethodsGeneratorInterface $methodsBuilder
+     * @param ModelPropertiesGeneratorInterface $modelPropertiesGenerator
+     * @param MethodsGeneratorInterface $methodsGenerator
      * @param string $definitionName
      * @param string $propertyName
      * @param array $configuration
@@ -104,8 +104,8 @@ interface SwaggerModelGeneratorInterface
      * @param bool $inherited
      */
     public function processProperty(
-        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
-        MethodsGeneratorInterface $methodsBuilder,
+        ModelPropertiesGeneratorInterface $modelPropertiesGenerator,
+        MethodsGeneratorInterface $methodsGenerator,
         string $definitionName,
         string $propertyName,
         array $configuration,
@@ -115,10 +115,8 @@ interface SwaggerModelGeneratorInterface
 
     /**
      * @param string $definitionName
-     *
-     * @return null|ClassGeneratorInterface
      */
-    public function generateClass(string $definitionName): ?ClassGeneratorInterface;
+    public function generateClass(string $definitionName): void;
 
     /**
      * @param string $definitionName
@@ -128,35 +126,33 @@ interface SwaggerModelGeneratorInterface
     public function hasDefinition(string $definitionName): bool;
 
     /**
-     * @param MethodsGeneratorInterface $methodsBuilder
-     * @param ModelPropertiesGeneratorInterface $modelPropertiesBuilder
-     * @param ModelConstructorGeneratorInterface $constructorBuilder
+     * @param MethodsGeneratorInterface $methodsGenerator
+     * @param ModelPropertiesGeneratorInterface $modelPropertiesGenerator
+     * @param ModelConstructorGeneratorInterface $constructorGenerator
      */
-    public function configureConstructorBuilder(
-        MethodsGeneratorInterface $methodsBuilder,
-        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
-        ModelConstructorGeneratorInterface $constructorBuilder
+    public function configureConstructorGenerator(
+        MethodsGeneratorInterface $methodsGenerator,
+        ModelPropertiesGeneratorInterface $modelPropertiesGenerator,
+        ModelConstructorGeneratorInterface $constructorGenerator
     ): void;
 
     /**
-     * @param ClassGeneratorInterface $classBuilder
+     * @param ClassGeneratorInterface $classGenerator
      * @param string $definitionName
-     *
-     * @return ClassGeneratorInterface|null
      */
-    public function configureClassBuilder(
-        ClassGeneratorInterface $classBuilder,
+    public function configureClassGenerator(
+        ClassGeneratorInterface $classGenerator,
         string $definitionName
-    ): ?ClassGeneratorInterface;
+    ): void;
 
     /**
-     * @param ClassGeneratorInterface $classBuilder
-     * @param ModelPropertiesGeneratorInterface $modelPropertiesBuilder
+     * @param ClassGeneratorInterface $classGenerator
+     * @param ModelPropertiesGeneratorInterface $modelPropertiesGenerator
      * @param string $definitionName
      */
-    public function configurePropertiesBuilder(
-        ClassGeneratorInterface $classBuilder,
-        ModelPropertiesGeneratorInterface $modelPropertiesBuilder,
+    public function configurePropertiesGenerator(
+        ClassGeneratorInterface $classGenerator,
+        ModelPropertiesGeneratorInterface $modelPropertiesGenerator,
         string $definitionName
     ): void;
 

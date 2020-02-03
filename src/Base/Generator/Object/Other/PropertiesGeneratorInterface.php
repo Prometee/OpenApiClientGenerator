@@ -10,15 +10,15 @@ use Prometee\SwaggerClientGenerator\Base\Generator\Object\Attribute\PropertyGene
 interface PropertiesGeneratorInterface extends GeneratorInterface
 {
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      * @param PropertyGeneratorInterface[] $properties
      */
-    public function configure(UsesGeneratorInterface $usesBuilder, array $properties = []): void;
+    public function configure(UsesGeneratorInterface $usesGenerator, array $properties = []): void;
 
     /**
-     * @param PropertyGeneratorInterface $propertyBuilder
+     * @param PropertyGeneratorInterface $propertyGenerator
      */
-    public function addProperty(PropertyGeneratorInterface $propertyBuilder);
+    public function addProperty(PropertyGeneratorInterface $propertyGenerator);
 
     /**
      * @param string $name
@@ -45,12 +45,12 @@ interface PropertiesGeneratorInterface extends GeneratorInterface
     public function getProperties(): array;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      */
-    public function setUsesBuilder(UsesGeneratorInterface $usesBuilder): void;
+    public function setUsesGenerator(UsesGeneratorInterface $usesGenerator): void;
 
     /**
      * @return UsesGeneratorInterface
      */
-    public function getUsesBuilder(): UsesGeneratorInterface;
+    public function getUsesGenerator(): UsesGeneratorInterface;
 }

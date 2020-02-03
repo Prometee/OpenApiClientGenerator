@@ -10,9 +10,9 @@ use Prometee\SwaggerClientGenerator\Base\Generator\PhpDoc\PhpDocGeneratorInterfa
 class PropertyGenerator implements PropertyGeneratorInterface
 {
     /** @var UsesGeneratorInterface  */
-    protected $usesBuilder;
+    protected $usesGenerator;
     /** @var PhpDocGeneratorInterface */
-    protected $phpDocBuilder;
+    protected $phpDocGenerator;
 
     /** @var string */
     protected $scope = 'private';
@@ -28,16 +28,16 @@ class PropertyGenerator implements PropertyGeneratorInterface
     protected $types;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
-     * @param PhpDocGeneratorInterface $phpDocBuilder
+     * @param UsesGeneratorInterface $usesGenerator
+     * @param PhpDocGeneratorInterface $phpDocGenerator
      */
     public function __construct(
-        UsesGeneratorInterface $usesBuilder,
-        PhpDocGeneratorInterface $phpDocBuilder
+        UsesGeneratorInterface $usesGenerator,
+        PhpDocGeneratorInterface $phpDocGenerator
     )
     {
-        $this->usesBuilder = $usesBuilder;
-        $this->phpDocBuilder = $phpDocBuilder;
+        $this->usesGenerator = $usesGenerator;
+        $this->phpDocGenerator = $phpDocGenerator;
     }
 
     /**
@@ -55,7 +55,7 @@ class PropertyGenerator implements PropertyGeneratorInterface
         $this->setValue($value);
         $this->setDescription($description);
 
-        $this->phpDocBuilder->configure();
+        $this->phpDocGenerator->configure();
         $this->hasAlreadyBeenGenerated = false;
     }
 
@@ -66,8 +66,8 @@ class PropertyGenerator implements PropertyGeneratorInterface
     {
         $content = "\n";
 
-        $this->configurePhpDocBuilder();
-        $content .= $this->phpDocBuilder->generate($indent);
+        $this->configurePhpDocGenerator();
+        $content .= $this->phpDocGenerator->generate($indent);
 
         $content .= $indent.$this->scope.' ';
         $content .= $this->getPhpName();
@@ -79,13 +79,13 @@ class PropertyGenerator implements PropertyGeneratorInterface
         return $content;
     }
 
-    public function configurePhpDocBuilder(): void
+    public function configurePhpDocGenerator(): void
     {
         if (!$this->hasAlreadyBeenGenerated) {
             if (!empty($this->description)) {
-                $this->phpDocBuilder->addDescriptionLine($this->description);
+                $this->phpDocGenerator->addDescriptionLine($this->description);
             }
-            $this->phpDocBuilder->addVarLine($this->getType());
+            $this->phpDocGenerator->addVarLine($this->getType());
 
             $this->hasAlreadyBeenGenerated = true;
         }
@@ -123,7 +123,7 @@ class PropertyGenerator implements PropertyGeneratorInterface
      */
     public function addType(string $type): void
     {
-        $type = $this->usesBuilder->guessUseOrReturnType($type);
+        $type = $this->usesGenerator->guessUseOrReturnType($type);
         if (false === $this->hasType($type)) {
             $this->types[] = $type;
         }
@@ -244,16 +244,16 @@ class PropertyGenerator implements PropertyGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function getPhpDocBuilder(): PhpDocGeneratorInterface
+    public function getPhpDocGenerator(): PhpDocGeneratorInterface
     {
-        return $this->phpDocBuilder;
+        return $this->phpDocGenerator;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setPhpDocBuilder(PhpDocGeneratorInterface $phpDocBuilder): void
+    public function setPhpDocGenerator(PhpDocGeneratorInterface $phpDocGenerator): void
     {
-        $this->phpDocBuilder = $phpDocBuilder;
+        $this->phpDocGenerator = $phpDocGenerator;
     }
 }

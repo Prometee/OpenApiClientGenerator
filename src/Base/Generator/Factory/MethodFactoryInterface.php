@@ -16,53 +16,53 @@ use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\UsesGeneratorInt
 interface MethodFactoryInterface
 {
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return MethodGeneratorInterface
      */
-    public function createMethodBuilder(UsesGeneratorInterface $usesBuilder): MethodGeneratorInterface;
+    public function createMethodGenerator(UsesGeneratorInterface $usesGenerator): MethodGeneratorInterface;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return ConstructorGeneratorInterface
      */
-    public function createConstructorBuilder(UsesGeneratorInterface $usesBuilder): ConstructorGeneratorInterface;
+    public function createConstructorGenerator(UsesGeneratorInterface $usesGenerator): ConstructorGeneratorInterface;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return MethodParameterGeneratorInterface
      */
-    public function createMethodParameterBuilder(UsesGeneratorInterface $usesBuilder): MethodParameterGeneratorInterface;
+    public function createMethodParameterGenerator(UsesGeneratorInterface $usesGenerator): MethodParameterGeneratorInterface;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return PropertyMethodsGeneratorInterface
      */
-    public function createPropertyMethodsBuilder(UsesGeneratorInterface $usesBuilder): PropertyMethodsGeneratorInterface;
+    public function createPropertyMethodsGenerator(UsesGeneratorInterface $usesGenerator): PropertyMethodsGeneratorInterface;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return GetterSetterGeneratorInterface
      */
-    public function createGetterSetterBuilder(UsesGeneratorInterface $usesBuilder): GetterSetterGeneratorInterface;
+    public function createGetterSetterGenerator(UsesGeneratorInterface $usesGenerator): GetterSetterGeneratorInterface;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return IsserSetterGeneratorInterface
      */
-    public function createIsserSetterBuilderBuilder(UsesGeneratorInterface $usesBuilder): IsserSetterGeneratorInterface;
+    public function createIsserSetterGenerator(UsesGeneratorInterface $usesGenerator): IsserSetterGeneratorInterface;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return ArrayGetterSetterGeneratorInterface
      */
-    public function createArrayGetterSetterBuilder(UsesGeneratorInterface $usesBuilder): ArrayGetterSetterGeneratorInterface;
+    public function createArrayGetterSetterGenerator(UsesGeneratorInterface $usesGenerator): ArrayGetterSetterGeneratorInterface;
 
     /**
      * @return PhpDocFactoryInterface
@@ -70,14 +70,14 @@ interface MethodFactoryInterface
     public function getPhpDocFactory(): PhpDocFactoryInterface;
 
     /**
-     * @param string $getterSetterBuilderClass
+     * @param string $getterSetterGeneratorClass
      */
-    public function setGetterSetterBuilderClass(string $getterSetterBuilderClass): void;
+    public function setGetterSetterGeneratorClass(string $getterSetterGeneratorClass): void;
 
     /**
      * @return string
      */
-    public function getMethodBuilderClass(): string;
+    public function getMethodGeneratorClass(): string;
 
     /**
      * @param PhpDocFactoryInterface $phpDocFactory
@@ -85,62 +85,62 @@ interface MethodFactoryInterface
     public function setPhpDocFactory(PhpDocFactoryInterface $phpDocFactory): void;
 
     /**
-     * @param string $arrayGetterSetterBuilderClass
+     * @param string $arrayGetterSetterGeneratorClass
      */
-    public function setArrayGetterSetterBuilderClass(string $arrayGetterSetterBuilderClass): void;
+    public function setArrayGetterSetterGeneratorClass(string $arrayGetterSetterGeneratorClass): void;
 
     /**
-     * @param string $methodBuilderClass
+     * @param string $methodGeneratorClass
      */
-    public function setMethodBuilderClass(string $methodBuilderClass): void;
+    public function setMethodGeneratorClass(string $methodGeneratorClass): void;
 
     /**
-     * @param string $propertyMethodsBuilderClass
+     * @param string $propertyMethodsGeneratorClass
      */
-    public function setPropertyMethodsBuilderClass(string $propertyMethodsBuilderClass): void;
+    public function setPropertyMethodsGeneratorClass(string $propertyMethodsGeneratorClass): void;
 
     /**
-     * @param string $methodParameterBuilderClass
+     * @param string $methodParameterGeneratorClass
      */
-    public function setMethodParameterBuilderClass(string $methodParameterBuilderClass): void;
+    public function setMethodParameterGeneratorClass(string $methodParameterGeneratorClass): void;
 
     /**
-     * @param string $isserSetterBuilderClass
+     * @param string $isserSetterGeneratorClass
      */
-    public function setIsserSetterBuilderClass(string $isserSetterBuilderClass): void;
-
-    /**
-     * @return string
-     */
-    public function getConstructorBuilderClass(): string;
-
-    /**
-     * @param string $constructorBuilderClass
-     */
-    public function setConstructorBuilderClass(string $constructorBuilderClass): void;
+    public function setIsserSetterGeneratorClass(string $isserSetterGeneratorClass): void;
 
     /**
      * @return string
      */
-    public function getMethodParameterBuilderClass(): string;
+    public function getConstructorGeneratorClass(): string;
+
+    /**
+     * @param string $constructorGeneratorClass
+     */
+    public function setConstructorGeneratorClass(string $constructorGeneratorClass): void;
 
     /**
      * @return string
      */
-    public function getPropertyMethodsBuilderClass(): string;
+    public function getMethodParameterGeneratorClass(): string;
 
     /**
      * @return string
      */
-    public function getArrayGetterSetterBuilderClass(): string;
+    public function getPropertyMethodsGeneratorClass(): string;
 
     /**
      * @return string
      */
-    public function getIsserSetterBuilderClass(): string;
+    public function getArrayGetterSetterGeneratorClass(): string;
 
     /**
      * @return string
      */
-    public function getGetterSetterBuilderClass(): string;
+    public function getIsserSetterGeneratorClass(): string;
+
+    /**
+     * @return string
+     */
+    public function getGetterSetterGeneratorClass(): string;
 }

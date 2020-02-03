@@ -13,13 +13,13 @@ class ModelMethodFactory extends BaseMethodFactory implements ModelMethodFactory
     /**
      * @inheritDoc
      */
-    public function createModelConstructorBuilder(UsesGeneratorInterface $usesBuilder): ModelConstructorGeneratorInterface
+    public function createModelConstructorGenerator(UsesGeneratorInterface $usesGenerator): ModelConstructorGeneratorInterface
     {
-        $phpDocBuilder = $this->phpDocFactory->createPhpDocBuilder($usesBuilder);
-        return new $this->constructorBuilderClass(
-            $usesBuilder,
-            $phpDocBuilder,
-            $this->createMethodParameterBuilder($usesBuilder)
+        $phpDocGenerator = $this->phpDocFactory->createPhpDocGenerator($usesGenerator);
+        return new $this->constructorGeneratorClass(
+            $usesGenerator,
+            $phpDocGenerator,
+            $this->createMethodParameterGenerator($usesGenerator)
         );
     }
 }

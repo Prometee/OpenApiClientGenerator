@@ -16,34 +16,34 @@ interface ClassFactoryInterface
     /**
      * @return ClassGeneratorInterface
      */
-    public function createClassBuilder(): ClassGeneratorInterface;
+    public function createClassGenerator(): ClassGeneratorInterface;
 
     /**
      * @return UsesGeneratorInterface
      */
-    public function createUsesBuilder(): UsesGeneratorInterface;
+    public function createUsesGenerator(): UsesGeneratorInterface;
 
     /**
      * @return TraitsGeneratorInterface
      */
-    public function createTraitsBuilder(): TraitsGeneratorInterface;
+    public function createTraitsGenerator(): TraitsGeneratorInterface;
 
     /**
      * @return PropertiesGeneratorInterface
      */
-    public function createPropertiesBuilder(): PropertiesGeneratorInterface;
+    public function createPropertiesGenerator(): PropertiesGeneratorInterface;
 
     /**
      * @return MethodsGeneratorInterface
      */
-    public function createMethodsBuilder(): MethodsGeneratorInterface;
+    public function createMethodsGenerator(): MethodsGeneratorInterface;
 
     /**
-     * @param UsesGeneratorInterface $usesBuilder
+     * @param UsesGeneratorInterface $usesGenerator
      *
      * @return PropertyGeneratorInterface
      */
-    public function createPropertyBuilder(UsesGeneratorInterface $usesBuilder): PropertyGeneratorInterface;
+    public function createPropertyGenerator(UsesGeneratorInterface $usesGenerator): PropertyGeneratorInterface;
 
     /**
      * @return PhpDocFactoryInterface
@@ -53,47 +53,47 @@ interface ClassFactoryInterface
     /**
      * @return string
      */
-    public function getTraitsBuilderClass(): string;
+    public function getTraitsGeneratorClass(): string;
 
     /**
-     * @param string $methodsBuilderClass
+     * @param string $methodsGeneratorClass
      */
-    public function setMethodsBuilderClass(string $methodsBuilderClass): void;
+    public function setMethodsGeneratorClass(string $methodsGeneratorClass): void;
 
     /**
-     * @param string $usesBuilderClass
+     * @param string $usesGeneratorClass
      */
-    public function setUsesBuilderClass(string $usesBuilderClass): void;
+    public function setUsesGeneratorClass(string $usesGeneratorClass): void;
 
     /**
-     * @param string $traitsBuilderClass
+     * @param string $traitsGeneratorClass
      */
-    public function setTraitsBuilderClass(string $traitsBuilderClass): void;
+    public function setTraitsGeneratorClass(string $traitsGeneratorClass): void;
 
     /**
-     * @param string $propertyBuilderClass
+     * @param string $propertyGeneratorClass
      */
-    public function setPropertyBuilderClass(string $propertyBuilderClass): void;
-
-    /**
-     * @return string
-     */
-    public function getPropertiesBuilderClass(): string;
-
-    /**
-     * @param string $classBuilderClass
-     */
-    public function setClassBuilderClass(string $classBuilderClass): void;
+    public function setPropertyGeneratorClass(string $propertyGeneratorClass): void;
 
     /**
      * @return string
      */
-    public function getClassBuilderClass(): string;
+    public function getPropertiesGeneratorClass(): string;
+
+    /**
+     * @param string $classGeneratorClass
+     */
+    public function setClassGeneratorClass(string $classGeneratorClass): void;
 
     /**
      * @return string
      */
-    public function getMethodsBuilderClass(): string;
+    public function getClassGeneratorClass(): string;
+
+    /**
+     * @return string
+     */
+    public function getMethodsGeneratorClass(): string;
 
     /**
      * @param PhpDocFactoryInterface $phpDocFactory
@@ -103,15 +103,15 @@ interface ClassFactoryInterface
     /**
      * @return string
      */
-    public function getPropertyBuilderClass(): string;
+    public function getPropertyGeneratorClass(): string;
 
     /**
      * @return string
      */
-    public function getUsesBuilderClass(): string;
+    public function getUsesGeneratorClass(): string;
 
     /**
-     * @param string $propertiesBuilderClass
+     * @param string $propertiesGeneratorClass
      */
-    public function setPropertiesBuilderClass(string $propertiesBuilderClass): void;
+    public function setPropertiesGeneratorClass(string $propertiesGeneratorClass): void;
 }

@@ -11,17 +11,17 @@ use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Other\ModelPropertie
 interface ModelConstructorGeneratorInterface extends ConstructorGeneratorInterface
 {
     /**
-     * @param ModelPropertiesGeneratorInterface $modelPropertiesBuilder
+     * @param ModelPropertiesGeneratorInterface $modelPropertiesGenerator
      */
-    public function configureFromPropertiesBuilder(ModelPropertiesGeneratorInterface $modelPropertiesBuilder): void;
+    public function configureFromPropertiesGenerator(ModelPropertiesGeneratorInterface $modelPropertiesGenerator): void;
 
     /**
-     * @param ModelPropertyGeneratorInterface $modelPropertyBuilder
+     * @param ModelPropertyGeneratorInterface $modelPropertyGenerator
      */
-    public function configureBodyFromPropertyBuilder(ModelPropertyGeneratorInterface $modelPropertyBuilder): void;
+    public function configureBodyFromPropertyGenerator(ModelPropertyGeneratorInterface $modelPropertyGenerator): void;
 
     /**
-     * @param ModelPropertyGeneratorInterface $modelPropertyBuilder
+     * @param ModelPropertyGeneratorInterface $modelPropertyGenerator
      */
-    public function configureParameterFromPropertyBuilder(ModelPropertyGeneratorInterface $modelPropertyBuilder): void;
+    public function configureParameterFromPropertyGenerator(ModelPropertyGeneratorInterface $modelPropertyGenerator): void;
 }
