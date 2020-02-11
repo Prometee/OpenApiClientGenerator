@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Prometee\SwaggerClientGenerator\Swagger;
 
 use Exception;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGeneratorInterface;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\MethodsGeneratorInterface;
-use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerModelHelperInterface;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelClassFactoryInterface;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelMethodFactoryInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\ClassGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Other\MethodsGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Factory\ModelClassGeneratorFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Factory\ModelMethodGeneratorFactoryInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Attribute\ModelPropertyGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Method\ModelConstructorGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Other\ModelPropertiesGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerModelHelperInterface;
 
 class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
 {
-    /** @var ModelClassFactoryInterface */
-    protected $classFactory;
-    /** @var ModelMethodFactoryInterface */
-    protected $methodFactory;
+    /** @var ModelClassGeneratorFactoryInterface */
+    protected $modelClassGeneratorFactory;
+    /** @var ModelMethodGeneratorFactoryInterface */
+    protected $modelMethodGeneratorFactory;
     /** @var SwaggerModelHelperInterface */
     protected $helper;
 
@@ -35,18 +35,18 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
     protected $overwrite = false;
 
     /**
-     * @param ModelClassFactoryInterface $classFactory
-     * @param ModelMethodFactoryInterface $methodFactory
+     * @param ModelClassGeneratorFactoryInterface $modelClassGeneratorFactory
+     * @param ModelMethodGeneratorFactoryInterface $modelMethodGeneratorFactory
      * @param SwaggerModelHelperInterface $helper
      */
     public function __construct(
-        ModelClassFactoryInterface $classFactory,
-        ModelMethodFactoryInterface $methodFactory,
+        ModelClassGeneratorFactoryInterface $modelClassGeneratorFactory,
+        ModelMethodGeneratorFactoryInterface $modelMethodGeneratorFactory,
         SwaggerModelHelperInterface $helper
     )
     {
-        $this->classFactory = $classFactory;
-        $this->methodFactory = $methodFactory;
+        $this->modelClassGeneratorFactory = $modelClassGeneratorFactory;
+        $this->modelMethodGeneratorFactory = $modelMethodGeneratorFactory;
         $this->helper = $helper;
     }
 
@@ -96,7 +96,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         }
 
         // Class
-        $classGenerator = $this->classFactory->createClassGenerator();
+        $classGenerator = $this->modelClassGeneratorFactory->createClassGenerator();
         $this->configureClassGenerator(
             $classGenerator,
             $definitionName
@@ -112,11 +112,12 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         );
 
         // Constructor
-        $constructorGenerator = $this->methodFactory->createModelConstructorGenerator($classGenerator->getUsesGenerator());
+        /** @var ModelConstructorGeneratorInterface $modelConstructorGenerator */
+        $modelConstructorGenerator = $this->modelMethodGeneratorFactory->createModelConstructorGenerator($classGenerator->getUsesGenerator());
         $this->configureConstructorGenerator(
             $classGenerator->getMethodsGenerator(),
             $modelPropertiesGenerator,
-            $constructorGenerator
+            $modelConstructorGenerator
         );
 
         // File creation
@@ -251,7 +252,6 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         string $definitionName
     ): void
     {
-        $subClassGenerator = null;
         $extendClass = null;
         if (isset($this->definitions[$definitionName]['allOf'])) {
             $allOfConfig = $this->definitions[$definitionName]['allOf'][0];
@@ -389,7 +389,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         $description = isset($configuration['description']) ? $configuration['description'] : null;
 
         /** @var ModelPropertyGeneratorInterface $propertyGenerator */
-        $propertyGenerator = $this->classFactory->createPropertyGenerator(
+        $propertyGenerator = $this->modelClassGeneratorFactory->createPropertyGenerator(
             $modelPropertiesGenerator->getUsesGenerator()
         );
         $modelPropertiesGenerator->addPropertyFromSwaggerPropertyDefinition(
@@ -405,7 +405,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
             return;
         }
 
-        $getterSetterGenerator = $this->methodFactory->createPropertyMethodsGenerator(
+        $getterSetterGenerator = $this->modelMethodGeneratorFactory->createPropertyMethodsGenerator(
             $methodsGenerator->getUsesGenerator()
         );
         $definition = &$this->definitions[$definitionName];
@@ -413,7 +413,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         $writeOnly = isset($definition['writeOnly']) && $definition['writeOnly'] === 'true';
         $getterSetterGenerator->configure($propertyGenerator, $readOnly, $writeOnly);
 
-        $methodGenerators = $getterSetterGenerator->getMethods($this->methodFactory, $this->indent);
+        $methodGenerators = $getterSetterGenerator->getMethods($this->modelMethodGeneratorFactory, $this->indent);
         $methodsGenerator->addMultipleMethod($methodGenerators);
     }
 

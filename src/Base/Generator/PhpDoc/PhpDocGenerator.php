@@ -4,12 +4,26 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Base\Generator\PhpDoc;
 
-class PhpDocGenerator implements PhpDocGeneratorInterface
+use Prometee\SwaggerClientGenerator\Base\Generator\AbstractGenerator;
+use Prometee\SwaggerClientGenerator\Base\View\PhpDoc\PhpDocViewInterface;
+
+class PhpDocGenerator extends AbstractGenerator implements PhpDocGeneratorInterface
 {
     /** @var array */
     protected $lines = [];
     /** @var int */
     protected $wrapOn = self::DEFAULT_WRAP_ON;
+
+
+    /**
+     * @param PhpDocViewInterface $phpDocView
+     */
+    public function __construct(
+        PhpDocViewInterface $phpDocView
+    )
+    {
+        $this->setView($phpDocView);
+    }
 
     /**
      * {@inheritDoc}
@@ -18,6 +32,14 @@ class PhpDocGenerator implements PhpDocGeneratorInterface
     {
         $this->lines = $lines;
         $this->wrapOn = $wrapOn ?? self::DEFAULT_WRAP_ON;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function orderLines(callable $orderingCallable): void
+    {
+        uksort($this->lines, $orderingCallable);
     }
 
     /**
@@ -101,150 +123,6 @@ class PhpDocGenerator implements PhpDocGeneratorInterface
     /**
      * {@inheritDoc}
      */
-    public function generate(string $indent = null): ?string
-    {
-        $phpdocLines = $this->buildLines();
-
-        if (empty($phpdocLines)) {
-            return null;
-        }
-
-        if ($this->hasSingleVarLine()) {
-            return sprintf('%1$s/** %3$s */%2$s', $indent, "\n", $phpdocLines[0]);
-        }
-
-        $lines = [];
-        foreach ($phpdocLines as $phpdocLine) {
-            $lines[] = sprintf('%s * %s', $indent,$phpdocLine);
-        }
-
-        return sprintf('%1$s/**%2$s%3$s%2$s%1$s */%2$s', $indent, "\n", implode("\n", $lines));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function buildLines(): array
-    {
-        $phpdocLines = [];
-        $previousType = null;
-
-        $this->orderLines();
-
-        foreach ($this->lines as $type => $lines) {
-            if ($previousType === null) {
-                $previousType = $type;
-            }
-            if ($previousType !== $type) {
-                $phpdocLines[] = '';
-                $previousType = $type;
-            }
-            $phpdocLines = array_merge(
-                $phpdocLines,
-                $this->buildTypedLines($type, $lines)
-            );
-        }
-        return $phpdocLines;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function buildTypedLines(string $type, array $lines): array
-    {
-        $phpdocLines = [];
-        $linePrefix = $this->buildTypedLinePrefix($type);
-
-        foreach ($lines as $line) {
-            $phpdocLines = array_merge(
-                $phpdocLines,
-                $this->buildLinesFromSingleLine($linePrefix, $line)
-            );
-        }
-
-        return $phpdocLines;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function buildTypedLinePrefix(string $type): string
-    {
-        if ($type === static::TYPE_DESCRIPTION) {
-            return '';
-        }
-
-        return sprintf('@%s ', $type);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function buildLinesFromSingleLine(string $linePrefix, string $line): array
-    {
-        $lines = [];
-        $linePrefixLength = strlen($linePrefix);
-        $blankSubLinePrefix = str_repeat(' ', $linePrefixLength);
-        $explodedLines = explode("\n", $line);
-
-        foreach ($explodedLines as $i=>$explodedLine) {
-            $wrapOn = $this->wrapOn;
-            if ($i === 0) {
-                $wrapOn -= $linePrefixLength;
-            }
-
-            $lines = array_merge(
-                $lines,
-                $this->wrapLines($explodedLine, $wrapOn)
-            );
-        }
-
-        foreach ($lines as $i=>$line) {
-            $subLinePrefix = $i === 0 ? $linePrefix : $blankSubLinePrefix;
-            $lines[$i] = $subLinePrefix . $line;
-        }
-
-        return $lines;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function wrapLines(string $line, ?int $wrapOn = null): array
-    {
-        $wrapOn = $wrapOn ?? $this->wrapOn;
-        $lines = [];
-        $currentLine = '';
-
-        foreach (explode(' ', $line) as $word) {
-            if (iconv_strlen($currentLine . ' ' . $word) > $wrapOn) {
-                $lines[] = $currentLine;
-                $currentLine = $word;
-            } else {
-                $currentLine .= (!empty($currentLine) ? ' ' : '') . $word;
-            }
-        }
-        $lines[] = $currentLine;
-
-        return $lines;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function orderLines(): void
-    {
-        uksort($this->lines, function ($k1, $k2) {
-            $o1 = array_search($k1, static::LINE_TYPE_ORDER);
-            $o2 = array_search($k2, static::LINE_TYPE_ORDER);
-
-            return $o1 - $o2;
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function setWrapOn(int $wrapOn): void
     {
         $this->wrapOn = $wrapOn;
@@ -256,5 +134,21 @@ class PhpDocGenerator implements PhpDocGeneratorInterface
     public function getWrapOn(): int
     {
         return $this->wrapOn;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getLines(): array
+    {
+        return $this->lines;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setLines(array $lines): void
+    {
+        $this->lines = $lines;
     }
 }

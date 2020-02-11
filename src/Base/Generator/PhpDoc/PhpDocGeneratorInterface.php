@@ -32,40 +32,9 @@ interface PhpDocGeneratorInterface extends GeneratorInterface
     public function configure(array $lines = [], ?int $wrapOn = null): void;
 
     /**
-     * @return string[]
+     * @param callable $orderingCallable
      */
-    public function buildLines(): array;
-
-    /**
-     * @param string $type
-     * @param string[] $lines
-     *
-     * @return string[]
-     */
-    public function buildTypedLines(string $type, array $lines): array;
-
-    /**
-     * @param string $type
-     *
-     * @return string
-     */
-    public function buildTypedLinePrefix(string $type): string;
-
-    /**
-     * @param string $linePrefix
-     * @param string $line
-     *
-     * @return string[]
-     */
-    public function buildLinesFromSingleLine(string $linePrefix, string $line): array;
-
-    /**
-     * @param string $line
-     * @param int|null $wrapOn
-     *
-     * @return string[]
-     */
-    public function wrapLines(string $line, ?int $wrapOn = null): array;
+    public function orderLines(callable $orderingCallable): void;
 
     /**
      * @return bool
@@ -121,7 +90,12 @@ interface PhpDocGeneratorInterface extends GeneratorInterface
     public function addParamLine(string $name, string $type = '', string $description = ''): void;
 
     /**
-     * Order PHPDoc line types
+     * @return string[]
      */
-    public function orderLines(): void;
+    public function getLines(): array;
+
+    /**
+     * @param string[] $lines
+     */
+    public function setLines(array $lines): void;
 }

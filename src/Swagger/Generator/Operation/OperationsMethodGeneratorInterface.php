@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Swagger\Generator\Operation;
 
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Method\MethodGeneratorInterface;
 
 interface OperationsMethodGeneratorInterface extends MethodGeneratorInterface
 {

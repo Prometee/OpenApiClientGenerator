@@ -5,27 +5,19 @@ declare(strict_types=1);
 namespace Prometee\SwaggerClientGenerator\Swagger\Builder;
 
 use Prometee\SwaggerClientGenerator\Base\Builder\GeneratorBuilder;
-use Prometee\SwaggerClientGenerator\Base\Generator\Factory\PhpDocFactoryInterface;
-use Prometee\SwaggerClientGenerator\Base\Generator\GeneratorInterface;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\ArrayGetterSetterGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\ConstructorGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\GetterSetterGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\IsserSetterGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodParameterGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\PropertyMethodsGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\MethodsGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\TraitsGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\UsesGenerator;
+use Prometee\SwaggerClientGenerator\Base\Factory\ClassGeneratorFactoryInterface;
+use Prometee\SwaggerClientGenerator\Base\Factory\ClassViewFactoryInterface;
+use Prometee\SwaggerClientGenerator\Base\Factory\MethodViewFactoryInterface;
+use Prometee\SwaggerClientGenerator\Base\Factory\PhpDocGeneratorFactoryInterface;
+use Prometee\SwaggerClientGenerator\Base\PhpGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerModelHelper;
 use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerOperationsHelper;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelClassFactory;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelClassFactoryInterface;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelMethodFactory;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\ModelMethodFactoryInterface;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\OperationsMethodFactory;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\OperationsMethodFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Factory\ModelClassGeneratorFactory;
+use Prometee\SwaggerClientGenerator\Swagger\Factory\ModelClassGeneratorFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Factory\ModelMethodGeneratorFactory;
+use Prometee\SwaggerClientGenerator\Swagger\Factory\ModelMethodGeneratorFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Factory\OperationsMethodGeneratorFactory;
+use Prometee\SwaggerClientGenerator\Swagger\Factory\OperationsMethodGeneratorFactoryInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Attribute\ModelPropertyGenerator;
 use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Method\ModelConstructorGenerator;
 use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Other\ModelPropertiesGenerator;
@@ -41,15 +33,43 @@ class SwaggerGeneratorBuilder extends GeneratorBuilder implements SwaggerGenerat
     /**
      * {@inheritDoc}
      */
-    public function createSwaggerModelGenerator(PhpDocFactoryInterface $phpDocFactory): SwaggerModelGeneratorInterface
+    public function build(): PhpGeneratorInterface
     {
-        $swaggerModelClassFactory = $this->createModelClassFactory($phpDocFactory);
-        $swaggerModelMethodFactory = $this->createModelMethodFactory($phpDocFactory);
+        $phpDocViewFactory = $this->createPhpDocViewFactory();
+        $classViewFactory = $this->createClassViewFactory();
+        $methodViewFactory = $this->createMethodViewFactory();
+        $phpDocGeneratorFactory = $this->createPhpDocGeneratorFactory($phpDocViewFactory);
+
+        return new SwaggerGenerator(
+            $this->createSwaggerModelGenerator(
+                $classViewFactory,
+                $methodViewFactory,
+                $phpDocGeneratorFactory
+            ),
+            $this->createSwaggerOperationsGenerator(
+                $classViewFactory,
+                $methodViewFactory,
+                $phpDocGeneratorFactory
+            )
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createSwaggerModelGenerator(
+        ClassViewFactoryInterface $classViewFactory,
+        MethodViewFactoryInterface $methodViewFactory,
+        PhpDocGeneratorFactoryInterface $phpDocGeneratorFactory
+    ): SwaggerModelGeneratorInterface
+    {
+        $modelClassGeneratorFactory = $this->createModelClassGeneratorFactory($classViewFactory, $phpDocGeneratorFactory);
+        $modelMethodGeneratorFactory = $this->createModelMethodGeneratorFactory($methodViewFactory, $phpDocGeneratorFactory);
         $swaggerModelHelper = new SwaggerModelHelper();
 
         return new SwaggerModelGenerator(
-            $swaggerModelClassFactory,
-            $swaggerModelMethodFactory,
+            $modelClassGeneratorFactory,
+            $modelMethodGeneratorFactory,
             $swaggerModelHelper
         );
     }
@@ -57,10 +77,74 @@ class SwaggerGeneratorBuilder extends GeneratorBuilder implements SwaggerGenerat
     /**
      * {@inheritDoc}
      */
-    public function createSwaggerOperationsGenerator(PhpDocFactoryInterface $phpDocFactory): SwaggerOperationsGeneratorInterface
+    public function createModelClassGeneratorFactory(
+        ClassViewFactoryInterface $classViewFactory,
+        PhpDocGeneratorFactoryInterface $phpDocGeneratorFactory
+    ): ModelClassGeneratorFactoryInterface
     {
-        $swaggerOperationsClassFactory = $this->createClassFactory($phpDocFactory);
-        $swaggerOperationsMethodFactory = $this->createOperationsMethodFactory($phpDocFactory);
+        $modelClassGeneratorFactory = new ModelClassGeneratorFactory(
+            $classViewFactory,
+            $phpDocGeneratorFactory
+        );
+
+        $this->configureModelClassGeneratorFactory($modelClassGeneratorFactory);
+
+        return $modelClassGeneratorFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function configureModelClassGeneratorFactory(ClassGeneratorFactoryInterface $classGeneratorFactory): void
+    {
+        parent::configureClassGeneratorFactory($classGeneratorFactory);
+
+        $classGeneratorFactory->setPropertiesGeneratorClass(ModelPropertiesGenerator::class);
+        $classGeneratorFactory->setPropertyGeneratorClass(ModelPropertyGenerator::class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createModelMethodGeneratorFactory(
+        MethodViewFactoryInterface $methodViewFactory,
+        PhpDocGeneratorFactoryInterface $phpDocGeneratorFactory
+    ): ModelMethodGeneratorFactoryInterface
+    {
+        $modelMethodGeneratorFactory = new ModelMethodGeneratorFactory(
+            $methodViewFactory,
+            $phpDocGeneratorFactory
+        );
+
+        $this->configureModelMethodGeneratorFactory($modelMethodGeneratorFactory);
+
+        return $modelMethodGeneratorFactory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function configureModelMethodGeneratorFactory(
+        ModelMethodGeneratorFactoryInterface $modelMethodGeneratorFactory
+    ): void
+    {
+        parent::configureMethodGeneratorFactory($modelMethodGeneratorFactory);
+
+        $modelMethodGeneratorFactory
+            ->setModelConstructorGeneratorClass(ModelConstructorGenerator::class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function createSwaggerOperationsGenerator(
+        ClassViewFactoryInterface $classViewFactory,
+        MethodViewFactoryInterface $methodViewFactory,
+        PhpDocGeneratorFactoryInterface $phpDocGeneratorFactory
+    ): SwaggerOperationsGeneratorInterface
+    {
+        $swaggerOperationsClassFactory = $this->createOperationsClassGeneratorFactory($classViewFactory, $phpDocGeneratorFactory);
+        $swaggerOperationsMethodFactory = $this->createOperationsMethodGeneratorFactory($methodViewFactory, $phpDocGeneratorFactory);
         $swaggerOperationsHelper = new SwaggerOperationsHelper();
 
         return new SwaggerOperationsGenerator(
@@ -73,63 +157,42 @@ class SwaggerGeneratorBuilder extends GeneratorBuilder implements SwaggerGenerat
     /**
      * {@inheritDoc}
      */
-    public function createModelClassFactory(PhpDocFactoryInterface $phpDocFactory): ModelClassFactoryInterface
+    public function createOperationsClassGeneratorFactory(
+        ClassViewFactoryInterface $classViewFactory,
+        PhpDocGeneratorFactoryInterface $phpDocGeneratorFactory
+    ): ClassGeneratorFactoryInterface
     {
-        return new ModelClassFactory(
-            $phpDocFactory,
-            ClassGenerator::class,
-            UsesGenerator::class,
-            TraitsGenerator::class,
-            ModelPropertiesGenerator::class,
-            MethodsGenerator::class,
-            ModelPropertyGenerator::class
-        );
+        return $this->createClassGeneratorFactory($classViewFactory, $phpDocGeneratorFactory);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createModelMethodFactory(PhpDocFactoryInterface $phpDocFactory): ModelMethodFactoryInterface
+    public function createOperationsMethodGeneratorFactory(
+        MethodViewFactoryInterface $methodViewFactory,
+        PhpDocGeneratorFactoryInterface $phpDocGeneratorFactory
+    ): OperationsMethodGeneratorFactoryInterface
     {
-        return new ModelMethodFactory(
-            $phpDocFactory,
-            MethodGenerator::class,
-            ModelConstructorGenerator::class,
-            MethodParameterGenerator::class,
-            GetterSetterGenerator::class,
-            IsserSetterGenerator::class,
-            ArrayGetterSetterGenerator::class,
-            PropertyMethodsGenerator::class
+        $operationsMethodGeneratorFactory = new OperationsMethodGeneratorFactory(
+            $methodViewFactory,
+            $phpDocGeneratorFactory
         );
+
+        $this->configureOperationsMethodGeneratorFactory($operationsMethodGeneratorFactory);
+
+        return $operationsMethodGeneratorFactory;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function createOperationsMethodFactory(PhpDocFactoryInterface $phpDocFactory): OperationsMethodFactoryInterface
+    public function configureOperationsMethodGeneratorFactory(
+        OperationsMethodGeneratorFactoryInterface $operationsMethodGeneratorFactory
+    ): void
     {
-        return new OperationsMethodFactory(
-            $phpDocFactory,
-            OperationsMethodGenerator::class,
-            ConstructorGenerator::class,
-            MethodParameterGenerator::class,
-            GetterSetterGenerator::class,
-            IsserSetterGenerator::class,
-            ArrayGetterSetterGenerator::class,
-            PropertyMethodsGenerator::class
-        );
-    }
+        parent::configureMethodGeneratorFactory($operationsMethodGeneratorFactory);
 
-    /**
-     * {@inheritDoc}
-     */
-    public function build(): GeneratorInterface
-    {
-        $phpDocFactory = $this->createPhpDocFactory();
-
-        return new SwaggerGenerator(
-            $this->createSwaggerModelGenerator($phpDocFactory),
-            $this->createSwaggerOperationsGenerator($phpDocFactory)
-        );
+        $operationsMethodGeneratorFactory
+            ->setOperationsMethodGeneratorClass(OperationsMethodGenerator::class);
     }
 }

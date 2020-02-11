@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Attribute;
 
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Attribute\PropertyGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Attribute\PropertyGenerator;
 
 class ModelPropertyGenerator extends PropertyGenerator implements ModelPropertyGeneratorInterface
 {
@@ -13,7 +13,10 @@ class ModelPropertyGenerator extends PropertyGenerator implements ModelPropertyG
     /** @var bool */
     protected $inherited = false;
 
-    public function generate(string $indent = null): ?string
+    /**
+     * {@inheritDoc}
+     */
+    public function generate(string $indent = null, string $eol = null): ?string
     {
         if ($this->isInherited()) {
             return null;

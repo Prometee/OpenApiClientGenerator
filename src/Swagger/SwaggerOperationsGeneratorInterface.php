@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Swagger;
 
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGeneratorInterface;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGeneratorInterface;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodParameterGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\ClassGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Method\MethodGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Method\MethodParameterGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerOperationsHelperInterface;
 
 interface SwaggerOperationsGeneratorInterface
@@ -19,7 +19,12 @@ interface SwaggerOperationsGeneratorInterface
      * @param string $modelNamespace
      * @param string $indent
      */
-    public function configure(string $folder, string $namespace, string $modelNamespace, string $indent = '    ');
+    public function configure(
+        string $folder,
+        string $namespace,
+        string $modelNamespace,
+        string $indent = '    '
+    );
 
     /**
      * @param SwaggerOperationsHelperInterface $helper
@@ -60,7 +65,11 @@ interface SwaggerOperationsGeneratorInterface
      *
      * @return array
      */
-    public function getClassNameAndNamespaceFromPath(string $path, string $classPrefix = '', string $classSuffix = ''): array;
+    public function getClassNameAndNamespaceFromPath(
+        string $path,
+        string $classPrefix = '',
+        string $classSuffix = ''
+    ): array;
 
     /**
      * @return SwaggerOperationsHelperInterface
@@ -73,7 +82,12 @@ interface SwaggerOperationsGeneratorInterface
      * @param string $operation
      * @param array $operationConfiguration
      */
-    public function processOperation(ClassGeneratorInterface $classGenerator, string $path, string $operation, array $operationConfiguration): void;
+    public function processOperation(
+        ClassGeneratorInterface $classGenerator,
+        string $path,
+        string $operation,
+        array $operationConfiguration
+    ): void;
 
     /**
      * @return string|null
@@ -86,7 +100,10 @@ interface SwaggerOperationsGeneratorInterface
      *
      * @return ClassGeneratorInterface|null
      */
-    public function generateClass(string $path, array $operationConfigurations): ?ClassGeneratorInterface;
+    public function generateClass(
+        string $path,
+        array $operationConfigurations
+    ): ?ClassGeneratorInterface;
 
     /**
      * @return array
@@ -110,7 +127,11 @@ interface SwaggerOperationsGeneratorInterface
      * @param MethodGeneratorInterface $methodGenerator
      * @param array $operationParameters
      */
-    public function processOperationParameters(ClassGeneratorInterface $classGenerator, MethodGeneratorInterface $methodGenerator, array $operationParameters): void;
+    public function processOperationParameters(
+        ClassGeneratorInterface $classGenerator,
+        MethodGeneratorInterface $methodGenerator,
+        array $operationParameters
+    ): void;
 
     /**
      * @param ClassGeneratorInterface $classGenerator
@@ -118,7 +139,10 @@ interface SwaggerOperationsGeneratorInterface
      *
      * @return MethodParameterGeneratorInterface|null
      */
-    public function createAnOperationParameter(ClassGeneratorInterface $classGenerator, array $parameterConfiguration): ?MethodParameterGeneratorInterface;
+    public function createAnOperationParameter(
+        ClassGeneratorInterface $classGenerator,
+        array $parameterConfiguration
+    ): ?MethodParameterGeneratorInterface;
 
     /**
      * @param array $parameterConfiguration
@@ -126,7 +150,10 @@ interface SwaggerOperationsGeneratorInterface
      *
      * @return string|null
      */
-    public function buildValueForOperationParameter(array $parameterConfiguration, ?string $type): ?string;
+    public function buildValueForOperationParameter(
+        array $parameterConfiguration,
+        ?string $type
+    ): ?string;
 
     /**
      * @return bool

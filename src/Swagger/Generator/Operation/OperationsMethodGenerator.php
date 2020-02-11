@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Swagger\Generator\Operation;
 
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\Method\MethodGenerator;
 use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerOperationsHelper;
 
 class OperationsMethodGenerator extends MethodGenerator implements OperationsMethodGeneratorInterface
@@ -58,7 +58,7 @@ class OperationsMethodGenerator extends MethodGenerator implements OperationsMet
     {
         $bodyParam = null;
 
-        if (in_array($operation, ['post', 'put'])) {
+        if (in_array($operation, ['post', 'put', 'patch'])) {
             $bodyParam = $this->buildBodyParam($operationParameters);
         }
 

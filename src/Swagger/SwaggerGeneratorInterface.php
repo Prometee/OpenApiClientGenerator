@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Swagger;
 
-use Prometee\SwaggerClientGenerator\Base\Generator\GeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\PhpGeneratorInterface;
 
-interface SwaggerGeneratorInterface extends GeneratorInterface
+interface SwaggerGeneratorInterface extends PhpGeneratorInterface
 {
     public const TYPE_OPERATIONS = 'Operations';
     public const TYPE_MODEL = 'Model';

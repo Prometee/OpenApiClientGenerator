@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Swagger;
 
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGeneratorInterface;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\MethodsGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\ClassGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Other\MethodsGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Other\ModelPropertiesGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerModelHelperInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Method\ModelConstructorGeneratorInterface;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Other\ModelPropertiesGeneratorInterface;
 
 interface SwaggerModelGeneratorInterface
 {
@@ -134,15 +134,6 @@ interface SwaggerModelGeneratorInterface
         MethodsGeneratorInterface $methodsGenerator,
         ModelPropertiesGeneratorInterface $modelPropertiesGenerator,
         ModelConstructorGeneratorInterface $constructorGenerator
-    ): void;
-
-    /**
-     * @param ClassGeneratorInterface $classGenerator
-     * @param string $definitionName
-     */
-    public function configureClassGenerator(
-        ClassGeneratorInterface $classGenerator,
-        string $definitionName
     ): void;
 
     /**

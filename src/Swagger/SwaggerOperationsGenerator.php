@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Prometee\SwaggerClientGenerator\Swagger;
 
 use Exception;
-use Prometee\SwaggerClientGenerator\Base\Generator\Factory\ClassFactoryInterface;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGenerator;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\ClassGeneratorInterface;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodGeneratorInterface;
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Method\MethodParameterGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Factory\ClassGeneratorFactoryInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\ClassGenerator;
+use Prometee\SwaggerClientGenerator\Base\Generator\ClassGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Method\MethodGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Method\MethodParameterGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerOperationsHelperInterface;
-use Prometee\SwaggerClientGenerator\Swagger\Generator\Factory\OperationsMethodFactoryInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Factory\OperationsMethodGeneratorFactoryInterface;
 
 class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
 {
-    /** @var ClassFactoryInterface */
-    protected $classFactory;
-    /** @var OperationsMethodFactoryInterface */
+    /** @var ClassGeneratorFactoryInterface */
+    protected $classGeneratorFactory;
+    /** @var OperationsMethodGeneratorFactoryInterface */
     protected $methodFactory;
     /** @var SwaggerOperationsHelperInterface */
     protected $helper;
@@ -42,17 +42,17 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     protected $overwrite = false;
 
     /**
-     * @param ClassFactoryInterface $classFactory
-     * @param OperationsMethodFactoryInterface $methodFactory
+     * @param ClassGeneratorFactoryInterface $classGeneratorFactory
+     * @param OperationsMethodGeneratorFactoryInterface $methodFactory
      * @param SwaggerOperationsHelperInterface $helper
      */
     public function __construct(
-        ClassFactoryInterface $classFactory,
-        OperationsMethodFactoryInterface $methodFactory,
+        ClassGeneratorFactoryInterface $classGeneratorFactory,
+        OperationsMethodGeneratorFactoryInterface $methodFactory,
         SwaggerOperationsHelperInterface $helper
     )
     {
-        $this->classFactory = $classFactory;
+        $this->classGeneratorFactory = $classGeneratorFactory;
         $this->methodFactory = $methodFactory;
         $this->helper = $helper;
     }
@@ -158,13 +158,10 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             return $this->classGenerators[$filePath];
         }
 
-        $classGenerator = $this->classFactory->createClassGenerator();
+        $classGenerator = $this->classGeneratorFactory->createClassGenerator();
         $classGenerator->configure($namespace, $className);
         if ($this->abstractOperationClass !== null) {
-            $useGenerator = $classGenerator->getUsesGenerator();
-            $useGenerator->addUse($this->abstractOperationClass);
-            $extendClassName = $useGenerator->getInternalUseName($this->abstractOperationClass);
-            $classGenerator->setExtendClassName($extendClassName);
+            $classGenerator->setExtendClass($this->abstractOperationClass);
         }
 
         $this->classGenerators[$filePath] = $classGenerator;
@@ -191,7 +188,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     ): void {
 
         $operation = strtolower($operation);
-        if (!in_array($operation, ['get', 'post', 'put', 'delete'])) {
+        if (!in_array($operation, ['get', 'post', 'put', 'patch', 'delete'])) {
             return;
         }
 

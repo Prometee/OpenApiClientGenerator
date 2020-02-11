@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Other;
 
-use Prometee\SwaggerClientGenerator\Base\Generator\Object\Other\PropertiesGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Base\Generator\Other\PropertiesGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Generator\Model\Attribute\ModelPropertyGeneratorInterface;
 
 interface ModelPropertiesGeneratorInterface extends PropertiesGeneratorInterface
