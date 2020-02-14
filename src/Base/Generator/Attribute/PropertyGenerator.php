@@ -138,30 +138,9 @@ class PropertyGenerator extends AbstractGenerator implements PropertyGeneratorIn
     /**
      * {@inheritdoc}
      */
-    public function getPhpType(): ?string
+    public function getPhpTypeFromTypes(): ?string
     {
-        if (empty($this->types)) {
-            return null;
-        }
-
-        $phpType = '';
-        if (in_array('null', $this->types)) {
-            $phpType = '?';
-        }
-        foreach ($this->types as $type) {
-            if (preg_match('#\[\]$#', $type)) {
-                $phpType .= 'array';
-
-                break;
-            }
-            if ($type !== 'null') {
-                $phpType .= $type;
-
-                break;
-            }
-        }
-
-        return $phpType;
+        return self::getPhpType($this->types);
     }
 
     /**

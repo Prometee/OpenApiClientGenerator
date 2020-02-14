@@ -105,7 +105,7 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
         $this->hasGetterMethod->addParameter($methodParameterGenerator2);
 
         $format = '';
-        if (preg_match('#^\?#', $methodParameterGenerator->getPhpType())) {
+        if (preg_match('#^\?#', $methodParameterGenerator->getPhpTypeFromTypes())) {
             $format .= 'if (null === $this->%2$s) {' . "\n";
             $format .= '%4$sreturn false;' . "\n";
             $format .= '}' . "\n\n";
@@ -144,7 +144,7 @@ class ArrayGetterSetterGenerator extends GetterSetterGenerator implements ArrayG
         $format  = 'if ($this->%1$s(%2$s)) {' . "\n";
         $format .= '%3$sreturn;' . "\n";
         $format .= '}' . "\n\n";
-        if (preg_match('#^\?#', $methodParameterGenerator->getPhpType())) {
+        if (preg_match('#^\?#', $methodParameterGenerator->getPhpTypeFromTypes())) {
             $format .= 'if (null === $this->%4$s) {' . "\n";
             $format .= '%3$s$this->%4$s = [];' . "\n";
             $format .= '}' . "\n\n";

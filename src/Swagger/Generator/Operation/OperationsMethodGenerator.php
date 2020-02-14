@@ -44,7 +44,7 @@ class OperationsMethodGenerator extends MethodGenerator implements OperationsMet
         }
 
         $suffix = '';
-        if ($this->getPhpReturnType() === 'array') {
+        if ($this->getPhpTypeFromReturnTypes() === 'array') {
             $suffix = '.\'[]\'';
         }
 

@@ -127,28 +127,9 @@ class MethodGenerator extends AbstractGenerator implements MethodGeneratorInterf
     /**
      * {@inheritdoc}
      */
-    public function getPhpReturnType(): ?string
+    public function getPhpTypeFromReturnTypes(): ?string
     {
-        if (empty($this->returnTypes)) {
-            return null;
-        }
-
-        $phpReturnType = '';
-        if (in_array('null', $this->returnTypes)) {
-            $phpReturnType = '?';
-        }
-        foreach ($this->returnTypes as $type) {
-            if (preg_match('#\[\]$#', $type)) {
-                $phpReturnType .= 'array';
-                break;
-            }
-            if ($type !== 'null') {
-                $phpReturnType .= $type;
-                break;
-            }
-        }
-
-        return $phpReturnType;
+        return self::getPhpType($this->returnTypes);
     }
 
     /**

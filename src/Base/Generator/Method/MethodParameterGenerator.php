@@ -104,62 +104,9 @@ class MethodParameterGenerator extends AbstractGenerator implements MethodParame
     /**
      * {@inheritDoc}
      */
-    public function getPhpType(): ?string
+    public function getPhpTypeFromTypes(): ?string
     {
-        if (empty($this->types)) {
-            return null;
-        }
-
-        $phpType = '';
-        if (in_array('null', $this->types)) {
-            $phpType = '?';
-        }
-        foreach ($this->getTypes() as $type) {
-            if (preg_match('#\[\]$#', $type)) {
-                $phpType .= 'array';
-
-                break;
-            }
-            if ($type !== 'null') {
-                $phpType .= $type;
-
-                break;
-            }
-        }
-
-        return $phpType;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getValueType(): ?string
-    {
-        if (null === $this->value) {
-            return null;
-        }
-
-        if ($this->value === '[]') {
-            return 'array';
-        }
-
-        if (preg_match('#^[\'"].*[\'"]$#', $this->value)) {
-            return 'string';
-        }
-
-        if (in_array($this->value, ['true', 'false'])) {
-            return 'bool';
-        }
-
-        if (preg_match('#^[0-9]+$#', $this->value)) {
-            return 'int';
-        }
-
-        if (preg_match('#^[0-9\.]+$#', $this->value)) {
-            return 'float';
-        }
-
-        return null;
+        return self::getPhpType($this->types);
     }
 
     /**

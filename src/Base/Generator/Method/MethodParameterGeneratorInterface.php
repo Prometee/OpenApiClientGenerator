@@ -61,11 +61,6 @@ interface MethodParameterGeneratorInterface extends GeneratorInterface
     public function getName(): string;
 
     /**
-     * @return string|null
-     */
-    public function getValueType(): ?string;
-
-    /**
      * @param bool $byReference
      */
     public function setByReference(bool $byReference): void;
@@ -98,7 +93,7 @@ interface MethodParameterGeneratorInterface extends GeneratorInterface
     /**
      * @return string|null
      */
-    public function getPhpType(): ?string;
+    public function getPhpTypeFromTypes(): ?string;
 
     /**
      * @return string|null

@@ -60,7 +60,7 @@ interface PropertyGeneratorInterface extends GeneratorInterface, PhpDocAwareGene
     /**
      * @return string|null
      */
-    public function getPhpType(): ?string;
+    public function getPhpTypeFromTypes(): ?string;
 
     /**
      * @return string

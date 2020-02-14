@@ -47,7 +47,7 @@ interface MethodGeneratorInterface extends GeneratorInterface, PhpDocAwareGenera
     /**
      * @return string
      */
-    public function getPhpReturnType(): ?string;
+    public function getPhpTypeFromReturnTypes(): ?string;
 
     /**
      * @return bool

@@ -56,7 +56,7 @@ class ModelConstructorGenerator extends ConstructorGenerator implements ModelCon
         }
 
         $defaultValue = null;
-        switch ($modelPropertyGenerator->getPhpType()) {
+        switch ($modelPropertyGenerator->getPhpTypeFromTypes()) {
             case 'array':
                 $defaultValue = '[]';
                 break;
