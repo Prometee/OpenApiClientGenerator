@@ -1,3 +1,4 @@
 /vendor/
 /composer.lock
 /etc
+/.phpunit.result.cache
