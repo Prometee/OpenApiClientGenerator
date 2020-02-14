@@ -79,6 +79,17 @@ interface SwaggerOperationsGeneratorInterface
     /**
      * @param ClassGeneratorInterface $classGenerator
      * @param string $path
+     * @param array $operationConfigurations
+     */
+    public function processOperations(
+        ClassGeneratorInterface $classGenerator,
+        string $path,
+        array $operationConfigurations
+    ): void;
+
+    /**
+     * @param ClassGeneratorInterface $classGenerator
+     * @param string $path
      * @param string $operation
      * @param array $operationConfiguration
      */

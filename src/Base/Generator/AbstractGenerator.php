@@ -113,4 +113,33 @@ abstract class AbstractGenerator implements GeneratorInterface
 
         return $phpType;
     }
+
+    /**
+     * @param array $types
+     *
+     * @return string|null
+     */
+    public static function getPhpDefaultValue(array $types): ?string
+    {
+        $defaultValue = null;
+        switch (self::getPhpType($types)) {
+            case 'array':
+                $defaultValue = '[]';
+                break;
+            case 'string':
+                $defaultValue = '\'\'';
+                break;
+            case 'bool':
+                $defaultValue = 'true';
+                break;
+            case 'int':
+                $defaultValue = '0';
+                break;
+            case 'float':
+                $defaultValue = '.0';
+                break;
+        }
+
+        return $defaultValue;
+    }
 }

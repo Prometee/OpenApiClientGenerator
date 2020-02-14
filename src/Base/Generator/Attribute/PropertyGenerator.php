@@ -144,6 +144,14 @@ class PropertyGenerator extends AbstractGenerator implements PropertyGeneratorIn
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function getDefaultValueFromTypes(): ?string
+    {
+        return self::getPhpDefaultValue($this->types);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getScope(): string

@@ -123,12 +123,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         $classGenerator = $this->getOrCreateClassGenerator($path, $filePath);
 
         // Methods
-        foreach ($operationConfigurations as $operation => $operationConfiguration) {
-            if (!is_array($operationConfiguration)) {
-                continue;
-            }
-            $this->processOperation($classGenerator, $path, $operation, $operationConfiguration);
-        }
+        $this->processOperations($classGenerator, $path, $operationConfigurations);
 
         // File creation
         $directory = dirname($filePath);
@@ -175,6 +170,23 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
     protected function hasClassGenerator(string $filePath): bool
     {
         return isset($this->classGenerators[$filePath]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function processOperations(
+        ClassGeneratorInterface $classGenerator,
+        string $path,
+        array $operationConfigurations
+    ): void
+    {
+        foreach ($operationConfigurations as $operation => $operationConfiguration) {
+            if (!is_array($operationConfiguration)) {
+                continue;
+            }
+            $this->processOperation($classGenerator, $path, $operation, $operationConfiguration);
+        }
     }
 
     /**
