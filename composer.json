@@ -15,7 +15,7 @@
         "php": "^7.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.5"
+        "phpunit/phpunit": "^8.5"
     },
     "autoload": {
         "psr-4": { "Prometee\\SwaggerClientGenerator\\": "src/" }
