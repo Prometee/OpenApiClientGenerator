@@ -13,8 +13,8 @@ class GeneratorTest extends TestCase
     /** @test */
     public function generate()
     {
-        // $baseUri = __DIR__ . '/Resources/swagger.json';
-        $baseUri = 'https://developer.sage.com/api/accounting/files/swagger.full.json';
+        $baseUri = __DIR__ . '/Resources/swagger.json';
+        // $baseUri = 'https://developer.sage.com/api/accounting/files/swagger.full.json';
         $folder = __DIR__ . '/../etc/build';
         $namespace = 'Tests\\Prometee\\SwaggerClientGenerator\\Build';
         $indent = '    ';
