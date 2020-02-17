@@ -35,6 +35,19 @@ interface HelperInterface
     public static function getPhpTypeFromSwaggerConfiguration(array $config): ?string;
 
     /**
+     * @param string $type
+     * @param array|null $items
+     * @param string|null $format
+     *
+     * @return string|null
+     */
+    public static function getPhpTypeFromSwaggerConfigurationType(
+        string $type,
+        ?array $items = null,
+        ?string $format = null
+    ): ?string;
+
+    /**
      * @param string $ref
      *
      * @return string

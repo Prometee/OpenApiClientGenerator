@@ -19,20 +19,7 @@ abstract class AbstractHelper implements HelperInterface
             $type = $config['type'];
             $items = $config['items'] ?? null;
             $format = $config['format'] ?? null;
-            switch ($type) {
-                case 'boolean':
-                    return 'bool';
-                case 'integer':
-                    return 'int';
-                case 'number':
-                    return 'float';
-                case 'array':
-                    return static::getPhpTypeFromSwaggerArrayType($items) . '[]';
-                case 'object':
-                    return '\\stdClass';
-                case 'string':
-                    return static::getPhpTypeFromSwaggerStringType($format);
-            }
+            return self::getPhpTypeFromSwaggerConfigurationType($type, $items, $format);
         }
 
         if (isset($config['$ref'])) {
@@ -41,6 +28,31 @@ abstract class AbstractHelper implements HelperInterface
 
         if ($config['schema'] && isset($config['schema']['$ref'])) {
             return static::getPhpTypeFromSwaggerDefinitionName($config['schema']['$ref']);
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws Exception
+     */
+    public static function getPhpTypeFromSwaggerConfigurationType(string $type, ?array $items = null, ?string $format = null): ?string
+    {
+        switch ($type) {
+            case 'boolean':
+                return 'bool';
+            case 'integer':
+                return 'int';
+            case 'number':
+                return 'float';
+            case 'array':
+                return static::getPhpTypeFromSwaggerArrayType($items) . '[]';
+            case 'object':
+                return '\\stdClass';
+            case 'string':
+                return static::getPhpTypeFromSwaggerStringType($format);
         }
 
         return null;

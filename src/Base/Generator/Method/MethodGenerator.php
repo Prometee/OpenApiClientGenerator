@@ -19,7 +19,7 @@ class MethodGenerator extends AbstractGenerator implements MethodGeneratorInterf
     protected $methodParameterGeneratorSkel;
 
     /** @var string */
-    protected $scope = '';
+    protected $scope = self::SCOPE_PUBLIC;
     /** @var string */
     protected $name = '';
     /** @var string[] */

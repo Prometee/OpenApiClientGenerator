@@ -10,6 +10,7 @@ use Prometee\SwaggerClientGenerator\Base\Generator\ClassGenerator;
 use Prometee\SwaggerClientGenerator\Base\Generator\ClassGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Base\Generator\Method\MethodGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Base\Generator\Method\MethodParameterGeneratorInterface;
+use Prometee\SwaggerClientGenerator\Swagger\Generator\Operation\OperationsMethodGeneratorInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Helper\SwaggerOperationsHelperInterface;
 use Prometee\SwaggerClientGenerator\Swagger\Factory\OperationsMethodGeneratorFactoryInterface;
 
@@ -204,15 +205,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             return;
         }
 
-        $returnType = null;
-        if (isset($operationConfiguration['responses'])) {
-            $returnType = $this->helper::getReturnType($operationConfiguration['responses']);
-        }
-        if ($returnType !== null) {
-            $returnType = $this->getPhpNameFromType($returnType);
-        } else {
-            $returnType = 'void';
-        }
+        $returnType = $this->processOperationReturnType($operationConfiguration);
 
         $operationMethodGenerator = $this->methodFactory->createOperationMethodGenerator(
             $classGenerator->getUsesGenerator()
@@ -237,10 +230,7 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             $this->processOperationParameters($classGenerator, $operationMethodGenerator, $operationParameters);
         }
 
-        foreach ($this->throwsClasses as $throwsClass => $className) {
-            $classGenerator->getUsesGenerator()->addUse($throwsClass);
-            $operationMethodGenerator->getPhpDocGenerator()->addThrowsLine($className);
-        }
+        $this->processOperationThrowsClass($classGenerator, $operationMethodGenerator);
 
         $operationMethodGenerator->addMethodBodyFromSwaggerConfiguration(
             $path,
@@ -250,6 +240,42 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         );
 
         $classGenerator->getMethodsGenerator()->addMethod($operationMethodGenerator);
+    }
+
+    /**
+     * @param ClassGeneratorInterface $classGenerator
+     * @param OperationsMethodGeneratorInterface $operationMethodGenerator
+     */
+    public function processOperationThrowsClass(
+        ClassGeneratorInterface $classGenerator,
+        OperationsMethodGeneratorInterface $operationMethodGenerator
+    ): void
+    {
+        foreach ($this->throwsClasses as $throwsClass => $className) {
+            $classGenerator->getUsesGenerator()->guessUse($throwsClass);
+            $operationMethodGenerator->getPhpDocGenerator()->addThrowsLine($className);
+        }
+    }
+
+    /**
+     * @param array $operationConfiguration
+     *
+     * @return string
+     */
+    public function processOperationReturnType(array $operationConfiguration): string
+    {
+        $returnType = null;
+        if (isset($operationConfiguration['responses'])) {
+            $returnType = $this->helper::getReturnType($operationConfiguration['responses']);
+        }
+
+        if ($returnType !== null) {
+            $returnType = $this->getPhpNameFromType($returnType);
+        } else {
+            $returnType = 'void';
+        }
+
+        return $returnType;
     }
 
     /**
