@@ -40,19 +40,28 @@ abstract class AbstractHelper implements HelperInterface
      */
     public static function getPhpTypeFromSwaggerConfigurationType(string $type, ?array $items = null, ?string $format = null): ?string
     {
-        switch ($type) {
-            case 'boolean':
-                return 'bool';
-            case 'integer':
-                return 'int';
-            case 'number':
-                return 'float';
-            case 'array':
-                return static::getPhpTypeFromSwaggerArrayType($items) . '[]';
-            case 'object':
-                return '\\stdClass';
-            case 'string':
-                return static::getPhpTypeFromSwaggerStringType($format);
+        if ('string' === $type) {
+            return static::getPhpTypeFromSwaggerStringType($format);
+        }
+
+        if ('array' === $type) {
+            return static::getPhpTypeFromSwaggerArrayType($items) . '[]';
+        }
+
+        if ('object' === $type) {
+            return '\\stdClass';
+        }
+
+        if ('boolean' === $type) {
+            return 'bool';
+        }
+
+        if ('integer' === $type) {
+            return 'int';
+        }
+
+        if ('number' === $type) {
+            return 'float';
         }
 
         return null;

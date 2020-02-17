@@ -13,4 +13,27 @@ interface SwaggerModelHelperInterface extends HelperInterface
      * @return bool
      */
     public static function isNullableBySwaggerConfiguration(string $targetedProperty, array $definition): bool;
+
+    /**
+     * @param array $config
+     *
+     * @return array|null
+     */
+    public static function getArrayEmbeddedObjectConfig(array $config): ?array;
+
+    /**
+     * @param string $definitionType
+     * @param array $definitions
+     * @param string $definitionName
+     *
+     * @return array
+     */
+    public static function flattenDefinitionType(string $definitionType, array $definitions, string $definitionName): array;
+
+    /**
+     * @param array $definition
+     *
+     * @return array
+     */
+    public static function foundNotInheritedProperties(array $definition): array;
 }

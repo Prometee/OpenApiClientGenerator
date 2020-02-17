@@ -50,13 +50,6 @@ interface SwaggerModelGeneratorInterface
     /**
      * @param array $config
      *
-     * @return array|null
-     */
-    public function getArrayEmbeddedObjectConfig(array $config): ?array;
-
-    /**
-     * @param array $config
-     *
      * @return string
      */
     public function getPhpTypeFromPropertyConfig(array $config): string;
@@ -146,20 +139,6 @@ interface SwaggerModelGeneratorInterface
         ModelPropertiesGeneratorInterface $modelPropertiesGenerator,
         string $definitionName
     ): void;
-
-    /**
-     * @param array $definition
-     *
-     * @return array
-     */
-    public function flattenPropertiesDefinition(array $definition): array;
-
-    /**
-     * @param array $definition
-     *
-     * @return string[]
-     */
-    public function flattenRequiresDefinition(array $definition): array;
 
     /**
      * @param string $definitionName

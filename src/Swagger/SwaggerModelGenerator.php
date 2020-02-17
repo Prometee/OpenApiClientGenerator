@@ -152,7 +152,7 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         }
 
         if ($currentConfig['type'] === 'array') {
-            $subConfig = $this->getArrayEmbeddedObjectConfig($currentConfig);
+            $subConfig = $this->helper::getArrayEmbeddedObjectConfig($currentConfig);
         }
 
         if (null === $subConfig) {
@@ -167,26 +167,6 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         $type .= $currentConfig['type'] === 'array' ? '[]' : '';
 
         return $type;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getArrayEmbeddedObjectConfig(array $config): ?array
-    {
-        if (!isset($config['items'])) {
-            return null;
-        }
-
-        if (!isset($config['items']['type'])) {
-            return null;
-        }
-
-        if ('object' !== $config['items']['type']) {
-            return null;
-        }
-
-        return $config['items'];
     }
 
     /**
@@ -277,9 +257,9 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
         string $definitionName
     ): void
     {
-        $properties = $this->flattenPropertiesDefinition($this->definitions[$definitionName]);
-        $requires = $this->flattenRequiresDefinition($this->definitions[$definitionName]);
-        $ownedProperties = $this->foundNotInheritedProperties($this->definitions[$definitionName]);
+        $properties = $this->helper::flattenDefinitionType('properties', $this->definitions, $definitionName);
+        $requires = $this->helper::flattenDefinitionType('required', $this->definitions, $definitionName);
+        $ownedProperties = $this->helper::foundNotInheritedProperties($this->definitions[$definitionName]);
         $inheritedProperties = array_diff(array_keys($properties), array_keys($ownedProperties));
 
         foreach ($properties as $propertyName => $configuration) {
@@ -295,74 +275,6 @@ class SwaggerModelGenerator implements SwaggerModelGeneratorInterface
                 $inherited
             );
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function flattenPropertiesDefinition(array $definition): array
-    {
-        if (isset($definition['properties'])) {
-            return $definition['properties'];
-        }
-
-        if (!isset($definition['allOf'])) {
-            return [];
-        }
-
-        $allOf = $definition['allOf'];
-        $inheritedPropertyName = $this->helper::getPhpTypeFromSwaggerDefinitionName($allOf[0]['$ref']);
-
-        $properties = [];
-        if (isset($allOf[1]['properties'])) {
-            $properties = $allOf[1]['properties'];
-        }
-
-        $inheritedProperties = $this->flattenPropertiesDefinition($this->definitions[$inheritedPropertyName]);
-        return array_merge($properties, $inheritedProperties);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function flattenRequiresDefinition(array $definition): array
-    {
-        if (isset($definition['required'])) {
-            return $definition['required'];
-        }
-
-        if (!isset($definition['allOf'])) {
-            return [];
-        }
-
-        $allOf = $definition['allOf'];
-        $inheritedPropertyName = $this->helper::getPhpTypeFromSwaggerDefinitionName($allOf[0]['$ref']);
-
-        $requires = [];
-        if (isset($allOf[1]['required'])) {
-            $requires = $allOf[1]['required'];
-        }
-
-        $inheritedRequires = $this->flattenRequiresDefinition($this->definitions[$inheritedPropertyName]);
-        return array_merge($requires, $inheritedRequires);
-    }
-
-    public function foundNotInheritedProperties(array $definition): array
-    {
-        if (isset($definition['properties'])) {
-            return $definition['properties'];
-        }
-
-        if (!isset($definition['allOf'])) {
-            return [];
-        }
-
-        $allOf = $definition['allOf'];
-        if (!isset($allOf[1]['properties'])) {
-            return [];
-        }
-
-        return $allOf[1]['properties'];
     }
 
     /**

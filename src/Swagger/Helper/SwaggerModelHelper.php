@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Prometee\SwaggerClientGenerator\Swagger\Helper;
 
+use Exception;
+
 class SwaggerModelHelper extends AbstractHelper implements SwaggerModelHelperInterface
 {
     public static function isNullableBySwaggerConfiguration(string $targetedProperty, array $definition): bool
@@ -22,5 +24,81 @@ class SwaggerModelHelper extends AbstractHelper implements SwaggerModelHelperInt
         return $definition['properties'][$targetedProperty]['nullable']
             ?? true
             ;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function getArrayEmbeddedObjectConfig(array $config): ?array
+    {
+        if (!isset($config['items'])) {
+            return null;
+        }
+
+        if (!isset($config['items']['type'])) {
+            return null;
+        }
+
+        if ('object' !== $config['items']['type']) {
+            return null;
+        }
+
+        return $config['items'];
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws Exception
+     */
+    public static function flattenDefinitionType(string $definitionType, array $definitions, string $definitionName): array
+    {
+        if (!isset($definitions[$definitionName])) {
+            throw new Exception(sprintf('Unable to found definition name "%s" !', $definitionName));
+        }
+
+        $definition = $definitions[$definitionName];
+
+        if (isset($definition[$definitionType])) {
+            return $definition[$definitionType];
+        }
+
+        if (!isset($definition['allOf'])) {
+            return [];
+        }
+
+        $allOf = $definition['allOf'];
+        $inheritedPropertyName = self::getPhpTypeFromSwaggerDefinitionName($allOf[0]['$ref']);
+
+        $properties = [];
+        if (isset($allOf[1][$definitionType])) {
+            $properties = $allOf[1][$definitionType];
+        }
+
+        $inheritedTypes = self::flattenDefinitionType($definitionType, $definitions, $inheritedPropertyName);
+
+        return array_merge($properties, $inheritedTypes);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function foundNotInheritedProperties(array $definition): array
+    {
+        if (isset($definition['properties'])) {
+            return $definition['properties'];
+        }
+
+        if (!isset($definition['allOf'])) {
+            return [];
+        }
+
+        $allOf = $definition['allOf'];
+        if (!isset($allOf[1]['properties'])) {
+            return [];
+        }
+
+        return $allOf[1]['properties'];
     }
 }
