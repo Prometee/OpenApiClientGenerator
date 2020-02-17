@@ -25,7 +25,7 @@ interface ArrayViewInterface extends ViewInterface
      * @param string|int $key
      * @param ViewInterface|string $item
      *
-     * @return string
+     * @return string|null
      */
-    public function buildArrayItem($key, $item): string;
+    public function buildArrayItem($key, $item): ?string;
 }

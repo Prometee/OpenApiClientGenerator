@@ -36,7 +36,7 @@ abstract class AbstractArrayView extends AbstractView implements ArrayViewInterf
     /**
      * {@inheritDoc}
      */
-    public function buildArrayItem($key, $item): string
+    public function buildArrayItem($key, $item): ?string
     {
         if ($item instanceof GeneratorInterface) {
             return $item->generate($this->indent, $this->eol);
