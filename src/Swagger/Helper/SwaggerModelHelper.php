@@ -69,14 +69,14 @@ class SwaggerModelHelper extends AbstractHelper implements SwaggerModelHelperInt
         }
 
         $allOf = $definition['allOf'];
-        $inheritedPropertyName = self::getPhpTypeFromSwaggerDefinitionName($allOf[0]['$ref']);
+        $inheritedPropertyName = static::getPhpTypeFromSwaggerDefinitionName($allOf[0]['$ref']);
 
         $properties = [];
         if (isset($allOf[1][$definitionType])) {
             $properties = $allOf[1][$definitionType];
         }
 
-        $inheritedTypes = self::flattenDefinitionType($definitionType, $definitions, $inheritedPropertyName);
+        $inheritedTypes = static::flattenDefinitionType($definitionType, $definitions, $inheritedPropertyName);
 
         return array_merge($properties, $inheritedTypes);
     }

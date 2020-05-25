@@ -20,7 +20,11 @@ interface SwaggerOperationsHelperInterface extends HelperInterface
      *
      * @return string
      */
-    public static function getOperationMethodName(string $path, string $operation, array $operationConfiguration): string;
+    public static function getOperationMethodName(
+        string $path,
+        string $operation,
+        array $operationConfiguration
+    ): string;
 
     /**
      * @param array $responseConfiguration

@@ -31,7 +31,11 @@ class SwaggerOperationsHelper extends AbstractHelper implements SwaggerOperation
     /**
      * {@inheritdoc}
      */
-    public static function getOperationMethodName(string $path, string $operation, array $operationConfiguration): string
+    public static function getOperationMethodName(
+        string $path,
+        string $operation,
+        array $operationConfiguration
+    ): string
     {
         if (isset($operationConfiguration['operationId'])) {
             $operationName = $operationConfiguration['operationId'];
@@ -40,7 +44,7 @@ class SwaggerOperationsHelper extends AbstractHelper implements SwaggerOperation
             $operationName = strtolower($operation) . ($hasPathParameters ? 'Item' : 'Collection');
         }
 
-        $operationName = self::camelize($operationName);
+        $operationName = static::camelize($operationName);
         $operationName = lcfirst($operationName);
         return $operationName;
     }
