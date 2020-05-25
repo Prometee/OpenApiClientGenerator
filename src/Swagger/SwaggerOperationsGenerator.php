@@ -205,13 +205,14 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
             return;
         }
 
-        $returnType = $this->processOperationReturnType($operationConfiguration);
-
         $operationMethodGenerator = $this->methodFactory->createOperationMethodGenerator(
             $classGenerator->getUsesGenerator()
         );
+
         $operationMethodName = $this->helper::getOperationMethodName($path, $operation, $operationConfiguration);
         $operationMethodGenerator->setName($operationMethodName);
+
+        $returnType = $this->processOperationReturnType($operationConfiguration);
         $operationMethodGenerator->addReturnType($returnType);
 
         if (isset($operationConfiguration['description'])) {
@@ -363,7 +364,8 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
         $classParts = explode('/', $classPath);
         $className = array_pop($classParts);
         $namespace = implode('\\', $classParts);
-        $namespace = $this->namespace . ($namespace === '' ? '' : $namespace);
+        $namespace = ($namespace === '' ? '' : '\\'.$namespace);
+        $namespace = $this->namespace . $namespace;
 
         return [
             $namespace,
@@ -376,13 +378,18 @@ class SwaggerOperationsGenerator implements SwaggerOperationsGeneratorInterface
      */
     public function getPhpNameFromType(string $type): string
     {
+        $class = $type;
         if (preg_match('$^#/definitions/$', $type)) {
             $className = preg_replace('$#/definitions/$', '', $type);
             $className = $this->helper::camelize($className);
-            return '\\' . $this->modelNamespace . '\\' . $className;
+            $class = '\\' . $this->modelNamespace . '\\' . $className;
         }
 
-        return $type;
+        if (preg_match('#\[]$#', $type) && $class !== $type) {
+            $class .= "[]";
+        }
+
+        return $class;
     }
 
     /**
