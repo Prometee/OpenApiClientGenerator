@@ -1,6 +1,6 @@
 {
     "name": "prometee/openapi-client-generator",
-    "description": "Swagger PHP7 client generator",
+    "description": "Open API PHP8 skeleton client generator",
     "type": "library",
     "license": "MIT",
     "authors": [
