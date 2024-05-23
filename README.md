@@ -90,9 +90,9 @@ $phpGenerator->generate();
 
 [ico-version]: https://img.shields.io/packagist/v/Prometee/openapi-client-generator.svg?style=flat-square
 [ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
-[ico-github-actions]: https://github.com/Prometee/openapi-client-generator/workflows/Build/badge.svg
+[ico-github-actions]: https://github.com/Prometee/OpenApiClientGenerator/workflows/Build/badge.svg
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/Prometee/openapi-client-generator.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/Prometee/openapi-client-generator
-[link-github-actions]: https://github.com/Prometee/openapi-client-generator/actions?query=workflow%3A"Build"
+[link-github-actions]: https://github.com/Prometee/OpenApiClientGenerator/actions?query=workflow%3A"Build"
 [link-code-quality]: https://scrutinizer-ci.com/g/Prometee/openapi-client-generator
