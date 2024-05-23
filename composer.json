@@ -1,5 +1,5 @@
 {
-    "name": "prometee/swagger-client-generator",
+    "name": "prometee/openapi-client-generator",
     "description": "Swagger PHP7 client generator",
     "type": "library",
     "license": "MIT",
@@ -12,10 +12,14 @@
     "require": {
         "ext-iconv": "*",
         "ext-json": "*",
-        "php": "^7.3"
+        "php": "^8.1",
+        "prometee/php-class-generator": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9"
+        "phpunit/phpunit": "^10",
+        "rector/rector": "^1.1",
+        "symplify/easy-coding-standard": "^12.1",
+        "phpstan/phpstan": "^1.11"
     },
     "autoload": {
         "psr-4": { "Prometee\\SwaggerClientGenerator\\": "src/" }
@@ -25,7 +29,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "2.0-dev"
         }
     }
 }

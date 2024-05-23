@@ -1,3 +1,4 @@
-/vendor/
-/composer.lock
 /etc
+/composer.lock
+/phpstan.neon
+/vendor/
